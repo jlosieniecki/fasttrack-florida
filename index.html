@@ -1,58 +1,123 @@
-// 1. Your Question Bank (FAST Style)
-const quizData = [
-    {
-        question: "A rectangular Florida garden is 8 feet long and 5 feet wide. What is the AREA?",
-        options: ["13 sq ft", "40 sq ft", "26 sq ft", "35 sq ft"],
-        correct: 1 // 40 sq ft
-    },
-    {
-        question: "Which expression is equal to 6 x 4?",
-        options: ["6 + 4", "4 + 4 + 4 + 4", "6 + 6 + 6 + 6", "6 x 6 x 6 x 6"],
-        correct: 2 // 6+6+6+6
-    },
-    {
-        question: "Solve: 144 ÷ 12",
-        options: ["10", "11", "12", "14"],
-        correct: 2 // 12
-    }
-];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastTrack Florida: Grade 3</title>
+    <style>
+        body { font-family: 'Arial Rounded MT Bold', sans-serif; text-align: center; background: #E0F7FA; color: #004D40; padding: 10px; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); max-width: 450px; margin: 20px auto; }
+        .btn { background: #00796B; color: white; padding: 15px 25px; border-radius: 12px; border: none; cursor: pointer; font-size: 1.1em; margin: 10px; width: 80%; transition: 0.3s; display: block; margin-left: auto; margin-right: auto; }
+        .btn:hover { background: #004D40; transform: scale(1.02); }
+        #feedback { font-weight: bold; margin-top: 15px; min-height: 25px; font-size: 1.2em; }
+        .score-bar { font-size: 1.4em; color: #00796B; margin-bottom: 10px; font-weight: bold; }
+        .quest-box { border-top: 2px solid #EEE; pt: 10px; }
+    </style>
+</head>
+<body>
 
-let currentQuestion = 0;
-let score = 0;
+    <h1>🐊 FastTrack Grade 3</h1>
+    <div class="score-bar" id="score-display">Score: 0</div>
 
-// 2. Function to Load a Question
-function loadQuestion() {
-    const q = quizData[currentQuestion];
-    document.getElementById('question-text').innerText = q.question;
-    
-    const optionsContainer = document.getElementById('options-container');
-    optionsContainer.innerHTML = ''; // Clear old buttons
+    <div class="card" id="quiz-box">
+        <h3 id="question-text">Loading your first challenge...</h3>
+        
+        <div id="options-container" class="quest-box">
+            </div>
+        
+        <div id="feedback"></div>
+    </div>
 
-    q.options.forEach((opt, index) => {
-        const btn = document.createElement('button');
-        btn.innerText = opt;
-        btn.className = 'btn';
-        btn.onclick = () => checkAnswer(index);
-        optionsContainer.appendChild(btn);
-    });
-}
+    <script>
+        // GRADE 3 FLORIDA B.E.S.T. STANDARDS QUESTION BANK
+        const quizData = [
+            {
+                // MA.3.NSO.1.1: Expanded Form
+                question: "What is the expanded form of 2,530?",
+                options: ["200 + 50 + 3", "2,000 + 500 + 30", "2,000 + 50 + 3", "200 + 500 + 30"],
+                correct: 1
+            },
+            {
+                // MA.3.NSO.1.4: Rounding
+                question: "Round 775 to the nearest 10.",
+                options: ["700", "770", "780", "800"],
+                correct: 2
+            },
+            {
+                // MA.3.NSO.2.3: Multiples of 10
+                question: "What is the product of 6 and 70?",
+                options: ["42", "420", "670", "130"],
+                correct: 1
+            },
+            {
+                // MA.3.FR.1.1: Unit Fractions
+                question: "If a pie is cut into 4 equal parts, what is the name of 1 part?",
+                options: ["One-half", "One-third", "One-fourth", "Four-ones"],
+                correct: 2
+            },
+            {
+                // MA.3.GR.2.2: Area
+                question: "A rectangle is 8 units long and 5 units wide. What is the area?",
+                options: ["13 sq units", "26 sq units", "40 sq units", "35 sq units"],
+                correct: 2
+            }
+        ];
 
-// 3. Function to Check Answer
-function checkAnswer(index) {
-    if (index === quizData[currentQuestion].correct) {
-        score++;
-        alert("Correct! 🐊 You're a Florida Math Star!");
-    } else {
-        alert("Not quite! Try the next one.");
-    }
+        let currentQuestion = 0;
+        let score = 0;
 
-    currentQuestion++;
-    if (currentQuestion < quizData.length) {
-        loadQuestion();
-    } else {
-        document.body.innerHTML = `<h1>Finish! ☀️</h1><p>Your Score: ${score}/${quizData.length}</p><button class="btn" onclick="location.reload()">Try Again</button>`;
-    }
-}
+        function loadQuestion() {
+            const q = quizData[currentQuestion];
+            document.getElementById('question-text').innerText = q.question;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = ''; 
+            document.getElementById('feedback').innerText = '';
 
-// Start the game
-window.onload = loadQuestion;
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.innerText = opt;
+                btn.className = 'btn';
+                btn.onclick = () => checkAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(index) {
+            const feedback = document.getElementById('feedback');
+            if (index === quizData[currentQuestion].correct) {
+                score++;
+                feedback.innerText = "Correct! 🐊";
+                feedback.style.color = "#4CAF50";
+            } else {
+                feedback.innerText = "Keep practicing! ☀️";
+                feedback.style.color = "#f44336";
+            }
+
+            document.getElementById('score-display').innerText = `Score: ${score}`;
+
+            // Wait 1.5 seconds so they can see the feedback, then move to next question
+            currentQuestion++;
+            setTimeout(() => {
+                if (currentQuestion < quizData.length) {
+                    loadQuestion();
+                } else {
+                    showFinalResults();
+                }
+            }, 1200);
+        }
+
+        function showFinalResults() {
+            document.getElementById('quiz-box').innerHTML = `
+                <h2>Quest Complete! ☀️</h2>
+                <p>Final Score: ${score} out of ${quizData.length}</p>
+                <button class="btn" onclick="location.reload()">Start New Quest</button>
+            `;
+        }
+
+        // Start the game when the page loads
+        window.onload = loadQuestion;
+    </script>
+
+</body>
+</html>
