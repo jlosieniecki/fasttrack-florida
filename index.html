@@ -1,37 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida</title>
-    <link rel="manifest" href="manifest.json">
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #E0F7FA; color: #004D40; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin: 20px auto; max-width: 400px; }
-        .btn { background: #00796B; color: white; padding: 15px 30px; border-radius: 25px; text-decoration: none; display: inline-block; font-weight: bold; margin: 10px; border: none; cursor: pointer; }
-        .premium-btn { background: #FF8C00; }
-    </style>
-</head>
-<body>
-    <h1>FastTrack Florida ☀️</h1>
-    <div class="card">
-        <h3>Welcome, Explorer!</h3>
-        <p>Ready to master the FAST exam?</p>
-        <button class="btn" onclick="alert('Math Quest Loading...')">Free Math Quest</button>
-        <button class="btn premium-btn" onclick="alert('Ask a parent to unlock Miami Levels!')">Unlock All Cities</button>
-    </div>
+// 1. Your Question Bank (FAST Style)
+const quizData = [
+    {
+        question: "A rectangular Florida garden is 8 feet long and 5 feet wide. What is the AREA?",
+        options: ["13 sq ft", "40 sq ft", "26 sq ft", "35 sq ft"],
+        correct: 1 // 40 sq ft
+    },
+    {
+        question: "Which expression is equal to 6 x 4?",
+        options: ["6 + 4", "4 + 4 + 4 + 4", "6 + 6 + 6 + 6", "6 x 6 x 6 x 6"],
+        correct: 2 // 6+6+6+6
+    },
+    {
+        question: "Solve: 144 ÷ 12",
+        options: ["10", "11", "12", "14"],
+        correct: 2 // 12
+    }
+];
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
-        
-        // Auto-unlock logic if returning from payment
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('status') === 'success') {
-            localStorage.setItem('fasttrack_unlocked', 'true');
-            alert("Success! All Florida cities are now unlocked.");
-        }
-    </script>
-</body>
-</html>
+let currentQuestion = 0;
+let score = 0;
+
+// 2. Function to Load a Question
+function loadQuestion() {
+    const q = quizData[currentQuestion];
+    document.getElementById('question-text').innerText = q.question;
+    
+    const optionsContainer = document.getElementById('options-container');
+    optionsContainer.innerHTML = ''; // Clear old buttons
+
+    q.options.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.innerText = opt;
+        btn.className = 'btn';
+        btn.onclick = () => checkAnswer(index);
+        optionsContainer.appendChild(btn);
+    });
+}
+
+// 3. Function to Check Answer
+function checkAnswer(index) {
+    if (index === quizData[currentQuestion].correct) {
+        score++;
+        alert("Correct! 🐊 You're a Florida Math Star!");
+    } else {
+        alert("Not quite! Try the next one.");
+    }
+
+    currentQuestion++;
+    if (currentQuestion < quizData.length) {
+        loadQuestion();
+    } else {
+        document.body.innerHTML = `<h1>Finish! ☀️</h1><p>Your Score: ${score}/${quizData.length}</p><button class="btn" onclick="location.reload()">Try Again</button>`;
+    }
+}
+
+// Start the game
+window.onload = loadQuestion;
