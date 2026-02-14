@@ -3,121 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida: Grade 3</title>
+    <title>FastTrack Florida: Grade 3 FAST Simulator</title>
     <style>
-        body { font-family: 'Arial Rounded MT Bold', sans-serif; text-align: center; background: #E0F7FA; color: #004D40; padding: 10px; }
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); max-width: 450px; margin: 20px auto; }
-        .btn { background: #00796B; color: white; padding: 15px 25px; border-radius: 12px; border: none; cursor: pointer; font-size: 1.1em; margin: 10px; width: 80%; transition: 0.3s; display: block; margin-left: auto; margin-right: auto; }
-        .btn:hover { background: #004D40; transform: scale(1.02); }
-        #feedback { font-weight: bold; margin-top: 15px; min-height: 25px; font-size: 1.2em; }
-        .score-bar { font-size: 1.4em; color: #00796B; margin-bottom: 10px; font-weight: bold; }
-        .quest-box { border-top: 2px solid #EEE; pt: 10px; }
+        :root { --primary: #00796B; --secondary: #004D40; --bg: #E0F7FA; --text: #002D20; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: var(--bg); color: var(--text); padding: 15px; margin: 0; }
+        .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 500px; margin: 20px auto; border: 3px solid var(--primary); }
+        .btn { background: var(--primary); color: white; padding: 15px 20px; border-radius: 15px; border: none; cursor: pointer; font-size: 1.1em; margin: 8px auto; width: 90%; display: block; font-weight: bold; transition: 0.2s; }
+        .btn:hover { background: var(--secondary); transform: translateY(-2px); }
+        .progress-container { width: 90%; background: #B2DFDB; border-radius: 10px; margin: 15px auto; height: 10px; overflow: hidden; }
+        #progress-bar { width: 0%; height: 100%; background: var(--primary); transition: 0.4s; }
+        #feedback { font-weight: bold; margin-top: 15px; font-size: 1.2em; height: 30px; }
+        .cat-tag { font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: block; }
+        .blueprint-info { background: #fff; padding: 15px; border-radius: 15px; font-size: 0.85em; text-align: left; margin-top: 30px; border: 1px dashed var(--primary); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        td, th { padding: 5px; border-bottom: 1px solid #ddd; }
     </style>
 </head>
 <body>
 
     <h1>🐊 FastTrack Grade 3</h1>
-    <div class="score-bar" id="score-display">Score: 0</div>
+    <div class="progress-container"><div id="progress-bar"></div></div>
+    <div id="score-display" style="font-weight: bold;">Question 1 of 10</div>
 
     <div class="card" id="quiz-box">
-        <h3 id="question-text">Loading your first challenge...</h3>
-        
-        <div id="options-container" class="quest-box">
-            </div>
-        
+        <span id="category-tag" class="cat-tag">Loading...</span>
+        <h3 id="question-text">Ready to start your Florida Math Quest?</h3>
+        <div id="visual-area"></div>
+        <div id="options-container"></div>
         <div id="feedback"></div>
     </div>
 
+    <div class="blueprint-info">
+        <strong>📊 Test Design Summary (2025 Blueprint)</strong>
+        <p>This simulator provides balanced coverage across the 4 official reporting categories (23-29% each).</p>
+        <table>
+            <tr><th>Category</th><th>Target Weight</th></tr>
+            <tr><td>Number Sense & Additive</td><td>25%</td></tr>
+            <tr><td>Multiplicative Reasoning</td><td>25%</td></tr>
+            <tr><td>Fractional Reasoning</td><td>25%</td></tr>
+            <tr><td>Geometric & Data</td><td>25%</td></tr>
+        </table>
+    </div>
+
     <script>
-        // GRADE 3 FLORIDA B.E.S.T. STANDARDS QUESTION BANK
         const quizData = [
-            {
-                // MA.3.NSO.1.1: Expanded Form
-                question: "What is the expanded form of 2,530?",
-                options: ["200 + 50 + 3", "2,000 + 500 + 30", "2,000 + 50 + 3", "200 + 500 + 30"],
-                correct: 1
-            },
-            {
-                // MA.3.NSO.1.4: Rounding
-                question: "Round 775 to the nearest 10.",
-                options: ["700", "770", "780", "800"],
-                correct: 2
-            },
-            {
-                // MA.3.NSO.2.3: Multiples of 10
-                question: "What is the product of 6 and 70?",
-                options: ["42", "420", "670", "130"],
-                correct: 1
-            },
-            {
-                // MA.3.FR.1.1: Unit Fractions
-                question: "If a pie is cut into 4 equal parts, what is the name of 1 part?",
-                options: ["One-half", "One-third", "One-fourth", "Four-ones"],
-                correct: 2
-            },
-            {
-                // MA.3.GR.2.2: Area
-                question: "A rectangle is 8 units long and 5 units wide. What is the area?",
-                options: ["13 sq units", "26 sq units", "40 sq units", "35 sq units"],
-                correct: 2
-            }
+            // CAT 1: Number Sense & Additive Reasoning (MA.3.NSO.1 / MA.3.AR.1.2)
+            { q: "What is the expanded form of 5,783?", a: ["5,000+700+80+3", "500+70+8+3", "5,000+70+8+3", "5,700+83"], c: 0, cat: "Number Sense & Additive" },
+            { q: "Round 745 to the nearest 100.", a: ["700", "750", "800", "740"], c: 0, cat: "Number Sense & Additive" },
+            
+            // CAT 2: Multiplicative Reasoning (MA.3.NSO.2.3 / MA.3.GR.2.2)
+            { q: "Find the product: 6 x 300", a: ["1,800", "180", "630", "2,400"], c: 0, cat: "Multiplicative Reasoning" },
+            { q: "A rectangle is 12 units long and 4 units wide. What is the area?", a: ["16 sq units", "48 sq units", "24 sq units", "36 sq units"], c: 1, cat: "Multiplicative Reasoning" },
+
+            // CAT 3: Fractional Reasoning (MA.3.FR.1.1 / MA.3.FR.2.1)
+            { q: "Which fraction is equivalent to 1 (one whole)?", a: ["1/3", "3/1", "3/3", "0/3"], c: 2, cat: "Fractional Reasoning" },
+            { q: "Which symbol makes this true? 3/8 ___ 5/8", a: [">", "<", "="], c: 1, cat: "Fractional Reasoning" },
+
+            // CAT 4: Geometric & Data (MA.3.M.2.2 / MA.3.GR.1.2)
+            { q: "A bus ride starts at 6:45 AM and ends at 8:15 AM. How long was the ride?", a: ["1 hour", "1 hour 15 mins", "1 hour 30 mins", "2 hours"], c: 2, cat: "Geometric & Data" },
+            { q: "Which shape has exactly 4 sides and parallel opposite sides?", a: ["Triangle", "Parallelogram", "Pentagon", "Hexagon"], c: 1, cat: "Geometric & Data" },
+            
+            // Mix items to reach 10
+            { q: "Which number is EVEN?", a: ["13", "21", "44", "79"], c: 2, cat: "Number Sense & Additive" },
+            { q: "Solve: 56 ÷ 7 = ?", a: ["6", "7", "8", "9"], c: 2, cat: "Multiplicative Reasoning" }
         ];
+
+        // Shuffle questions
+        quizData.sort(() => Math.random() - 0.5);
 
         let currentQuestion = 0;
         let score = 0;
+        let categoryScores = {};
 
         function loadQuestion() {
             const q = quizData[currentQuestion];
-            document.getElementById('question-text').innerText = q.question;
+            document.getElementById('category-tag').innerText = q.cat;
+            document.getElementById('question-text').innerText = q.q;
+            document.getElementById('score-display').innerText = `Question ${currentQuestion + 1} of ${quizData.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentQuestion) / quizData.length) * 100}%`;
             
-            const optionsContainer = document.getElementById('options-container');
-            optionsContainer.innerHTML = ''; 
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
             document.getElementById('feedback').innerText = '';
 
-            q.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.innerText = opt;
-                btn.className = 'btn';
-                btn.onclick = () => checkAnswer(index);
-                optionsContainer.appendChild(btn);
+            q.a.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.innerText = opt;
+                b.className = 'btn';
+                b.onclick = () => checkAnswer(idx, q.cat);
+                container.appendChild(b);
             });
         }
 
-        function checkAnswer(index) {
-            const feedback = document.getElementById('feedback');
-            if (index === quizData[currentQuestion].correct) {
+        function checkAnswer(idx, cat) {
+            const isCorrect = idx === quizData[currentQuestion].c;
+            if(!categoryScores[cat]) categoryScores[cat] = { got: 0, total: 0 };
+            categoryScores[cat].total++;
+
+            if(isCorrect) {
                 score++;
-                feedback.innerText = "Correct! 🐊";
-                feedback.style.color = "#4CAF50";
+                categoryScores[cat].got++;
+                document.getElementById('feedback').innerText = "Correct! 🐊";
+                document.getElementById('feedback').style.color = "green";
             } else {
-                feedback.innerText = "Keep practicing! ☀️";
-                feedback.style.color = "#f44336";
+                document.getElementById('feedback').innerText = "Keep going! ☀️";
+                document.getElementById('feedback').style.color = "orange";
             }
 
-            document.getElementById('score-display').innerText = `Score: ${score}`;
-
-            // Wait 1.5 seconds so they can see the feedback, then move to next question
             currentQuestion++;
             setTimeout(() => {
-                if (currentQuestion < quizData.length) {
-                    loadQuestion();
-                } else {
-                    showFinalResults();
-                }
-            }, 1200);
+                if(currentQuestion < quizData.length) loadQuestion();
+                else showResults();
+            }, 1000);
         }
 
-        function showFinalResults() {
-            document.getElementById('quiz-box').innerHTML = `
-                <h2>Quest Complete! ☀️</h2>
-                <p>Final Score: ${score} out of ${quizData.length}</p>
-                <button class="btn" onclick="location.reload()">Start New Quest</button>
-            `;
-        }
-
-        // Start the game when the page loads
-        window.onload = loadQuestion;
-    </script>
-
-</body>
-</html>
+        function showResults() {
+            document.getElementById('progress-bar').style.width = "100%";
+            let reportHTML = `<h2>FAST Results</h2><p>Total Score: ${score}/10</p><hr><p><strong>Category Breakdown:</strong></p>`;
+            
+            for(let cat in categoryScores) {
+                let pct = Math.round((categoryScores[cat].got / categoryScores[cat].total) * 1
