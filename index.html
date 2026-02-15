@@ -1,71 +1,102 @@
-<!DOCTYPE html>
+                <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FAST Grade 3 Math Portal</title>
     <style>
         :root { --header: #2C3E50; --bg: #EAEAEA; --active: #3498DB; --text: #333; --panel-bg: #fff; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* LAYOUT FIXES FOR MOBILE */
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: var(--bg); 
+            margin: 0; 
+            height: 100dvh; /* Dynamic Height fixes "hidden button" issue */
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
 
         /* --- SCREENS --- */
         .screen { display: none; height: 100%; width: 100%; flex-direction: column; }
         .screen.active { display: flex; }
 
-        /* --- LOGIN / MENU SCREEN --- */
+        /* --- MENU --- */
         .menu-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, #2C3E50, #4CA1AF); color: white; padding: 20px; box-sizing: border-box; }
-        .menu-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; color: #333; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
-        .menu-btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: 0.2s; background: #f9f9f9; text-align: left; position: relative; }
-        .menu-btn:hover { background: #e3f2fd; border-color: var(--active); transform: translateX(5px); }
-        .menu-btn strong { display: block; color: var(--header); }
-        .menu-btn small { color: #666; font-size: 0.85em; }
+        .menu-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; color: #333; width: 100%; max-width: 450px; max-height: 90vh; overflow-y: auto; }
+        .menu-btn { display: block; width: 100%; padding: 15px; margin: 8px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 1em; cursor: pointer; transition: 0.2s; background: #f9f9f9; text-align: left; }
+        .menu-btn:hover { background: #e3f2fd; border-color: var(--active); }
 
-        /* --- TEST INTERFACE (Cambium Style) --- */
-        .top-bar { background: var(--header); color: white; padding: 0 20px; height: 60px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .tool-btn { background: transparent; border: 1px solid #7F8C8D; color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-left: 5px; font-size: 0.9em; }
-        .tool-btn:hover { background: rgba(255,255,255,0.1); }
+        /* --- TEST HEADER --- */
+        .top-bar { background: var(--header); color: white; padding: 0 15px; height: 50px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; font-size: 0.9em; }
+        .tool-btn { background: transparent; border: 1px solid #7F8C8D; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-left: 5px; font-size: 0.85em; }
 
-        .main-stage { flex: 1; padding: 15px; overflow: hidden; display: flex; gap: 15px; height: 100%; }
-        .pane { background: white; border-radius: 4px; padding: 25px; overflow-y: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 100%; box-sizing: border-box; }
+        /* --- MAIN STAGE (The Scrollable Part) --- */
+        .main-stage { 
+            flex: 1; 
+            padding: 10px; 
+            overflow: hidden; 
+            display: flex; 
+            gap: 10px; 
+            height: 100%; 
+            position: relative;
+        }
+
+        /* PANES (Split Screen Logic) */
+        .pane { background: white; border-radius: 4px; padding: 20px; overflow-y: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 100%; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
         .left-pane { width: 45%; border-right: 4px solid #ddd; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #FAFAFA; padding: 10px; }
         .right-pane { width: 55%; display: flex; flex-direction: column; }
-        .full-pane { width: 100%; }
+        
+        /* MOBILE OVERRIDE: Stack panes vertically on small screens */
+        @media (max-width: 768px) {
+            .main-stage { flex-direction: column; padding: 5px; }
+            .left-pane { width: 100%; height: 35%; border-right: none; border-bottom: 4px solid #ddd; }
+            .right-pane { width: 100%; height: 65%; }
+            .pane { padding: 15px; }
+            svg { max-height: 150px; } /* Shrink images on mobile */
+        }
 
-        /* GRAPHICS FIXES */
-        svg { width: 100%; height: auto; max-height: 300px; display: block; margin: 0 auto; }
-        .key-box { border: 2px solid #333; padding: 15px; background: white; border-radius: 8px; font-size: 1em; width: 90%; }
+        /* GRAPHICS */
+        svg { width: 100%; height: auto; max-height: 280px; display: block; margin: 0 auto; }
+        .key-box { border: 2px solid #333; padding: 10px; background: white; border-radius: 8px; font-size: 0.9em; width: 95%; }
 
         /* QUESTIONS */
-        .q-header { color: #555; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; font-size: 1.1em; }
-        .q-text { font-size: 1.25em; line-height: 1.5; color: #222; margin-bottom: 20px; flex-shrink: 0; }
+        .q-header { color: #555; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 8px; font-size: 1em; }
+        .q-text { font-size: 1.15em; line-height: 1.4; color: #222; margin-bottom: 15px; flex-shrink: 0; }
         
-        .opt-container { overflow-y: auto; flex: 1; }
-        .opt-row { display: flex; padding: 15px; margin-bottom: 10px; cursor: pointer; border: 1px solid transparent; border-radius: 6px; transition: 0.1s; align-items: center; background: #f8f8f8; }
-        .opt-row:hover { background: #eee; border-color: #bbb; }
+        .opt-container { overflow-y: auto; flex: 1; padding-bottom: 10px; } /* Extra padding for scrolling */
+        .opt-row { display: flex; padding: 12px; margin-bottom: 8px; cursor: pointer; border: 1px solid #eee; border-radius: 6px; align-items: center; background: #f8f8f8; }
         .opt-row.selected { background: #EBF5FB; border-color: var(--active); font-weight: bold; border-width: 2px; }
-        .bubble { width: 24px; height: 24px; border: 2px solid #7f8c8d; border-radius: 50%; margin-right: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: white; }
+        .bubble { width: 22px; height: 22px; border: 2px solid #7f8c8d; border-radius: 50%; margin-right: 12px; flex-shrink: 0; background: white; }
         .opt-row.selected .bubble { background: var(--active); border-color: var(--active); }
         .bubble.square { border-radius: 4px; }
 
-        .input-box { font-size: 1.4em; padding: 10px; width: 120px; text-align: center; border: 2px solid #ccc; border-radius: 6px; }
-        .input-box:focus { border-color: var(--active); outline: none; }
-        
-        /* FOOTER */
-        .nav-bar { background: white; border-top: 1px solid #ccc; height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; flex-shrink: 0; }
-        .nav-btn { background: var(--active); color: white; border: none; padding: 12px 30px; border-radius: 4px; font-size: 1.1em; font-weight: bold; cursor: pointer; box-shadow: 0 3px 0 #2070a0; }
+        .input-box { font-size: 1.3em; padding: 8px; width: 100px; text-align: center; border: 2px solid #ccc; border-radius: 6px; }
+
+        /* --- FOOTER (Fixed to Bottom) --- */
+        .nav-bar { 
+            background: white; 
+            border-top: 1px solid #ccc; 
+            height: 60px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0 15px; 
+            flex-shrink: 0; 
+            z-index: 100;
+        }
+        .nav-btn { background: var(--active); color: white; border: none; padding: 10px 20px; border-radius: 4px; font-size: 1em; font-weight: bold; cursor: pointer; box-shadow: 0 3px 0 #2070a0; min-width: 80px; }
         .nav-btn:active { transform: translateY(2px); box-shadow: none; }
 
         /* REPORT CARD */
-        .report-header { text-align: center; margin-bottom: 20px; }
         .score-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: bold; color: white; margin: 10px; font-size: 1.2em; }
         .level-5 { background: #009688; } .level-4 { background: #4CAF50; }
         .level-3 { background: #FFC107; color: #333; } .level-2 { background: #FF9800; } .level-1 { background: #F44336; }
         
-        .strength-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; max-height: 400px; overflow-y: auto; }
-        .strength-box { padding: 15px; border-radius: 8px; background: #f9f9f9; border-left: 6px solid #ccc; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .strength-grid { display: grid; grid-template-columns: 1fr; gap: 10px; text-align: left; max-height: 400px; overflow-y: auto; }
+        .strength-box { padding: 12px; border-radius: 8px; background: #f9f9f9; border-left: 6px solid #ccc; font-size: 0.9em; }
         .good { border-color: #4CAF50; } .bad { border-color: #F44336; }
-        .strength-box h3 { margin: 0 0 5px 0; font-size: 1em; color: #444; }
-
     </style>
 </head>
 <body>
@@ -73,9 +104,9 @@
     <div id="screen-menu" class="screen active">
         <div class="menu-container">
             <div class="menu-card">
-                <img src="Gemini_Generated_Image_t8043ht8043ht804.png" style="width:80px; border-radius:10px; margin-bottom:15px;" alt="Gator Logo">
-                <h2 style="margin-top:0;">FAST Math Portal</h2>
-                <p style="color:#666; margin-bottom:20px;">Select a Practice Mode:</p>
+                <img src="Gemini_Generated_Image_t8043ht8043ht804.png" style="width:70px; border-radius:10px; margin-bottom:15px;" alt="Gator Logo">
+                <h2 style="margin:0 0 10px 0;">FAST Math Portal</h2>
+                <p style="color:#666; margin-bottom:15px; font-size:0.9em;">Select a Practice Mode:</p>
                 
                 <button class="menu-btn" onclick="startTest('ALL')">
                     <strong>🚀 Full FAST Mock Test</strong>
@@ -106,7 +137,6 @@
             <div><strong>G3 Math</strong> | <span id="mode-label">Full Test</span></div>
             <div>
                 <button class="tool-btn" onclick="toggleZoom()">🔍 Zoom</button>
-                <button class="tool-btn" onclick="alert('Reference Sheet:\n\n1 ft = 12 in\n1 yd = 3 ft\n1 min = 60 sec')">📄 Formulas</button>
                 <button class="tool-btn" style="background:#C0392B; border-color:#C0392B" onclick="location.reload()">Exit</button>
             </div>
         </div>
@@ -115,14 +145,14 @@
 
         <div class="nav-bar">
             <button class="nav-btn" style="background:white; color:#333; border:2px solid #ccc; box-shadow:none;" onclick="prevQ()">Back</button>
-            <div style="font-weight:bold; color:#555;">Question <span id="q-idx">1</span> of <span id="q-total">10</span></div>
-            <button class="nav-btn" onclick="nextQ()">Next</button>
+            <div style="font-weight:bold; color:#555; font-size:0.9em;">Q <span id="q-idx">1</span> of <span id="q-total">10</span></div>
+            <button id="btn-next" class="nav-btn" onclick="nextQ()">Next</button>
         </div>
     </div>
 
     <div id="screen-report" class="screen">
         <div class="menu-container" style="background: #f4f4f4; color: #333;">
-            <div class="menu-card" style="width: 700px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+            <div class="menu-card" style="width: 100%; max-width: 600px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
                 <div class="report-header">
                     <h1 style="margin:0;">Assessment Report</h1>
                     <div id="final-level" class="score-badge level-3">Level 3</div>
@@ -139,13 +169,12 @@
 
     <script>
         // --- DATA ---
-        // I added extra questions so every category has enough content.
         const ALL_QUESTIONS = [
             // FRACTIONS (FR)
             {
                 id: 1, cat: "MA.3.FR.1.1", type: "input", layout: "split",
                 visual: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="white" stroke="#333" stroke-width="2"/><path d="M50,50 L50,5 A45,45 0 0,1 81.8,18.2 Z" fill="#3498DB" stroke="#333"/><line x1="50" y1="5" x2="50" y2="95" stroke="#333"/><line x1="5" y1="50" x2="95" y2="50" stroke="#333"/><line x1="18.2" y1="18.2" x2="81.8" y2="81.8" stroke="#333"/><line x1="18.2" y1="81.8" x2="81.8" y2="18.2" stroke="#333"/></svg>`,
-                text: "<b>Fractions:</b> A circle is divided into 8 equal parts. One part is shaded.<br>Write the fraction that represents the shaded part.",
+                text: "<b>Fractions:</b> A circle is divided into 8 equal parts. One part is shaded. Write the fraction.",
                 ans: "1/8"
             },
             {
@@ -154,8 +183,21 @@
                 opts: ["1/3 > 1/2", "1/4 < 1/8", "1/6 < 1/3", "1/2 = 1/4"],
                 ans: 2
             },
-            
-            // NUMBER SENSE (NSO)
+            // GEOMETRY (Fixed Rectangle)
+            {
+                id: 3, cat: "MA.3.GR.2.3", type: "multi-select", layout: "split",
+                visual: `<svg viewBox="0 0 300 150">
+                    <rect x="50" y="25" width="200" height="100" fill="#EAEAEA" stroke="#333" stroke-width="3"/>
+                    <text x="150" y="20" text-anchor="middle" font-weight="bold" font-size="16">9 units</text>
+                    <text x="150" y="145" text-anchor="middle" font-weight="bold" font-size="16">9 units</text>
+                    <text x="30" y="80" text-anchor="middle" font-weight="bold" font-size="16" transform="rotate(-90,30,80)">4 units</text>
+                    <text x="270" y="80" text-anchor="middle" font-weight="bold" font-size="16" transform="rotate(90,270,80)">4 units</text>
+                </svg>`,
+                text: "<b>Perimeter:</b> Select <b>ALL</b> expressions for the perimeter.",
+                opts: ["9 × 4", "9 + 9 + 4 + 4", "9 + 4", "(9 × 2) + (4 × 2)"],
+                ans: [1, 3]
+            },
+            // NUMBER SENSE
             {
                 id: 2, cat: "MA.3.NSO.1.2", type: "choice", layout: "full",
                 text: "<b>Place Value:</b> What is the expanded form of 7,403?",
@@ -167,46 +209,17 @@
                 text: "<b>Multiplication:</b> Solve: 8 × 7 =",
                 ans: "56"
             },
-
-            // GEOMETRY & MEASUREMENT (GR & M)
-            {
-                id: 3, cat: "MA.3.GR.2.3", type: "multi-select", layout: "split",
-                visual: `<svg viewBox="0 0 300 150">
-                    <rect x="50" y="25" width="200" height="100" fill="#EAEAEA" stroke="#333" stroke-width="3"/>
-                    <text x="150" y="20" text-anchor="middle" font-weight="bold" font-size="16">9 units</text>
-                    <text x="150" y="145" text-anchor="middle" font-weight="bold" font-size="16">9 units</text>
-                    <text x="30" y="80" text-anchor="middle" font-weight="bold" font-size="16" transform="rotate(-90,30,80)">4 units</text>
-                    <text x="270" y="80" text-anchor="middle" font-weight="bold" font-size="16" transform="rotate(90,270,80)">4 units</text>
-                </svg>`,
-                text: "<b>Perimeter:</b> Select <b>ALL</b> expressions that represent the perimeter of this rectangle.",
-                opts: ["9 × 4", "9 + 9 + 4 + 4", "9 + 4", "(9 × 2) + (4 × 2)"],
-                ans: [1, 3]
-            },
-            {
-                id: 301, cat: "MA.3.M.1.1", type: "choice", layout: "full",
-                text: "<b>Measurement:</b> How many centimeters are in 1 meter?",
-                opts: ["10", "100", "1,000", "12"],
-                ans: 1
-            },
-
-            // ALGEBRAIC REASONING (AR)
+            // ALGEBRA
             {
                 id: 4, cat: "MA.3.AR.1.2", type: "input", layout: "full",
-                text: "<b>Word Problem:</b> Jamael works on homework from 3:57 p.m. to 4:32 p.m. How many total minutes did he work?",
+                text: "<b>Word Problem:</b> Jamael works from 3:57 p.m. to 4:32 p.m. Total minutes?",
                 ans: "35"
             },
-            {
-                id: 401, cat: "MA.3.AR.2.3", type: "choice", layout: "full",
-                text: "<b>Logic:</b> Find the missing number: ? ÷ 6 = 7",
-                opts: ["13", "42", "36", "48"],
-                ans: 1
-            },
-
-            // DATA (DP) - Grouped with Geometry/Measurement usually, or its own
+            // DATA
             {
                 id: 5, cat: "MA.3.DP.1.1", type: "input", layout: "split",
                 visual: `<div class="key-box"><b>Key:</b> 📚 = 3 Students<hr><b>Sci-Fi:</b> 📚📚 (6)<br><b>Fantasy:</b> 📚📚📚 (9)</div>`,
-                text: "<b>Data:</b> How many more students liked Fantasy books than Sci-Fi books?",
+                text: "<b>Data:</b> How many more students liked Fantasy than Sci-Fi?",
                 ans: "3"
             }
         ];
@@ -215,32 +228,29 @@
         let curIdx = 0;
         let userAnswers = {};
 
-        // --- NAVIGATION ---
+        // --- NAVIGATION LOGIC ---
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
 
         function startTest(mode) {
-            // FILTER LOGIC
             if(mode === 'ALL') {
                 activeQuestions = [...ALL_QUESTIONS];
                 document.getElementById('mode-label').innerText = "Full Mock Exam";
             } 
             else if (mode === 'MA.3.GR_M') {
-                // Combine Geometry and Measurement
                 activeQuestions = ALL_QUESTIONS.filter(q => q.cat.includes('GR') || q.cat.includes('M.'));
                 document.getElementById('mode-label').innerText = "Geometry & Measurement";
             }
             else {
-                // Strict match for others
                 activeQuestions = ALL_QUESTIONS.filter(q => q.cat.includes(mode));
                 document.getElementById('mode-label').innerText = mode.replace('MA.3.', '') + " Practice";
             }
 
-            if(activeQuestions.length === 0) { alert("Please try another section."); return; }
+            if(activeQuestions.length === 0) { alert("Loading more questions soon!"); return; }
 
-            // Shuffle questions for "Real Test" feel
+            // Shuffle
             activeQuestions.sort(() => Math.random() - 0.5);
 
             curIdx = 0;
@@ -261,6 +271,8 @@
             if(q.layout === "split") {
                 left = `<div class="left-pane">${q.visual}</div>`;
                 rightClass = "right-pane";
+            } else {
+                rightClass = "full-pane";
             }
 
             let interact = "<div class='opt-container'>";
@@ -288,6 +300,11 @@
                 </div>
             `;
             document.getElementById('q-idx').innerText = curIdx + 1;
+            
+            // Update Next Button Text
+            const btn = document.getElementById('btn-next');
+            btn.innerText = (curIdx === activeQuestions.length - 1) ? "Finish" : "Next";
+            btn.style.backgroundColor = (curIdx === activeQuestions.length - 1) ? "#27ae60" : "var(--active)";
         }
 
         // --- ANSWER HANDLING ---
@@ -303,7 +320,7 @@
             if(curIdx < activeQuestions.length - 1) {
                 curIdx++; renderQ();
             } else {
-                if(confirm("Finish Test and see report?")) finishTest();
+                finishTest();
             }
         }
         window.prevQ = () => { if(curIdx > 0) { curIdx--; renderQ(); } }
@@ -311,14 +328,12 @@
         // --- SCORING & REPORTING ---
         function finishTest() {
             let score = 0;
-            // Tracking categories
-            let cats = { "Fractions": {c:0,t:0}, "Number Sense": {c:0,t:0}, "Algebra": {c:0,t:0}, "Geometry": {c:0,t:0}, "Measurement": {c:0,t:0}, "Data": {c:0,t:0} };
+            let breakdown = {}; 
 
             activeQuestions.forEach((q, i) => {
                 let ans = userAnswers[i];
                 let correct = false;
                 
-                // Logic
                 if(q.type === "choice" && ans === q.ans) correct = true;
                 if(q.type === "input" && ans === q.ans) correct = true;
                 if(q.type === "multi-select") {
@@ -331,15 +346,15 @@
                 if(q.cat.includes("NSO")) name = "Number Sense";
                 if(q.cat.includes("AR")) name = "Algebra";
                 if(q.cat.includes("GR")) name = "Geometry";
-                if(q.cat.includes("M.")) name = "Measurement"; // Note the dot to avoid confusion
+                if(q.cat.includes("M.")) name = "Measurement";
                 if(q.cat.includes("DP")) name = "Data";
 
-                if(!cats[name]) cats[name] = {c:0,t:0};
-                cats[name].t++;
-                if(correct) { score++; cats[name].c++; }
+                if(!breakdown[name]) breakdown[name] = {c:0,t:0};
+                breakdown[name].t++;
+                if(correct) { score++; breakdown[name].c++; }
             });
 
-            // Calculate Overall Level
+            // Calculate Level
             let pct = (score / activeQuestions.length) * 100;
             let level = 1; let lvlText = "Level 1"; let lvlClass = "level-1"; let msg = "Intervention Needed";
             if(pct >= 40) { level=2; lvlText="Level 2"; lvlClass="level-2"; msg="Below Satisfactory"; }
@@ -347,38 +362,32 @@
             if(pct >= 80) { level=4; lvlText="Level 4"; lvlClass="level-4"; msg="Proficient"; }
             if(pct === 100) { level=5; lvlText="Level 5"; lvlClass="level-5"; msg="Mastery!"; }
 
-            // Render Report
             document.getElementById('final-level').innerText = lvlText;
             document.getElementById('final-level').className = "score-badge " + lvlClass;
             document.getElementById('final-score-text').innerText = `${msg} (${Math.round(pct)}%)`;
 
             let html = "";
-            for(let key in cats) {
-                if(cats[key].t === 0) continue;
-                let domainPct = (cats[key].c / cats[key].t) * 100;
-                let statusClass = domainPct >= 60 ? "good" : "bad";
-                let statusText = domainPct >= 60 ? "✅ Strength" : "⚠️ Needs Practice";
+            for(let key in breakdown) {
+                let dPct = (breakdown[key].c / breakdown[key].t) * 100;
+                let sClass = dPct >= 60 ? "good" : "bad";
+                let sText = dPct >= 60 ? "✅ Strength" : "⚠️ Needs Practice";
                 
                 html += `
-                <div class="strength-box ${statusClass}">
+                <div class="strength-box ${sClass}">
                     <h3>${key}</h3>
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span>${cats[key].c}/${cats[key].t} Correct</span>
-                        <strong>${statusText}</strong>
+                        <span>${breakdown[key].c}/${breakdown[key].t} Correct</span>
+                        <strong>${sText}</strong>
                     </div>
                 </div>`;
             }
             document.getElementById('breakdown-area').innerHTML = html;
-            
             showScreen('screen-report');
         }
 
-        // TOOL
         let z = 1;
         window.toggleZoom = () => { z = z===1 ? 1.2 : 1; document.body.style.transform = `scale(${z})`; document.body.style.transformOrigin = "top center"; }
-
-        // Start at menu
         showScreen('screen-menu');
     </script>
 </body>
-</html>                   
+</html>
