@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida: Elite Mastery</title>
+    <title>FastTrack Florida: Grade 3 Master</title>
     <style>
         :root { --primary: #00796B; --bg: #f4f7f7; --fast-blue: #2196F3; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
@@ -11,15 +11,15 @@
         .stat-pill { background: white; padding: 8px 15px; border-radius: 20px; border: 2px solid var(--primary); font-weight: bold; font-size: 0.9em; }
         .card { background: white; width: 100%; max-width: 500px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 25px; box-sizing: border-box; border-top: 12px solid var(--primary); }
         .std-tag { color: #888; font-size: 0.75em; font-weight: bold; text-transform: uppercase; }
-        .q-text { font-size: 1.2em; line-height: 1.4; margin: 15px 0; color: #333; }
+        .q-text { font-size: 1.25em; line-height: 1.4; margin: 15px 0; color: #333; }
         .opt-btn { display: block; width: 100%; padding: 16px; margin-bottom: 10px; border: 2px solid #eee; border-radius: 12px; background: white; text-align: left; font-size: 1.1em; cursor: pointer; transition: 0.2s; }
-        .opt-btn.selected { border-color: var(--fast-blue); background: #e3f2fd; font-weight: 600; }
+        .opt-btn.selected { border-color: var(--fast-blue); background: #e3f2fd; font-weight: 600; border-width: 3px; }
         .eq-input { width: 100%; padding: 15px; font-size: 1.6em; border: 2px solid #ccc; border-radius: 12px; text-align: center; margin-bottom: 15px; outline: none; }
         .submit-btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; width: 100%; font-size: 1.1em; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 0 #004D40; }
         #feedback { margin-top: 20px; font-weight: bold; text-align: center; font-size: 1.1em; min-height: 30px; }
         .progress-bar { width: 100%; height: 10px; background: #e0e0e0; border-radius: 5px; margin-top: 20px; overflow: hidden; }
         #fill { height: 100%; background: #4CAF50; width: 0%; transition: 0.6s; }
-        .hint-text { font-size: 0.85em; color: #666; font-style: italic; margin-top: 10px; display: none; background: #fff9c4; padding: 10px; border-radius: 8px; border: 1px dashed #fbc02d; }
+        .hint-box { font-size: 0.85em; color: #555; background: #fffde7; padding: 10px; border-radius: 8px; margin-top: 10px; display: none; border: 1px dashed #fbc02d; }
     </style>
 </head>
 <body>
@@ -32,131 +32,20 @@
     </div>
 
     <div class="card">
-        <span id="std" class="std-tag">READY?</span>
-        <div id="q-area" class="q-text">Click below to start your Florida Math Quest!</div>
+        <span id="std" class="std-tag">Loading Quest...</span>
+        <div id="q-area" class="q-text"></div>
         <div id="interaction-area"></div>
         <button id="submit" class="submit-btn" onclick="checkAnswer()">Submit Answer</button>
-        <div id="hint" class="hint-text"></div>
+        <div id="hint" class="hint-box"></div>
         <div id="feedback"></div>
         <div class="progress-bar"><div id="fill"></div></div>
     </div>
 
     <script>
-        let state = JSON.parse(localStorage.getItem('fasttrack_elite_final')) || { points: 0, level: 1, correct: 0 };
+        let state = JSON.parse(localStorage.getItem('fast_final_vault')) || { points: 0, level: 1, correct: 0 };
         let curQ = {};
 
         const engines = [
-            // 1. ELAPSED TIME (MA.3.M.2.2)
+            // 1. FIXED PLACE VALUE (MA.3.NSO.1.1)
             function() {
-                let startH = Math.floor(Math.random() * 5) + 1;
-                let duration = [15, 30, 45, 60][Math.floor(Math.random() * 4)];
-                let endH = startH + (duration === 60 ? 1 : 0);
-                let endM = (duration === 60 ? "00" : duration);
-                return {
-                    type: "choice", std: "MA.3.M.2.2",
-                    q: `Soccer practice starts at ${startH}:00 PM and lasts for ${duration} minutes. What time does it end?`,
-                    opts: [`${endH}:${endM} PM`, `${startH}:${duration === 60 ? '30' : '10'} PM`, `${startH+2}:00 PM`],
-                    correct: `${endH}:${endM} PM`,
-                    hint: "Think about the clock face. 60 minutes is one full hour!"
-                };
-            },
-            // 2. FRACTION COMPARISON (MA.3.FR.2.1)
-            function() {
-                let d1 = [2, 3, 4, 6, 8][Math.floor(Math.random() * 5)];
-                let d2 = [2, 3, 4, 6, 8].filter(x => x !== d1)[Math.floor(Math.random() * 4)];
-                let bigger = d1 < d2 ? `1/${d1}` : `1/${d2}`;
-                return {
-                    type: "choice", std: "MA.3.FR.2.1",
-                    q: `Which fraction is <b>greater</b>?`,
-                    opts: [`1/${d1}`, `1/${d2}`, "They are equal"],
-                    correct: bigger,
-                    hint: "Imagine a pizza! If you share it with FEWER people, your slice is BIGGER."
-                };
-            },
-            // 3. TWO-STEP WORD PROBLEM (MA.3.AR.1.2) - BOSS LEVEL
-            function() {
-                let bags = Math.floor(Math.random() * 5) + 3;
-                let perBag = 5;
-                let eaten = 4;
-                let total = (bags * perBag) - eaten;
-                return {
-                    type: "input", std: "MA.3.AR.1.2",
-                    q: `Gator has ${bags} bags of oranges. Each bag has ${perBag} oranges. He eats ${eaten} oranges. How many oranges does he have left?`,
-                    correct: total.toString(),
-                    hint: "Step 1: Multiply bags by oranges. Step 2: Subtract what he ate."
-                };
-            },
-            // 4. MULTISELECT PLACE VALUE (MA.3.NSO.1.1)
-            function() {
-                let n = 2450 + Math.floor(Math.random()*10);
-                let opt1 = "2,000 + 400 + 50";
-                let opt2 = "24 hundreds and 50 ones";
-                return {
-                    type: "multi", std: "MA.3.NSO.1.1",
-                    q: `Select <b>ALL</b> that equal ${n}:`,
-                    opts: [opt1, opt2, "20 hundreds and 5 ones"],
-                    correct: [opt1, opt2],
-                    target: n,
-                    hint: "Remember: 10 hundreds = 1 thousand!"
-                }
-            }
-        ];
-
-        function next() {
-            localStorage.setItem('fasttrack_elite_final', JSON.stringify(state));
-            document.getElementById('pts').innerText = state.points;
-            document.getElementById('lvl').innerText = state.level;
-            document.getElementById('fill').style.width = (state.correct % 10 * 10) + "%";
-            document.getElementById('feedback').innerText = "";
-            document.getElementById('hint').style.display = "none";
-
-            curQ = engines[Math.floor(Math.random() * engines.length)]();
-            document.getElementById('std').innerText = curQ.std;
-            document.getElementById('q-area').innerHTML = curQ.q;
-            document.getElementById('hint').innerText = "💡 Tip: " + curQ.hint;
-            
-            const area = document.getElementById('interaction-area');
-            area.innerHTML = '';
-
-            if(curQ.type === "input") {
-                area.innerHTML = `<input type="text" id="ans-in" class="eq-input" inputmode="numeric" placeholder="?">`;
-            } else {
-                curQ.opts.sort(() => Math.random() - 0.5).forEach(o => {
-                    area.innerHTML += `<button class="opt-btn" onclick="toggleSelect(this)">${o}</button>`;
-                });
-            }
-        }
-
-        function toggleSelect(btn) {
-            if(curQ.type === "choice") {
-                document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
-            }
-            btn.classList.toggle('selected');
-        }
-
-        function checkAnswer() {
-            let isRight = false;
-            if(curQ.type === "input") {
-                isRight = document.getElementById('ans-in').value.trim() === curQ.correct;
-            } else if(curQ.type === "choice") {
-                let sel = document.querySelector('.opt-btn.selected');
-                isRight = sel && sel.innerText === curQ.correct;
-            } else if(curQ.type === "multi") {
-                let sel = Array.from(document.querySelectorAll('.opt-btn.selected')).map(b => b.innerText);
-                isRight = sel.length === curQ.correct.length && sel.every(v => curQ.correct.includes(v));
-            }
-
-            if(isRight) {
-                state.points += 10; state.correct++;
-                if(state.correct % 10 === 0) state.level++;
-                document.getElementById('feedback').innerHTML = "<span style='color:green'>Correct! 🐊</span>";
-                setTimeout(next, 1200);
-            } else {
-                document.getElementById('feedback').innerHTML = "<span style='color:orange'>Try again! ☀️</span>";
-                document.getElementById('hint').style.display = "block";
-            }
-        }
-        window.onload = next;
-    </script>
-</body>
-</html>
+                const th =
