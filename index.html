@@ -12,13 +12,15 @@
         body { font-family: 'Segoe UI', sans-serif; text-align: center; background: var(--bg); color: var(--text); padding: 10px; margin: 0; }
         .logo { width: 80px; height: 80px; margin: 10px auto; display: block; border-radius: 15px; background: white; object-fit: cover; }
         .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 500px; margin: 10px auto; border: 3px solid var(--primary); }
-        .btn { background: var(--primary); color: white; padding: 15px 20px; border-radius: 15px; border: none; cursor: pointer; font-size: 1.1em; margin: 8px auto; width: 95%; display: block; font-weight: bold; }
+        .btn { background: var(--primary); color: white; padding: 15px 20px; border-radius: 15px; border: none; cursor: pointer; font-size: 1.1em; margin: 8px auto; width: 95%; display: block; font-weight: bold; transition: 0.2s; }
+        .btn:hover { background: var(--secondary); transform: translateY(-2px); }
         .progress-bar-container { width: 90%; background: #B2DFDB; border-radius: 10px; margin: 10px auto; height: 12px; overflow: hidden; border: 1px solid #004D40; }
         #progress-fill { width: 0%; height: 100%; background: #4CAF50; transition: 0.5s; }
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; font-size: 0.85em; }
         .stat-box { background: white; padding: 10px; border-radius: 10px; border: 1px solid var(--primary); }
         .cat-tag { font-size: 0.75em; color: #666; font-weight: bold; text-transform: uppercase; }
         #feedback { font-weight: bold; margin-top: 10px; font-size: 1.1em; height: 25px; }
+        .hint-box { background: var(--hint); border: 1px dashed #FBC02D; padding: 10px; border-radius: 10px; margin-top: 10px; display: none; font-size: 0.85em; text-align: left; }
     </style>
 </head>
 <body>
@@ -36,6 +38,8 @@
         <span id="category-tag" class="cat-tag">GENERATING QUESTION...</span>
         <h3 id="question-text">---</h3>
         <div id="options-container"></div>
+        <button class="btn" style="background:#FF9800; font-size: 0.8em; width: auto; padding: 8px 15px;" onclick="toggleHint()">💡 Hint</button>
+        <div id="hint-text" class="hint-box"></div>
         <div id="feedback"></div>
     </div>
 
@@ -52,17 +56,19 @@
             document.getElementById('total-points').innerText = stats.points;
             document.getElementById('mastery-lvl').innerText = stats.level;
             let progress = (stats.correctCount % 10) * 10; 
-            document.getElementById('progress-fill').style.width = progress + "%";
+            document.getElementById('progress-fill').style.width = (stats.correctCount > 0 && progress === 0) ? "100%" : progress + "%";
             
-            // Level Up logic
-            if (stats.correctCount > 0 && stats.correctCount % 10 === 0 && progress === 0) {
+            if (stats.correctCount > 0 && stats.correctCount % 10 === 0 && progress === 0 && !window.leveledUp) {
                 stats.level++;
-                alert("🌟 LEVEL UP! You are now Level " + stats.level);
+                window.leveledUp = true;
+                alert("🌟 LEVEL UP! You reached Mastery Level " + stats.level);
                 saveStats();
+            } else if (progress !== 0) {
+                window.leveledUp = false;
             }
         }
 
-        // INFINITE QUESTION ENGINES
+        // INFINITE ENGINES BASED ON FLORIDA B.E.S.T.
         const engines = [
             // Engine 1: Expanded Form (MA.3.NSO.1.1)
             function() {
@@ -71,32 +77,32 @@
                 let t = Math.floor(Math.random() * 9);
                 let o = Math.floor(Math.random() * 9) + 1;
                 let num = (th*1000) + (h*100) + (t*10) + o;
-                let correct = `${th*1000} + ${h*100} + ${t*10} + ${o}`;
                 return {
                     q: `What is the expanded form of ${num.toLocaleString()}?`,
-                    a: [correct, `${th*100} + ${h*10} + ${o}`, `${th*1000} + ${t*100} + ${o}`, `${th*1000} + ${h*100} + ${t*100}`],
-                    c: 0, cat: "Number Sense"
+                    a: [`${th*1000} + ${h*100} + ${t*10} + ${o}`, `${th*100} + ${h*10} + ${o}`, `${th*1000} + ${h*10} + ${o}`, `${th*1000} + ${h*100} + ${t*100}`],
+                    c: 0, cat: "Number Sense", hint: "Decompose the number by its place values: thousands, hundreds, tens, and ones."
                 };
             },
-            // Engine 2: Multiplication Multiples (MA.3.NSO.2.2)
+            // Engine 2: Multiplication (MA.3.NSO.2.2)
             function() {
                 let factor = Math.floor(Math.random() * 8) + 2;
-                let multi = [10, 20, 30, 40, 50, 60, 70, 80, 90][Math.floor(Math.random()*9)];
+                let multi = [10, 20, 30, 40, 50, 60, 100, 200, 300][Math.floor(Math.random()*9)];
                 let correct = factor * multi;
                 return {
                     q: `Solve: ${factor} × ${multi} = ?`,
                     a: [correct, correct - 10, correct + 10, factor + multi],
-                    c: 0, cat: "Multiplication"
+                    c: 0, cat: "Multiplication", hint: "Multiply the basic facts first, then add the zeros from the multiple of 10 or 100."
                 };
             },
-            // Engine 3: Identifying Fractions (MA.3.FR.1.1)
+            // Engine 3: Perimeter (MA.3.GR.2.3)
             function() {
-                let denoms = [2, 3, 4, 6, 8, 10];
-                let d = denoms[Math.floor(Math.random()*denoms.length)];
+                let l = Math.floor(Math.random() * 10) + 2;
+                let w = Math.floor(Math.random() * 5) + 2;
+                let correct = (l * 2) + (w * 2);
                 return {
-                    q: `A pizza is cut into ${d} equal slices. You eat 1 slice. What fraction did you eat?`,
-                    a: [`1/${d}`, `${d}/1`, `1/2`, `0/${d}`],
-                    c: 0, cat: "Fractions"
+                    q: `A rectangle has a length of ${l} and a width of ${w}. What is the perimeter?`,
+                    a: [correct, l * w, l + w, (l * 2) + w],
+                    c: 0, cat: "Geometry", hint: "Perimeter is the distance around the outside. Add all four sides together!"
                 };
             }
         ];
@@ -106,15 +112,14 @@
         function nextQuestion() {
             let engine = engines[Math.floor(Math.random() * engines.length)];
             currentQ = engine();
-            
-            // Shuffle Answers
-            let originalA = [...currentQ.a];
-            let correctVal = originalA[0];
+            let correctVal = currentQ.a[0];
             currentQ.a.sort(() => Math.random() - 0.5);
             currentQ.c = currentQ.a.indexOf(correctVal);
 
             document.getElementById('category-tag').innerText = currentQ.cat;
             document.getElementById('question-text').innerText = currentQ.q;
+            document.getElementById('hint-text').innerText = currentQ.hint;
+            document.getElementById('hint-text').style.display = 'none';
             document.getElementById('feedback').innerText = "";
             
             const container = document.getElementById('options-container');
@@ -126,6 +131,11 @@
                 b.onclick = () => check(idx);
                 container.appendChild(b);
             });
+        }
+
+        function toggleHint() {
+            const h = document.getElementById('hint-text');
+            h.style.display = h.style.display === 'none' ? 'block' : 'none';
         }
 
         function check(idx) {
