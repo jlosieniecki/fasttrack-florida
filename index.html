@@ -3,228 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida: Assessment Pro</title>
+    <title>FastTrack Florida: Infinite Mastery</title>
     <style>
-        :root { --primary: #00796B; --bg: #f4f7f7; --fast-blue: #2196F3; --selected: #e3f2fd; }
+        :root { --primary: #00796B; --bg: #f4f7f7; --fast-blue: #2196F3; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        
-        /* LAYOUT */
         .card { background: white; width: 100%; max-width: 600px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 20px; box-sizing: border-box; border-top: 8px solid var(--primary); }
         .header { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; color: #555; }
-        .q-text { font-size: 1.15em; margin-bottom: 20px; line-height: 1.5; }
+        .std-tag { color: #888; font-size: 0.75em; font-weight: bold; text-transform: uppercase; }
+        .q-text { font-size: 1.15em; margin-bottom: 20px; line-height: 1.5; color: #333; }
         
-        /* MATCHING GRID (Table) */
-        .match-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        .match-table th, .match-table td { border: 1px solid #ddd; padding: 12px; text-align: center; font-size: 1em; }
-        .match-table th { background: #f8f9fa; color: #444; }
-        .check-box { width: 25px; height: 25px; cursor: pointer; accent-color: var(--primary); }
+        /* TEI: ARRAY VISUALS */
+        .array-container { display: inline-grid; gap: 8px; margin: 15px 0; padding: 15px; background: #fff; border: 1px solid #eee; border-radius: 8px; justify-content: center; width: 100%; }
+        .dot { width: 22px; height: 22px; background: #FF9800; border-radius: 50%; }
 
-        /* FRACTION MODEL (Interactive Shading) */
-        .fraction-container { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
-        .frac-part { width: 50px; height: 50px; border: 2px solid #333; background: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #aaa; }
+        /* TEI: FRACTION SHADING */
+        .fraction-container { display: flex; gap: 5px; justify-content: center; margin: 20px 0; }
+        .frac-part { width: 45px; height: 45px; border: 2px solid #333; background: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-size: 0.8em; }
         .frac-part.shaded { background: var(--fast-blue); color: white; border-color: var(--fast-blue); }
 
-        /* GRAPHING (Interactive Bars) */
-        .chart-container { display: flex; align-items: flex-end; justify-content: space-around; height: 200px; border-bottom: 2px solid #333; padding-bottom: 5px; margin-top: 20px; }
-        .bar-group { display: flex; flex-direction: column; align-items: center; width: 40px; }
-        .bar { width: 100%; background: #ddd; transition: 0.3s; cursor: pointer; border-radius: 5px 5px 0 0; position: relative; }
-        .bar:hover { background: #ccc; }
+        /* TEI: BAR GRAPHING */
+        .chart-container { display: flex; align-items: flex-end; justify-content: space-around; height: 180px; border-bottom: 2px solid #333; padding-bottom: 5px; margin-top: 20px; }
+        .bar-group { display: flex; flex-direction: column; align-items: center; width: 50px; }
+        .bar { width: 100%; background: #ddd; transition: 0.3s; cursor: pointer; border-radius: 4px 4px 0 0; }
         .bar.active { background: var(--primary); }
-        .bar-label { margin-top: 5px; font-size: 0.8em; font-weight: bold; }
-        .bar-val { font-size: 0.8em; margin-bottom: 3px; }
+        .bar-label { margin-top: 5px; font-size: 0.75em; font-weight: bold; }
 
-        /* EDITING TASK (Dropdowns) */
-        .inline-select { font-size: 1em; padding: 5px; border: 2px solid var(--primary); border-radius: 5px; background: white; cursor: pointer; margin: 0 4px; }
-
-        /* BUTTONS */
-        .submit-btn { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; width: 100%; font-size: 1.1em; cursor: pointer; margin-top: 20px; }
-        .nav-btn { background: #ddd; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; font-size: 0.9em; }
-
+        /* INPUTS & BUTTONS */
+        .inline-select { font-size: 1em; padding: 5px; border: 2px solid var(--primary); border-radius: 5px; margin: 0 4px; }
+        .opt-btn { display: block; width: 100%; padding: 14px; margin-bottom: 10px; border: 2px solid #eee; border-radius: 10px; background: white; text-align: left; cursor: pointer; }
+        .opt-btn.selected { border-color: var(--fast-blue); background: #e3f2fd; font-weight: bold; }
+        .submit-btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; font-size: 1.1em; cursor: pointer; margin-top: 15px; }
         #feedback { margin-top: 15px; font-weight: bold; text-align: center; min-height: 25px; }
     </style>
 </head>
 <body>
 
-    <img src="Gemini_Generated_Image_t8043ht8043ht804.png" style="width:60px; border-radius:10px; margin-bottom:10px;">
-
     <div class="card">
         <div class="header">
-            <span>Question <span id="q-num">1</span></span>
-            <span>🏆 Score: <span id="score">0</span></span>
+            <span id="std" class="std-tag">B.E.S.T. STANDARD</span>
+            <span>⭐ <span id="pts">0</span></span>
         </div>
-
-        <div id="q-area" class="q-text">Loading...</div>
+        <div id="q-area" class="q-text"></div>
         <div id="interaction-area"></div>
-        
         <button id="submit" class="submit-btn" onclick="checkAnswer()">Submit Response</button>
         <div id="feedback"></div>
     </div>
 
     <script>
-        let state = { score: 0, qNum: 1 };
+        let score = 0;
         let curQ = {};
+        let lastIdx = -1;
 
         const engines = [
-            // 1. MATCHING ITEM (MA.3.NSO.2.4 - Division/Multiplication Facts)
+            // ENGINE 1: ARRAY EDITING TASK (MA.3.NSO.2.2)
             function() {
-                const rows = [
-                    { q: "4 × 3", a: 12 },
-                    { q: "12 ÷ 2", a: 6 },
-                    { q: "15 ÷ 3", a: 5 }
-                ];
-                const cols = [5, 6, 12]; // The headers
-                
-                let html = `<table class="match-table"><thead><tr><th>Expression</th>`;
-                cols.forEach(c => html += `<th>${c}</th>`);
-                html += `</tr></thead><tbody>`;
-                
-                rows.forEach((r, i) => {
-                    html += `<tr><td><b>${r.q}</b></td>`;
-                    cols.forEach((c, j) => {
-                        html += `<td><input type="checkbox" class="check-box" data-row="${i}" data-val="${c}"></td>`;
-                    });
-                    html += `</tr>`;
-                });
-                html += `</tbody></table>`;
-
+                const r = Math.floor(Math.random() * 3) + 3;
+                const c = Math.floor(Math.random() * 3) + 2;
+                let dots = "";
+                for(let i=0; i<r*c; i++) dots += `<div class="dot"></div>`;
                 return {
-                    type: "matching",
-                    std: "MA.3.NSO.2.4",
-                    q: "Match each expression to its correct value by checking the box.",
-                    html: html,
-                    correctRows: rows // We will check logic in checkAnswer
+                    type: "editing", std: "MA.3.NSO.2.2",
+                    q: "Complete the statement to describe the array shown below.",
+                    html: `<div class="array-container" style="grid-template-columns:repeat(${c},auto);">${dots}</div>
+                           <p>The array has <select id="s1" class="inline-select"><option>?</option><option>${r}</option><option>${c}</option></select> rows and 
+                           <select id="s2" class="inline-select"><option>?</option><option>${r}</option><option>${c}</option></select> columns. 
+                           Total = <select id="s3" class="inline-select"><option>?</option><option>${r*c}</option><option>${r+c}</option></select>.</p>`,
+                    ans: [r.toString(), c.toString(), (r*c).toString()]
                 };
             },
-
-            // 2. FRACTION MODEL (MA.3.FR.1.1 - Partitioning)
+            // ENGINE 2: FRACTION MODELING (MA.3.FR.1.1)
             function() {
-                let d = [3, 4, 6, 8][Math.floor(Math.random() * 4)];
-                let target = Math.floor(Math.random() * (d - 1)) + 1; // e.g., Shade 3 of 4
-                
-                let html = `<div class="fraction-container">`;
-                for(let i=0; i<d; i++) {
-                    html += `<div class="frac-part" onclick="this.classList.toggle('shaded')">1/${d}</div>`;
-                }
-                html += `</div>`;
-
+                const d = [4, 6, 8][Math.floor(Math.random()*3)];
+                const n = Math.floor(Math.random()*(d-1))+1;
+                let parts = "";
+                for(let i=0; i<d; i++) parts += `<div class="frac-part" onclick="this.classList.toggle('shaded')">1/${d}</div>`;
                 return {
-                    type: "fraction",
-                    std: "MA.3.FR.1.1",
-                    q: `Click parts of the model to shade <b>${target}/${d}</b> of the rectangle.`,
-                    html: html,
-                    target: target
+                    type: "shading", std: "MA.3.FR.1.1",
+                    q: `Select parts of the model to shade <b>${n}/${d}</b> of the whole.`,
+                    html: `<div class="fraction-container">${parts}</div>`,
+                    ans: n
                 };
             },
-
-            // 3. GRAPHING ITEM (MA.3.DP.1.1 - Bar Graphs)
+            // ENGINE 3: GRAPHING TASK (MA.3.DP.1.1)
             function() {
-                const data = [
-                    { label: "Apples", val: Math.floor(Math.random()*8)+2 },
-                    { label: "Bananas", val: Math.floor(Math.random()*8)+2 },
-                    { label: "Grapes", val: Math.floor(Math.random()*8)+2 }
-                ];
-                
-                let html = `<div class="chart-container">`;
-                data.forEach((d, i) => {
-                    html += `
-                    <div class="bar-group">
-                        <div class="bar-val" id="val-${i}">0</div>
-                        <div class="bar" style="height: 10px;" onclick="adjustBar(this, ${i})"></div>
-                        <div class="bar-label">${d.label}</div>
-                    </div>`;
-                });
-                html += `</div><p style="font-size:0.9em; text-align:center; color:#666;">(Tap bars to raise them)</p>`;
-
+                const vals = [Math.floor(Math.random()*5)+2, Math.floor(Math.random()*5)+2];
                 return {
-                    type: "graph",
-                    std: "MA.3.DP.1.1",
-                    q: `Create a bar graph to show: <br> <b>${data[0].val} Apples, ${data[1].val} Bananas, ${data[2].val} Grapes</b>.`,
-                    html: html,
-                    data: data
+                    type: "graph", std: "MA.3.DP.1.1",
+                    q: `Set the bars to show: <b>Dogs: ${vals[0]}, Cats: ${vals[1]}</b>.`,
+                    html: `<div class="chart-container">
+                        <div class="bar-group"><div id="v0">0</div><div class="bar" style="height:10px" onclick="grow(this,0)"></div><div class="bar-label">Dogs</div></div>
+                        <div class="bar-group"><div id="v1">0</div><div class="bar" style="height:10px" onclick="grow(this,1)"></div><div class="bar-label">Cats</div></div>
+                    </div>`,
+                    ans: vals
                 };
             },
-
-            // 4. EDITING TASK (MA.3.NSO.2.2 - Logic)
+            // ENGINE 4: MULTISELECT (MA.3.NSO.1.1)
             function() {
-                let a = 5, b = 4;
+                const target = 4000 + (Math.floor(Math.random()*9)*100) + 50;
+                const opt1 = `${target - 50} + 50`;
+                const opt2 = `${Math.floor(target/100)} hundreds and 50 ones`;
                 return {
-                    type: "editing",
-                    std: "MA.3.NSO.2.2",
-                    q: "Complete the sentence to describe the array.",
-                    html: `
-                        The array has <select id="s1" class="inline-select"><option>?</option><option>4</option><option>5</option></select> rows 
-                        and <select id="s2" class="inline-select"><option>?</option><option>4</option><option>5</option></select> columns. 
-                        The total is <select id="s3" class="inline-select"><option>?</option><option>9</option><option>20</option></select>.
-                    `,
-                    correct: ["5", "4", "20"]
+                    type: "multi", std: "MA.3.NSO.1.1",
+                    q: `Select <b>ALL</b> that equal ${target.toLocaleString()}:`,
+                    opts: [opt1, opt2, "4,000 + 5", "40 hundreds"],
+                    ans: [opt1, opt2]
                 };
             }
         ];
 
-        // --- GLOBAL HELPERS ---
-        function adjustBar(bar, index) {
-            let currentH = parseInt(bar.style.height) || 10;
-            let newVal = currentH + 20;
-            if (newVal > 180) newVal = 10; // Reset if too high
-            
-            bar.style.height = newVal + "px";
-            // Rough conversion: 20px = 1 unit for simplicity in this demo
-            let unitVal = Math.floor((newVal - 10) / 20);
-            document.getElementById(`val-${index}`).innerText = unitVal;
-            bar.dataset.value = unitVal;
-            bar.classList.add('active');
+        function grow(el, idx) {
+            let h = parseInt(el.style.height);
+            let units = Math.floor((h-10)/20) + 1;
+            if(units > 8) { units = 0; h = 10; } else { h += 20; }
+            el.style.height = h + "px";
+            el.classList.add('active');
+            document.getElementById('v'+idx).innerText = units;
         }
 
         function next() {
-            document.getElementById('score').innerText = state.score;
-            document.getElementById('q-num').innerText = state.qNum;
-            document.getElementById('feedback').innerText = "";
-
-            curQ = engines[Math.floor(Math.random() * engines.length)]();
+            let idx; do { idx = Math.floor(Math.random()*engines.length); } while(idx === lastIdx);
+            lastIdx = idx; curQ = engines[idx]();
+            document.getElementById('std').innerText = curQ.std;
             document.getElementById('q-area').innerHTML = curQ.q;
-            document.getElementById('interaction-area').innerHTML = curQ.html;
+            const area = document.getElementById('interaction-area');
+            area.innerHTML = curQ.html || "";
+            if(curQ.type === "multi") {
+                curQ.opts.forEach(o => area.innerHTML += `<button class="opt-btn" onclick="this.classList.toggle('selected')">${o}</button>`);
+            }
+            document.getElementById('feedback').innerText = "";
         }
 
         function checkAnswer() {
-            let isCorrect = false;
-
-            if (curQ.type === "matching") {
-                // Check if every row has exactly the correct box checked
-                let allRight = true;
-                curQ.correctRows.forEach((row, i) => {
-                    let checked = document.querySelector(`.check-box[data-row="${i}"]:checked`);
-                    if (!checked || parseInt(checked.dataset.val) !== row.a) allRight = false;
-                });
-                isCorrect = allRight;
-            } 
-            else if (curQ.type === "fraction") {
-                let shadedCount = document.querySelectorAll('.frac-part.shaded').length;
-                isCorrect = (shadedCount === curQ.target);
-            }
-            else if (curQ.type === "graph") {
-                let allRight = true;
-                curQ.data.forEach((d, i) => {
-                    let userVal = parseInt(document.getElementById(`val-${i}`).innerText) || 0;
-                    if (userVal !== d.val) allRight = false;
-                });
-                isCorrect = allRight;
-            }
-            else if (curQ.type === "editing") {
-                let s1 = document.getElementById('s1').value;
-                let s2 = document.getElementById('s2').value;
-                let s3 = document.getElementById('s3').value;
-                isCorrect = (s1 === curQ.correct[0] && s2 === curQ.correct[1] && s3 === curQ.correct[2]);
+            let correct = false;
+            if(curQ.type === "editing") {
+                correct = [1,2,3].every(i => document.getElementById('s'+i).value === curQ.ans[i-1]);
+            } else if(curQ.type === "shading") {
+                correct = document.querySelectorAll('.frac-part.shaded').length === curQ.ans;
+            } else if(curQ.type === "graph") {
+                correct = curQ.ans.every((v, i) => parseInt(document.getElementById('v'+i).innerText) === v);
+            } else if(curQ.type === "multi") {
+                let sel = Array.from(document.querySelectorAll('.opt-btn.selected')).map(b => b.innerText);
+                correct = sel.length === curQ.ans.length && sel.every(v => curQ.ans.includes(v));
             }
 
-            if (isCorrect) {
-                state.score += 10;
+            if(correct) {
+                score += 10; document.getElementById('pts').innerText = score;
                 document.getElementById('feedback').innerHTML = "<span style='color:green'>Correct! 🐊</span>";
-                setTimeout(() => { state.qNum++; next(); }, 1500);
+                setTimeout(next, 1500);
             } else {
-                document.getElementById('feedback').innerHTML = "<span style='color:orange'>Try again! Check your work.</span>";
+                document.getElementById('feedback').innerHTML = "<span style='color:orange'>Try again! ☀️</span>";
             }
         }
-
         window.onload = next;
     </script>
 </body>
