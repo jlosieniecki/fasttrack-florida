@@ -3,216 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida: Complete Edition</title>
+    <title>FastTrack Florida: Assessment Pro</title>
     <style>
-        :root { --primary: #00796B; --bg: #f4f7f7; --fast-blue: #2196F3; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .header { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .stat-pill { background: white; padding: 8px 15px; border-radius: 20px; border: 2px solid var(--primary); font-weight: bold; font-size: 0.9em; }
-        .card { background: white; width: 100%; max-width: 500px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 25px; box-sizing: border-box; border-top: 12px solid var(--primary); }
-        .std-tag { color: #888; font-size: 0.75em; font-weight: bold; text-transform: uppercase; }
-        .q-text { font-size: 1.2em; line-height: 1.4; margin: 15px 0; color: #333; min-height: 60px; }
-        .opt-btn { display: block; width: 100%; padding: 16px; margin-bottom: 10px; border: 2px solid #eee; border-radius: 12px; background: white; text-align: left; font-size: 1.05em; cursor: pointer; transition: 0.2s; }
-        .opt-btn.selected { border-color: var(--fast-blue); background: #e3f2fd; font-weight: 600; border-width: 3px; }
-        .eq-input { width: 100%; padding: 15px; font-size: 1.6em; border: 2px solid #ccc; border-radius: 12px; text-align: center; margin-bottom: 15px; outline: none; }
-        .submit-btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; width: 100%; font-size: 1.1em; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 0 #004D40; }
-        #feedback { margin-top: 20px; font-weight: bold; text-align: center; font-size: 1.1em; min-height: 30px; }
-        .progress-bar { width: 100%; height: 10px; background: #e0e0e0; border-radius: 5px; margin-top: 20px; overflow: hidden; }
-        #fill { height: 100%; background: #4CAF50; width: 0%; transition: 0.6s; }
-        .hint-box { font-size: 0.85em; color: #555; background: #fffde7; padding: 10px; border-radius: 8px; margin-top: 10px; display: none; border: 1px dashed #fbc02d; }
+        :root { --primary: #00796B; --bg: #f4f7f7; --fast-blue: #2196F3; --selected: #e3f2fd; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        
+        /* LAYOUT */
+        .card { background: white; width: 100%; max-width: 600px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 20px; box-sizing: border-box; border-top: 8px solid var(--primary); }
+        .header { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; color: #555; }
+        .q-text { font-size: 1.15em; margin-bottom: 20px; line-height: 1.5; }
+        
+        /* MATCHING GRID (Table) */
+        .match-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .match-table th, .match-table td { border: 1px solid #ddd; padding: 12px; text-align: center; font-size: 1em; }
+        .match-table th { background: #f8f9fa; color: #444; }
+        .check-box { width: 25px; height: 25px; cursor: pointer; accent-color: var(--primary); }
+
+        /* FRACTION MODEL (Interactive Shading) */
+        .fraction-container { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
+        .frac-part { width: 50px; height: 50px; border: 2px solid #333; background: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #aaa; }
+        .frac-part.shaded { background: var(--fast-blue); color: white; border-color: var(--fast-blue); }
+
+        /* GRAPHING (Interactive Bars) */
+        .chart-container { display: flex; align-items: flex-end; justify-content: space-around; height: 200px; border-bottom: 2px solid #333; padding-bottom: 5px; margin-top: 20px; }
+        .bar-group { display: flex; flex-direction: column; align-items: center; width: 40px; }
+        .bar { width: 100%; background: #ddd; transition: 0.3s; cursor: pointer; border-radius: 5px 5px 0 0; position: relative; }
+        .bar:hover { background: #ccc; }
+        .bar.active { background: var(--primary); }
+        .bar-label { margin-top: 5px; font-size: 0.8em; font-weight: bold; }
+        .bar-val { font-size: 0.8em; margin-bottom: 3px; }
+
+        /* EDITING TASK (Dropdowns) */
+        .inline-select { font-size: 1em; padding: 5px; border: 2px solid var(--primary); border-radius: 5px; background: white; cursor: pointer; margin: 0 4px; }
+
+        /* BUTTONS */
+        .submit-btn { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; width: 100%; font-size: 1.1em; cursor: pointer; margin-top: 20px; }
+        .nav-btn { background: #ddd; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; margin-top: 10px; font-size: 0.9em; }
+
+        #feedback { margin-top: 15px; font-weight: bold; text-align: center; min-height: 25px; }
     </style>
 </head>
 <body>
 
-    <img src="Gemini_Generated_Image_t8043ht8043ht804.png" style="width:70px; border-radius:15px; margin-bottom:10px;">
-
-    <div class="header">
-        <div class="stat-pill">⭐ Points: <span id="pts">0</span></div>
-        <div class="stat-pill">🏆 Level: <span id="lvl">1</span></div>
-    </div>
+    <img src="Gemini_Generated_Image_t8043ht8043ht804.png" style="width:60px; border-radius:10px; margin-bottom:10px;">
 
     <div class="card">
-        <span id="std" class="std-tag">Loading B.E.S.T. Standard...</span>
-        <div id="q-area" class="q-text"></div>
+        <div class="header">
+            <span>Question <span id="q-num">1</span></span>
+            <span>🏆 Score: <span id="score">0</span></span>
+        </div>
+
+        <div id="q-area" class="q-text">Loading...</div>
         <div id="interaction-area"></div>
-        <button id="submit" class="submit-btn" onclick="checkAnswer()">Submit Answer</button>
-        <div id="hint" class="hint-box"></div>
+        
+        <button id="submit" class="submit-btn" onclick="checkAnswer()">Submit Response</button>
         <div id="feedback"></div>
-        <div class="progress-bar"><div id="fill"></div></div>
     </div>
 
     <script>
-        let state = JSON.parse(localStorage.getItem('fast_complete_v3')) || { points: 0, level: 1, correct: 0 };
+        let state = { score: 0, qNum: 1 };
         let curQ = {};
-        let lastEngineIndex = -1;
 
         const engines = [
-            // 1. MA.3.NSO.1.2: Composition of Numbers
+            // 1. MATCHING ITEM (MA.3.NSO.2.4 - Division/Multiplication Facts)
             function() {
-                const th = (Math.floor(Math.random() * 5) + 1) * 1000;
-                const h = (Math.floor(Math.random() * 8) + 1) * 100;
-                const t = (Math.floor(Math.random() * 8) + 1) * 10;
-                const o = Math.floor(Math.random() * 8) + 1;
-                const target = th + h + t + o;
+                const rows = [
+                    { q: "4 × 3", a: 12 },
+                    { q: "12 ÷ 2", a: 6 },
+                    { q: "15 ÷ 3", a: 5 }
+                ];
+                const cols = [5, 6, 12]; // The headers
+                
+                let html = `<table class="match-table"><thead><tr><th>Expression</th>`;
+                cols.forEach(c => html += `<th>${c}</th>`);
+                html += `</tr></thead><tbody>`;
+                
+                rows.forEach((r, i) => {
+                    html += `<tr><td><b>${r.q}</b></td>`;
+                    cols.forEach((c, j) => {
+                        html += `<td><input type="checkbox" class="check-box" data-row="${i}" data-val="${c}"></td>`;
+                    });
+                    html += `</tr>`;
+                });
+                html += `</tbody></table>`;
+
                 return {
-                    type: "multi", std: "MA.3.NSO.1.2",
-                    q: `Select <b>ALL</b> expressions equal to <b>${target.toLocaleString()}</b>:`,
-                    opts: [
-                        `${th.toLocaleString()} + ${h} + ${t} + ${o}`,
-                        `${(th+h)/100} hundreds and ${t+o} ones`,
-                        `${(th+h+t).toLocaleString()} + ${o}`,
-                        `${th.toLocaleString()} + ${t+o}` // Wrong one
-                    ].sort(() => Math.random() - 0.5),
-                    correct: [`${th.toLocaleString()} + ${h} + ${t} + ${o}`, `${(th+h)/100} hundreds and ${t+o} ones`, `${(th+h+t).toLocaleString()} + ${o}`],
-                    hint: "Use your place value chart. Remember that 10 hundreds = 1 thousand!"
+                    type: "matching",
+                    std: "MA.3.NSO.2.4",
+                    q: "Match each expression to its correct value by checking the box.",
+                    html: html,
+                    correctRows: rows // We will check logic in checkAnswer
                 };
             },
-            // 2. MA.3.AR.1.2: Multi-Step Word Problems
+
+            // 2. FRACTION MODEL (MA.3.FR.1.1 - Partitioning)
             function() {
-                const items = ["stickers", "cards", "shells", "rocks"];
-                const item = items[Math.floor(Math.random()*items.length)];
-                let packs = Math.floor(Math.random() * 4) + 3;
-                let perPack = [5, 6, 8, 9, 10][Math.floor(Math.random()*5)];
-                let away = Math.floor(Math.random() * 5) + 3;
-                let ans = (packs * perPack) - away;
+                let d = [3, 4, 6, 8][Math.floor(Math.random() * 4)];
+                let target = Math.floor(Math.random() * (d - 1)) + 1; // e.g., Shade 3 of 4
+                
+                let html = `<div class="fraction-container">`;
+                for(let i=0; i<d; i++) {
+                    html += `<div class="frac-part" onclick="this.classList.toggle('shaded')">1/${d}</div>`;
+                }
+                html += `</div>`;
+
                 return {
-                    type: "input", std: "MA.3.AR.1.2",
-                    q: `Alex has ${packs} packs of ${item}. Each pack has ${perPack}. He gives ${away} to his sister. How many does he have left?`,
-                    correct: ans.toString(),
-                    hint: "Multiply first to find the total, then subtract what he gave away."
+                    type: "fraction",
+                    std: "MA.3.FR.1.1",
+                    q: `Click parts of the model to shade <b>${target}/${d}</b> of the rectangle.`,
+                    html: html,
+                    target: target
                 };
             },
-            // 3. MA.3.M.1.1: Length Measurement (New from Doc)
+
+            // 3. GRAPHING ITEM (MA.3.DP.1.1 - Bar Graphs)
             function() {
-                let cm = Math.floor(Math.random() * 50) + 10;
+                const data = [
+                    { label: "Apples", val: Math.floor(Math.random()*8)+2 },
+                    { label: "Bananas", val: Math.floor(Math.random()*8)+2 },
+                    { label: "Grapes", val: Math.floor(Math.random()*8)+2 }
+                ];
+                
+                let html = `<div class="chart-container">`;
+                data.forEach((d, i) => {
+                    html += `
+                    <div class="bar-group">
+                        <div class="bar-val" id="val-${i}">0</div>
+                        <div class="bar" style="height: 10px;" onclick="adjustBar(this, ${i})"></div>
+                        <div class="bar-label">${d.label}</div>
+                    </div>`;
+                });
+                html += `</div><p style="font-size:0.9em; text-align:center; color:#666;">(Tap bars to raise them)</p>`;
+
                 return {
-                    type: "choice", std: "MA.3.M.1.1",
-                    q: `A pencil is ${cm} centimeters long. How many millimeters is that?`,
-                    opts: [`${cm * 10} mm`, `${cm * 100} mm`, `${cm}00 mm`],
-                    correct: `${cm * 10} mm`,
-                    hint: "There are 10 millimeters in 1 centimeter."
+                    type: "graph",
+                    std: "MA.3.DP.1.1",
+                    q: `Create a bar graph to show: <br> <b>${data[0].val} Apples, ${data[1].val} Bananas, ${data[2].val} Grapes</b>.`,
+                    html: html,
+                    data: data
                 };
             },
-            // 4. MA.3.FR.2.1: Comparing Fractions
+
+            // 4. EDITING TASK (MA.3.NSO.2.2 - Logic)
             function() {
-                let d1 = [2, 3, 4, 6, 8][Math.floor(Math.random() * 5)];
-                let d2 = [2, 3, 4, 6, 8].filter(x => x !== d1)[Math.floor(Math.random() * 4)];
-                let bigger = d1 < d2 ? `1/${d1}` : `1/${d2}`;
+                let a = 5, b = 4;
                 return {
-                    type: "choice", std: "MA.3.FR.2.1",
-                    q: `Which fraction is <b>greater</b>?`,
-                    opts: [`1/${d1}`, `1/${d2}`, "They are equal"],
-                    correct: bigger,
-                    hint: "Smaller denominator means BIGGER pieces!"
-                };
-            },
-            // 5. MA.3.GR.1.2: Quadrilaterals (New from Doc)
-            function() {
-                return {
-                    type: "choice", std: "MA.3.GR.1.2",
-                    q: "Which shape must have 4 right angles?",
-                    opts: ["Rectangle", "Rhombus", "Trapezoid", "Parallelogram"],
-                    correct: "Rectangle",
-                    hint: "A rectangle is a special parallelogram with 4 square corners."
-                };
-            },
-            // 6. MA.3.M.2.2: Time Intervals
-            function() {
-                let startH = Math.floor(Math.random() * 5) + 1;
-                let duration = [20, 30, 40, 50][Math.floor(Math.random() * 4)];
-                let endM = duration; 
-                return {
-                    type: "choice", std: "MA.3.M.2.2",
-                    q: `Class starts at ${startH}:00 PM and lasts for ${duration} minutes. What time does it end?`,
-                    opts: [`${startH}:${duration} PM`, `${startH+1}:00 PM`, `${startH}:05 PM`],
-                    correct: `${startH}:${duration} PM`,
-                    hint: "Since it started at o'clock, just put the minutes after the hour."
-                };
-            },
-            // 7. MA.3.NSO.2.4: Division Facts
-            function() {
-                let divisor = Math.floor(Math.random() * 8) + 2;
-                let quotient = Math.floor(Math.random() * 9) + 1;
-                let dividend = divisor * quotient;
-                return {
-                    type: "input", std: "MA.3.NSO.2.4",
-                    q: `Solve: ${dividend} ÷ ${divisor} = ?`,
-                    correct: quotient.toString(),
-                    hint: `Think backwards: What number times ${divisor} equals ${dividend}?`
-                };
-            },
-            // 8. MA.3.DP.1.1: Interpreting Data
-            function() {
-                let scale = [2, 5, 10][Math.floor(Math.random()*3)];
-                let symbols = Math.floor(Math.random()*6)+2;
-                return {
-                    type: "input", std: "MA.3.DP.1.1",
-                    q: `Key: ⭐ = ${scale} students.<br>How many students are represented by ${symbols} stars?`,
-                    correct: (scale * symbols).toString(),
-                    hint: "Multiply the number of symbols by the value of the key."
+                    type: "editing",
+                    std: "MA.3.NSO.2.2",
+                    q: "Complete the sentence to describe the array.",
+                    html: `
+                        The array has <select id="s1" class="inline-select"><option>?</option><option>4</option><option>5</option></select> rows 
+                        and <select id="s2" class="inline-select"><option>?</option><option>4</option><option>5</option></select> columns. 
+                        The total is <select id="s3" class="inline-select"><option>?</option><option>9</option><option>20</option></select>.
+                    `,
+                    correct: ["5", "4", "20"]
                 };
             }
         ];
 
-        function next() {
-            localStorage.setItem('fast_complete_v3', JSON.stringify(state));
-            document.getElementById('pts').innerText = state.points;
-            document.getElementById('lvl').innerText = state.level;
-            document.getElementById('fill').style.width = (state.correct % 10 * 10) + "%";
-            document.getElementById('feedback').innerText = "";
-            document.getElementById('hint').style.display = "none";
-
-            // Loop to ensure random non-repeating questions
-            let newIndex;
-            do {
-                newIndex = Math.floor(Math.random() * engines.length);
-            } while (newIndex === lastEngineIndex);
-            lastEngineIndex = newIndex;
-
-            curQ = engines[newIndex]();
-            document.getElementById('std').innerText = curQ.std;
-            document.getElementById('q-area').innerHTML = curQ.q;
-            document.getElementById('hint').innerText = "💡 Tip: " + curQ.hint;
+        // --- GLOBAL HELPERS ---
+        function adjustBar(bar, index) {
+            let currentH = parseInt(bar.style.height) || 10;
+            let newVal = currentH + 20;
+            if (newVal > 180) newVal = 10; // Reset if too high
             
-            const area = document.getElementById('interaction-area');
-            area.innerHTML = '';
-
-            if(curQ.type === "input") {
-                area.innerHTML = `<input type="text" id="ans-in" class="eq-input" inputmode="numeric" placeholder="?">`;
-            } else {
-                curQ.opts.forEach(o => {
-                    area.innerHTML += `<button class="opt-btn" onclick="toggleSelect(this)">${o}</button>`;
-                });
-            }
+            bar.style.height = newVal + "px";
+            // Rough conversion: 20px = 1 unit for simplicity in this demo
+            let unitVal = Math.floor((newVal - 10) / 20);
+            document.getElementById(`val-${index}`).innerText = unitVal;
+            bar.dataset.value = unitVal;
+            bar.classList.add('active');
         }
 
-        function toggleSelect(btn) {
-            if(curQ.type === "choice") document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.toggle('selected');
+        function next() {
+            document.getElementById('score').innerText = state.score;
+            document.getElementById('q-num').innerText = state.qNum;
+            document.getElementById('feedback').innerText = "";
+
+            curQ = engines[Math.floor(Math.random() * engines.length)]();
+            document.getElementById('q-area').innerHTML = curQ.q;
+            document.getElementById('interaction-area').innerHTML = curQ.html;
         }
 
         function checkAnswer() {
-            let isRight = false;
-            if(curQ.type === "input") {
-                isRight = document.getElementById('ans-in').value.trim() === curQ.correct;
-            } else if(curQ.type === "choice") {
-                let sel = document.querySelector('.opt-btn.selected');
-                isRight = sel && sel.innerText === curQ.correct;
-            } else if(curQ.type === "multi") {
-                let sel = Array.from(document.querySelectorAll('.opt-btn.selected')).map(b => b.innerText);
-                isRight = sel.length === curQ.correct.length && sel.every(v => curQ.correct.includes(v));
+            let isCorrect = false;
+
+            if (curQ.type === "matching") {
+                // Check if every row has exactly the correct box checked
+                let allRight = true;
+                curQ.correctRows.forEach((row, i) => {
+                    let checked = document.querySelector(`.check-box[data-row="${i}"]:checked`);
+                    if (!checked || parseInt(checked.dataset.val) !== row.a) allRight = false;
+                });
+                isCorrect = allRight;
+            } 
+            else if (curQ.type === "fraction") {
+                let shadedCount = document.querySelectorAll('.frac-part.shaded').length;
+                isCorrect = (shadedCount === curQ.target);
+            }
+            else if (curQ.type === "graph") {
+                let allRight = true;
+                curQ.data.forEach((d, i) => {
+                    let userVal = parseInt(document.getElementById(`val-${i}`).innerText) || 0;
+                    if (userVal !== d.val) allRight = false;
+                });
+                isCorrect = allRight;
+            }
+            else if (curQ.type === "editing") {
+                let s1 = document.getElementById('s1').value;
+                let s2 = document.getElementById('s2').value;
+                let s3 = document.getElementById('s3').value;
+                isCorrect = (s1 === curQ.correct[0] && s2 === curQ.correct[1] && s3 === curQ.correct[2]);
             }
 
-            if(isRight) {
-                state.points += 10; state.correct++;
-                if(state.correct % 10 === 0) state.level++;
+            if (isCorrect) {
+                state.score += 10;
                 document.getElementById('feedback').innerHTML = "<span style='color:green'>Correct! 🐊</span>";
-                setTimeout(next, 1000);
+                setTimeout(() => { state.qNum++; next(); }, 1500);
             } else {
-                document.getElementById('feedback').innerHTML = "<span style='color:orange'>Try again! ☀️</span>";
-                document.getElementById('hint').style.display = "block";
+                document.getElementById('feedback').innerHTML = "<span style='color:orange'>Try again! Check your work.</span>";
             }
         }
+
         window.onload = next;
     </script>
 </body>
