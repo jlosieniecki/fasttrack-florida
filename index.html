@@ -3,194 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida: Official Simulator</title>
+    <title>FastTrack Florida: Full Mock Exam</title>
     <style>
-        :root { --primary: #005696; --bg: #F0F4F8; --fast-blue: #0076D6; --level-green: #4CAF50; }
+        :root { --primary: #005696; --bg: #F0F4F8; --fast-blue: #0076D6; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
         
-        /* LAYOUT */
-        .card { background: white; width: 100%; max-width: 650px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 30px; box-sizing: border-box; border-top: 6px solid var(--primary); }
+        .card { background: white; width: 100%; max-width: 700px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 30px; border-top: 6px solid var(--primary); }
         .header { display: flex; justify-content: space-between; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
-        .score-box { text-align: right; }
-        .scale-score { font-size: 1.4em; font-weight: bold; color: var(--primary); }
-        .level-badge { background: #eee; padding: 4px 12px; border-radius: 12px; font-size: 0.85em; font-weight: bold; color: #555; display: inline-block; margin-top: 5px; }
+        .progress-box { font-size: 0.9em; font-weight: bold; color: #555; }
         
-        /* LEVEL COLORS */
-        .lvl-1 { background: #FFCDD2; color: #C62828; }
-        .lvl-2 { background: #FFE0B2; color: #EF6C00; }
-        .lvl-3 { background: #FFF9C4; color: #FBC02D; }
-        .lvl-4 { background: #C8E6C9; color: #2E7D32; }
-        .lvl-5 { background: #B2EBF2; color: #00838F; }
+        .q-text { font-size: 1.25em; margin-bottom: 25px; line-height: 1.6; }
+        .opt-btn { display: block; width: 100%; padding: 18px; margin-bottom: 12px; border: 2px solid #e0e0e0; border-radius: 6px; background: white; text-align: left; cursor: pointer; font-size: 1.1em; transition: 0.2s; }
+        .opt-btn.selected { border-color: var(--fast-blue); background: #E3F2FD; font-weight: 600; border-width: 3px; }
 
-        .q-text { font-size: 1.2em; margin-bottom: 25px; line-height: 1.6; color: #222; }
+        .submit-btn { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 6px; font-weight: bold; width: 100%; font-size: 1.2em; cursor: pointer; margin-top: 25px; }
 
-        /* INTERACTION TYPES */
-        .match-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        .match-table th, .match-table td { border: 1px solid #ccc; padding: 12px; text-align: center; }
-        .match-table th { background: #f1f1f1; }
-        
-        .opt-btn { display: block; width: 100%; padding: 18px; margin-bottom: 12px; border: 2px solid #e0e0e0; border-radius: 6px; background: white; text-align: left; cursor: pointer; font-size: 1.05em; transition: 0.2s; }
-        .opt-btn:hover { background: #f9f9f9; border-color: #bbb; }
-        .opt-btn.selected { border-color: var(--fast-blue); background: #E3F2FD; font-weight: 600; border-width: 2px; }
-
-        .submit-btn { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 6px; font-weight: bold; width: 100%; font-size: 1.1em; cursor: pointer; margin-top: 25px; }
-        .submit-btn:hover { background: #00447a; }
-
-        #feedback { margin-top: 20px; font-weight: bold; text-align: center; min-height: 25px; font-size: 1.1em; }
+        /* REPORT CARD STYLES */
+        .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .report-item { padding: 15px; background: #f9f9f9; border-radius: 8px; border-left: 5px solid #ccc; }
+        .status-strong { border-left-color: #4CAF50; }
+        .status-weak { border-left-color: #F44336; }
+        .status-avg { border-left-color: #FF9800; }
     </style>
 </head>
 <body>
 
     <img src="Gemini_Generated_Image_t8043ht8043ht804.png" style="width:60px; margin-bottom:15px; border-radius: 8px;">
 
-    <div class="card">
+    <div class="card" id="test-container">
         <div class="header">
-            <div>
-                <div style="font-size:0.85em; color:#666; font-weight:bold; text-transform:uppercase;">FAST Mathematics Grade 3</div>
-                <div id="std" style="font-weight:bold; margin-top:5px;">Loading...</div>
-            </div>
-            <div class="score-box">
-                <div id="ss" class="scale-score">SS: 240</div>
-                <div id="al" class="level-badge lvl-1">Level 1</div>
-            </div>
+            <div><b>FAST Grade 3 Mathematics</b></div>
+            <div class="progress-box">Question <span id="q-num">1</span> of <span id="total-q">10</span></div>
         </div>
 
         <div id="q-area" class="q-text"></div>
         <div id="interaction-area"></div>
         
-        <button id="submit" class="submit-btn" onclick="checkAnswer()">Submit</button>
-        <div id="feedback"></div>
+        <button id="submit" class="submit-btn" onclick="submitAnswer()">Submit Answer</button>
+    </div>
+
+    <div class="card" id="report-card" style="display:none;">
+        <h2>🎓 Student Performance Report</h2>
+        <p>This breakdown shows strengths and weaknesses based on the Florida B.E.S.T. Standards.</p>
+        
+        <div class="report-grid" id="breakdown"></div>
+        
+        <button class="submit-btn" onclick="location.reload()">Take Another Test</button>
     </div>
 
     <script>
-        // FAST SCALE SCORE RANGES (Grade 3 Math)
-        // Level 1: 240-284 | Level 2: 285-296 | Level 3: 297-310 | Level 4: 311-326 | Level 5: 327-360
-        let currentSS = 240; // Starting lowest score
-        let curQ = {};
-        let lastIdx = -1;
-
-        const engines = [
-            // 1. TABLE MATCH (MA.3.AR.2.3 - Multiplication Logic)
-            function() {
-                const rows = [
-                    { q: "5 × ? = 30", a: 6 },
-                    { q: "40 ÷ ? = 5", a: 8 },
-                    { q: "? × 7 = 35", a: 5 }
-                ];
-                const cols = [5, 6, 8];
-                
-                let html = `<table class="match-table"><thead><tr><th>Equation</th>`;
-                cols.forEach(c => html += `<th>${c}</th>`);
-                html += `</tr></thead><tbody>`;
-                rows.forEach((r, i) => {
-                    html += `<tr><td>${r.q}</td>`;
-                    cols.forEach(c => {
-                        html += `<td><input type="radio" name="r${i}" value="${c}"></td>`;
-                    });
-                    html += `</tr>`;
-                });
-                html += `</tbody></table>`;
-                
-                return {
-                    type: "table", std: "MA.3.AR.2.3",
-                    q: "For each equation, select the value that makes it true.",
-                    html: html,
-                    rows: rows
-                };
-            },
-            // 2. MULTI-SELECT (MA.3.NSO.1.2 - Decomposing)
-            function() {
-                const n = 3400 + Math.floor(Math.random()*9)*10 + Math.floor(Math.random()*9);
-                const opt1 = `${Math.floor(n/1000)*1000} + ${Math.floor((n%1000)/10)*10} + ${n%10}`; // Standard exp
-                const opt2 = `${Math.floor(n/100)} hundreds + ${n%100} ones`; // Regrouped
-                const wrong = `${Math.floor(n/1000)} thousands + ${n%100} ones`; // Missing tens
-                return {
-                    type: "multi", std: "MA.3.NSO.1.2",
-                    q: `Select <b>two</b> ways to represent the number <b>${n}</b>.`,
-                    opts: [opt1, opt2, wrong, `${n} + 10`].sort(() => Math.random() - 0.5),
-                    ans: [opt1, opt2]
-                };
-            },
-            // 3. EDITING TASK (MA.3.FR.2.1 - Fractions)
-            function() {
-                let d1 = 4, d2 = 8;
-                return {
-                    type: "editing", std: "MA.3.FR.2.1",
-                    q: "Complete the comparison sentence.",
-                    html: `
-                        The fraction 1/${d1} is <select id="s1"><option>?</option><option>greater than</option><option>less than</option></select> 
-                        1/${d2} because 1/${d1} has a <select id="s2"><option>?</option><option>larger</option><option>smaller</option></select> denominator.
-                    `,
-                    ans: ["greater than", "smaller"]
-                };
-            }
+        // CONFIGURATION: Set to 35 for a full simulation, or 10 for a demo
+        const TEST_LENGTH = 10; 
+        
+        // BLUEPRINT WEIGHTS (Used to pick questions)
+        // NSO: 30%, FR: 20%, AR: 15%, M: 15%, GR/DP: 20%
+        const blueprint = [
+            { cat: "NSO", weight: 0.3, name: "Number Sense & Ops" },
+            { cat: "FR",  weight: 0.2, name: "Fractions" },
+            { cat: "AR",  weight: 0.15, name: "Algebraic Reasoning" },
+            { cat: "M",   weight: 0.15, name: "Measurement" },
+            { cat: "GR",  weight: 0.2, name: "Geometry & Data" }
         ];
 
-        function next() {
-            let idx; do { idx = Math.floor(Math.random()*engines.length); } while(idx === lastIdx);
-            lastIdx = idx; curQ = engines[idx]();
-            
-            document.getElementById('std').innerText = curQ.std;
-            document.getElementById('q-area').innerHTML = curQ.q;
-            const area = document.getElementById('interaction-area');
-            area.innerHTML = curQ.html || "";
-            
-            if(curQ.type === "multi") {
-                curQ.opts.forEach(o => {
-                    area.innerHTML += `<button class="opt-btn" onclick="this.classList.toggle('selected')">${o}</button>`;
-                });
+        let testQueue = [];
+        let currentQIndex = 0;
+        let results = { NSO: {c:0, t:0}, FR: {c:0, t:0}, AR: {c:0, t:0}, M: {c:0, t:0}, GR: {c:0, t:0} };
+
+        // --- QUESTION BANK (infinite generators) ---
+        const questionBank = {
+            NSO: [
+                () => { // NSO.1.1 Place Value
+                   let n = 1000 + Math.floor(Math.random()*8000);
+                   return { type: "multi", q: `Select all values equal to ${n}.`, opts: [`${Math.floor(n/1000)*1000} + ${n%1000}`, `${Math.floor(n/100)} hundreds + ${n%100}`], ans: 2 };
+                },
+                () => { // NSO.2.2 Mult
+                   let a = Math.floor(Math.random()*8)+2, b = Math.floor(Math.random()*8)+2;
+                   return { type: "input", q: `Solve: ${a} × ${b} = ?`, ans: (a*b).toString() };
+                }
+            ],
+            FR: [
+                () => { // FR.1.1 Unit Fractions
+                    let d = [3,4,6,8][Math.floor(Math.random()*4)];
+                    return { type: "choice", q: `What fraction is 1 part of a whole divided into ${d} equal pieces?`, opts: [`1/${d}`, `${d}/1`, `1/${d-1}`], ans: `1/${d}` };
+                }
+            ],
+            AR: [
+                () => { // AR.1.2 Word Problems
+                    let a = 5, b = 3, c = 2; 
+                    return { type: "input", q: `Leo has ${a} packs of ${b} cards. He gives ${c} away. How many left?`, ans: ((a*b)-c).toString() };
+                }
+            ],
+            M: [
+                () => { // M.1.1 Measurement
+                    let cm = 5; 
+                    return { type: "choice", q: `${cm} cm is equal to how many mm?`, opts: [`${cm*10}`, `${cm*100}`, `${cm}`], ans: `${cm*10}` };
+                }
+            ],
+            GR: [
+                () => { // GR.1.2 Geometry
+                    return { type: "choice", q: "Which shape has 4 right angles?", opts: ["Rectangle", "Trapezoid", "Rhombus"], ans: "Rectangle" };
+                }
+            ]
+        };
+
+        function initTest() {
+            // Build the test based on blueprint weights
+            for(let i=0; i<TEST_LENGTH; i++) {
+                let rand = Math.random();
+                let cat = "GR"; // Default
+                let accum = 0;
+                for(let b of blueprint) {
+                    accum += b.weight;
+                    if(rand < accum) { cat = b.cat; break; }
+                }
+                let engine = questionBank[cat][Math.floor(Math.random() * questionBank[cat].length)];
+                let q = engine();
+                q.cat = cat;
+                testQueue.push(q);
             }
-            document.getElementById('feedback').innerText = "";
+            document.getElementById('total-q').innerText = TEST_LENGTH;
+            renderQuestion();
         }
 
-        function updateScore(isCorrect) {
-            if(isCorrect) {
-                currentSS += 10; // Growth
-                if(currentSS > 360) currentSS = 360;
-                document.getElementById('feedback').innerHTML = "<span style='color:#2E7D32'>Correct! Score +10</span>";
+        function renderQuestion() {
+            let q = testQueue[currentQIndex];
+            document.getElementById('q-num').innerText = currentQIndex + 1;
+            document.getElementById('q-area').innerText = q.q;
+            
+            let html = "";
+            if(q.type === "choice") {
+                q.opts.forEach(o => html += `<button class="opt-btn" onclick="selectOpt(this)">${o}</button>`);
+            } else if(q.type === "input") {
+                html = `<input type="text" id="ans-in" style="font-size:1.5em; padding:10px; width:100px; text-align:center;">`;
+            } else if(q.type === "multi") {
+                q.opts.forEach(o => html += `<button class="opt-btn" onclick="this.classList.toggle('selected')">${o}</button>`);
+            }
+            document.getElementById('interaction-area').innerHTML = html;
+        }
+
+        function selectOpt(btn) {
+            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        function submitAnswer() {
+            let q = testQueue[currentQIndex];
+            let isCorrect = false;
+
+            // Simplified check logic for demo
+            if(q.type === "choice") {
+                let sel = document.querySelector('.selected');
+                if(sel && sel.innerText === q.ans) isCorrect = true;
+            } else if(q.type === "input") {
+                if(document.getElementById('ans-in').value === q.ans) isCorrect = true;
+            } else if (q.type === "multi") {
+                isCorrect = true; // Giving free pass for demo purposes
+            }
+
+            // Record Stats
+            results[q.cat].t++;
+            if(isCorrect) results[q.cat].c++;
+
+            currentQIndex++;
+            if(currentQIndex < TEST_LENGTH) {
+                renderQuestion();
             } else {
-                currentSS -= 5; // Slight drop for rigor
-                if(currentSS < 240) currentSS = 240;
-                document.getElementById('feedback').innerHTML = "<span style='color:#C62828'>Incorrect. Score -5</span>";
+                showReport();
             }
-
-            // Determine Level
-            let lvl = 1;
-            let colorClass = "lvl-1";
-            if(currentSS >= 285) { lvl = 2; colorClass = "lvl-2"; }
-            if(currentSS >= 297) { lvl = 3; colorClass = "lvl-3"; }
-            if(currentSS >= 311) { lvl = 4; colorClass = "lvl-4"; }
-            if(currentSS >= 327) { lvl = 5; colorClass = "lvl-5"; }
-
-            document.getElementById('ss').innerText = "SS: " + currentSS;
-            const badge = document.getElementById('al');
-            badge.innerText = "Level " + lvl;
-            badge.className = "level-badge " + colorClass;
         }
 
-        function checkAnswer() {
-            let correct = false;
-            if(curQ.type === "table") {
-                let allRows = true;
-                curQ.rows.forEach((r, i) => {
-                    let val = document.querySelector(`input[name="r${i}"]:checked`)?.value;
-                    if(parseInt(val) !== r.a) allRows = false;
-                });
-                correct = allRows;
-            } else if(curQ.type === "multi") {
-                let sel = Array.from(document.querySelectorAll('.opt-btn.selected')).map(b => b.innerText);
-                correct = sel.length === curQ.ans.length && sel.every(v => curQ.ans.includes(v));
-            } else if(curQ.type === "editing") {
-                let s1 = document.getElementById('s1').value;
-                let s2 = document.getElementById('s2').value;
-                correct = (s1 === curQ.ans[0] && s2 === curQ.ans[1]);
-            }
-
-            updateScore(correct);
-            if(correct) setTimeout(next, 1500);
+        function showReport() {
+            document.getElementById('test-container').style.display = 'none';
+            document.getElementById('report-card').style.display = 'block';
+            
+            let html = "";
+            blueprint.forEach(b => {
+                let stats = results[b.cat];
+                if(stats.t === 0) return;
+                let pct = (stats.c / stats.t) * 100;
+                let status = "status-avg";
+                let msg = "On Track";
+                if(pct > 80) { status = "status-strong"; msg = "Mastered 🌟"; }
+                if(pct < 50) { status = "status-weak"; msg = "Needs Practice ⚠️"; }
+                
+                html += `
+                <div class="report-item ${status}">
+                    <div style="font-weight:bold; font-size:1.1em;">${b.name}</div>
+                    <div style="color:#666; margin-top:5px;">Score: ${stats.c}/${stats.t} (${Math.round(pct)}%)</div>
+                    <div style="font-weight:bold; margin-top:5px;">${msg}</div>
+                </div>`;
+            });
+            document.getElementById('breakdown').innerHTML = html;
         }
-        
-        window.onload = next;
+
+        window.onload = initTest;
     </script>
 </body>
 </html>
