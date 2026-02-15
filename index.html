@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida: Grade 3 Master</title>
+    <title>FastTrack Florida: Infinite Edition</title>
     <style>
         :root { --primary: #00796B; --bg: #f4f7f7; --fast-blue: #2196F3; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
@@ -11,7 +11,7 @@
         .stat-pill { background: white; padding: 8px 15px; border-radius: 20px; border: 2px solid var(--primary); font-weight: bold; font-size: 0.9em; }
         .card { background: white; width: 100%; max-width: 500px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 25px; box-sizing: border-box; border-top: 12px solid var(--primary); }
         .std-tag { color: #888; font-size: 0.75em; font-weight: bold; text-transform: uppercase; }
-        .q-text { font-size: 1.25em; line-height: 1.4; margin: 15px 0; color: #333; }
+        .q-text { font-size: 1.25em; line-height: 1.4; margin: 15px 0; color: #333; min-height: 60px; }
         .opt-btn { display: block; width: 100%; padding: 16px; margin-bottom: 10px; border: 2px solid #eee; border-radius: 12px; background: white; text-align: left; font-size: 1.1em; cursor: pointer; transition: 0.2s; }
         .opt-btn.selected { border-color: var(--fast-blue); background: #e3f2fd; font-weight: 600; border-width: 3px; }
         .eq-input { width: 100%; padding: 15px; font-size: 1.6em; border: 2px solid #ccc; border-radius: 12px; text-align: center; margin-bottom: 15px; outline: none; }
@@ -32,8 +32,8 @@
     </div>
 
     <div class="card">
-        <span id="std" class="std-tag">Loading Quest...</span>
-        <div id="q-area" class="q-text"></div>
+        <span id="std" class="std-tag">B.E.S.T. Quest</span>
+        <div id="q-area" class="q-text">Ready for your FAST Practice?</div>
         <div id="interaction-area"></div>
         <button id="submit" class="submit-btn" onclick="checkAnswer()">Submit Answer</button>
         <div id="hint" class="hint-box"></div>
@@ -42,10 +42,135 @@
     </div>
 
     <script>
-        let state = JSON.parse(localStorage.getItem('fast_final_vault')) || { points: 0, level: 1, correct: 0 };
+        let state = JSON.parse(localStorage.getItem('fast_infinite_v1')) || { points: 0, level: 1, correct: 0 };
         let curQ = {};
+        let lastEngineIndex = -1;
 
         const engines = [
-            // 1. FIXED PLACE VALUE (MA.3.NSO.1.1)
+            // 1. PLACE VALUE (MA.3.NSO.1.1)
             function() {
-                const th =
+                const th = (Math.floor(Math.random() * 5) + 1) * 1000;
+                const h = (Math.floor(Math.random() * 8) + 1) * 100;
+                const t = (Math.floor(Math.random() * 8) + 1) * 10;
+                const o = Math.floor(Math.random() * 8) + 1;
+                const target = th + h + t + o;
+                const opt1 = `${th.toLocaleString()} + ${h} + ${t} + ${o}`;
+                const opt2 = `${(th + h) / 100} hundreds and ${t + o} ones`;
+                const opt3 = `${(th + h + t).toLocaleString()} + ${o}`;
+                return {
+                    type: "multi", std: "MA.3.NSO.1.1",
+                    q: `Select <b>ALL</b> that equal <b>${target.toLocaleString()}</b>:`,
+                    opts: [opt1, opt2, opt3, `${th} + ${t}`].sort(() => Math.random() - 0.5),
+                    correct: [opt1, opt2, opt3],
+                    hint: "Place value is flexible! 1,000 is the same as 10 hundreds."
+                };
+            },
+            // 2. ELAPSED TIME (MA.3.M.2.2)
+            function() {
+                const names = ["Mia", "Leo", "Gator", "Sara"];
+                const activities = ["soccer", "reading", "art", "lunch"];
+                const name = names[Math.floor(Math.random()*names.length)];
+                const act = activities[Math.floor(Math.random()*activities.length)];
+                let startH = Math.floor(Math.random() * 6) + 1;
+                let duration = [15, 30, 45][Math.floor(Math.random() * 3)];
+                return {
+                    type: "choice", std: "MA.3.M.2.2",
+                    q: `${name} starts ${act} at ${startH}:00 PM. It lasts for ${duration} minutes. What time is it over?`,
+                    opts: [`${startH}:${duration} PM`, `${startH+1}:00 PM`, `${startH}:05 PM`],
+                    correct: `${startH}:${duration} PM`,
+                    hint: "Just add the minutes to the clock!"
+                };
+            },
+            // 3. FRACTION COMPARISON (MA.3.FR.2.1)
+            function() {
+                let d1 = [2, 3, 4, 6, 8][Math.floor(Math.random() * 5)];
+                let d2 = [2, 3, 4, 6, 8].filter(x => x !== d1)[Math.floor(Math.random() * 4)];
+                let bigger = d1 < d2 ? `1/${d1}` : `1/${d2}`;
+                return {
+                    type: "choice", std: "MA.3.FR.2.1",
+                    q: `Which fraction represents a <b>larger</b> piece of the whole?`,
+                    opts: [`1/${d1}`, `1/${d2}`],
+                    correct: bigger,
+                    hint: "Fewer pieces mean bigger slices!"
+                };
+            },
+            // 4. TWO-STEP BOSS (MA.3.AR.1.2)
+            function() {
+                const items = ["stickers", "oranges", "toy cars", "pencils"];
+                const item = items[Math.floor(Math.random()*items.length)];
+                let packs = Math.floor(Math.random() * 4) + 3;
+                let perPack = [5, 10][Math.floor(Math.random()*2)];
+                let away = Math.floor(Math.random() * 4) + 2;
+                let ans = (packs * perPack) - away;
+                return {
+                    type: "input", std: "MA.3.AR.1.2",
+                    q: `Gator has ${packs} packs of ${item}. Each pack has ${perPack}. He gives ${away} away. How many are left?`,
+                    correct: ans.toString(),
+                    hint: "Multiply the packs first, then subtract the ones given away."
+                };
+            }
+        ];
+
+        function next() {
+            localStorage.setItem('fast_infinite_v1', JSON.stringify(state));
+            document.getElementById('pts').innerText = state.points;
+            document.getElementById('lvl').innerText = state.level;
+            document.getElementById('fill').style.width = (state.correct % 10 * 10) + "%";
+            document.getElementById('feedback').innerText = "";
+            document.getElementById('hint').style.display = "none";
+
+            // Prevent repetition
+            let engineIndex;
+            do {
+                engineIndex = Math.floor(Math.random() * engines.length);
+            } while (engineIndex === lastEngineIndex);
+            lastEngineIndex = engineIndex;
+
+            curQ = engines[engineIndex]();
+            document.getElementById('std').innerText = curQ.std;
+            document.getElementById('q-area').innerHTML = curQ.q;
+            document.getElementById('hint').innerText = "💡 Tip: " + curQ.hint;
+            
+            const area = document.getElementById('interaction-area');
+            area.innerHTML = '';
+
+            if(curQ.type === "input") {
+                area.innerHTML = `<input type="text" id="ans-in" class="eq-input" inputmode="numeric" placeholder="?">`;
+            } else {
+                curQ.opts.forEach(o => {
+                    area.innerHTML += `<button class="opt-btn" onclick="toggleSelect(this)">${o}</button>`;
+                });
+            }
+        }
+
+        function toggleSelect(btn) {
+            if(curQ.type === "choice") document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.toggle('selected');
+        }
+
+        function checkAnswer() {
+            let isRight = false;
+            if(curQ.type === "input") {
+                isRight = document.getElementById('ans-in').value.trim() === curQ.correct;
+            } else if(curQ.type === "choice") {
+                let sel = document.querySelector('.opt-btn.selected');
+                isRight = sel && sel.innerText === curQ.correct;
+            } else if(curQ.type === "multi") {
+                let sel = Array.from(document.querySelectorAll('.opt-btn.selected')).map(b => b.innerText);
+                isRight = sel.length === curQ.correct.length && sel.every(v => curQ.correct.includes(v));
+            }
+
+            if(isRight) {
+                state.points += 10; state.correct++;
+                if(state.correct % 10 === 0) state.level++;
+                document.getElementById('feedback').innerHTML = "<span style='color:green'>Correct! 🐊</span>";
+                setTimeout(next, 1000);
+            } else {
+                document.getElementById('feedback').innerHTML = "<span style='color:orange'>Try again! ☀️</span>";
+                document.getElementById('hint').style.display = "block";
+            }
+        }
+        window.onload = next;
+    </script>
+</body>
+</html>
