@@ -90,3 +90,103 @@
                 let a = Math.floor(Math.random() * 8) + 2;
                 let b = [10, 20, 30, 40, 50, 60, 70, 80, 90][Math.floor(Math.random() * 9)];
                 return {
+                    type: "input", std: "MA.3.NSO.2.2",
+                    q: `Solve the equation: <br><b>${a} × ${b} = ?</b>`,
+                    correct: (a * b).toString(),
+                    hint: "Multiply the non-zero digits first, then add the zero back to the end."
+                };
+            },
+            // MA.3.GR.2.3: Perimeter (Input)
+            function() {
+                let l = Math.floor(Math.random() * 10) + 2;
+                let w = Math.floor(Math.random() * 6) + 2;
+                return {
+                    type: "input", std: "MA.3.GR.2.3",
+                    q: `A rectangle has a length of ${l} units and a width of ${w} units. What is the <b>perimeter</b>?`,
+                    correct: ((l * 2) + (w * 2)).toString(),
+                    hint: "Perimeter is the distance around. Add all four sides: L + W + L + W."
+                };
+            }
+        ];
+
+        function next() {
+            localStorage.setItem('fasttrack_master_v1', JSON.stringify(state));
+            document.getElementById('pts').innerText = state.points;
+            document.getElementById('lvl').innerText = state.level;
+            document.getElementById('fill').style.width = (state.correct % 10 * 10) + "%";
+            document.getElementById('feedback').innerText = "";
+            document.getElementById('hint').style.display = "none";
+
+            curQ = engines[Math.floor(Math.random() * engines.length)]();
+            document.getElementById('std').innerText = curQ.std;
+            document.getElementById('q-area').innerHTML = curQ.q;
+            document.getElementById('hint').innerText = "💡 Hint: " + curQ.hint;
+            
+            const area = document.getElementById('interaction-area');
+            area.innerHTML = '';
+
+            if(curQ.type === "input") {
+                area.innerHTML = `<input type="text" id="ans-in" class="eq-input" inputmode="numeric" placeholder="?">`;
+            } else {
+                curQ.opts.forEach(o => {
+                    area.innerHTML += `<button class="opt-btn" onclick="this.classList.toggle('selected')">${o}</button>`;
+                });
+            }
+        }
+
+        function checkAnswer() {
+            let isRight = false;
+
+            if(curQ.type === "input") {
+                let val = document.getElementById('ans-in').value.trim();
+                isRight = (val === curQ.correct);
+            } else {
+                let selected = Array.from(document.querySelectorAll('.opt-btn.selected'));
+                let score = 0;
+                let totalCorrectNeeded = 0;
+
+                // Mathematical validation for Multiselect
+                selected.forEach(btn => {
+                    let text = btn.innerText.toLowerCase();
+                    let val = 0;
+                    if(text.includes('hundreds')) {
+                        let p = text.split(' hundreds and ');
+                        val = (parseInt(p[0]) * 100) + parseInt(p[1]);
+                    } else {
+                        val = text.split('+').reduce((a, b) => a + parseInt(b.replace(/,/g, '')), 0);
+                    }
+                    if(val === curQ.target) score++;
+                    else score--; // Penalty for wrong choice
+                });
+
+                // Count how many correct options exist in the buttons
+                document.querySelectorAll('.opt-btn').forEach(btn => {
+                    let text = btn.innerText.toLowerCase();
+                    let val = 0;
+                    if(text.includes('hundreds')) {
+                        let p = text.split(' hundreds and ');
+                        val = (parseInt(p[0]) * 100) + parseInt(p[1]);
+                    } else {
+                        val = text.split('+').reduce((a, b) => a + parseInt(b.replace(/,/g, '')), 0);
+                    }
+                    if(val === curQ.target) totalCorrectNeeded++;
+                });
+
+                isRight = (score === totalCorrectNeeded);
+            }
+
+            if(isRight) {
+                state.points += 10; state.correct++;
+                if(state.correct % 10 === 0) state.level++;
+                document.getElementById('feedback').innerHTML = "<span style='color:green'>Correct! 🐊</span>";
+                setTimeout(next, 1200);
+            } else {
+                document.getElementById('feedback').innerHTML = "<span style='color:orange'>Try again! ☀️</span>";
+                document.getElementById('hint').style.display = "block";
+            }
+        }
+
+        window.onload = next;
+    </script>
+</body>
+</html>
