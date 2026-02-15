@@ -3,46 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida: Grade 3 B.E.S.T. Edition</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="Gemini_Generated_Image_t8043ht8043ht804.png">
-
+    <title>FastTrack Florida: Elite Mastery</title>
     <style>
         :root { --primary: #00796B; --bg: #f4f7f7; --fast-blue: #2196F3; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        
         .header { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .stat-pill { background: white; padding: 8px 15px; border-radius: 20px; border: 2px solid var(--primary); font-weight: bold; font-size: 0.9em; }
-        
-        .card { background: white; width: 100%; max-width: 500px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 25px; box-sizing: border-box; border-top: 12px solid var(--primary); position: relative; }
-        
-        .logo { width: 70px; height: 70px; border-radius: 15px; margin-bottom: 10px; }
-        .std-tag { color: #888; font-size: 0.75em; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .card { background: white; width: 100%; max-width: 500px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 25px; box-sizing: border-box; border-top: 12px solid var(--primary); }
+        .std-tag { color: #888; font-size: 0.75em; font-weight: bold; text-transform: uppercase; }
         .q-text { font-size: 1.2em; line-height: 1.4; margin: 15px 0; color: #333; }
-
-        /* MULTISELECT & CHOICE BUTTONS */
-        .opt-btn { display: block; width: 100%; padding: 16px; margin-bottom: 10px; border: 2px solid #eee; border-radius: 12px; background: white; text-align: left; font-size: 1em; cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
+        .opt-btn { display: block; width: 100%; padding: 16px; margin-bottom: 10px; border: 2px solid #eee; border-radius: 12px; background: white; text-align: left; font-size: 1.1em; cursor: pointer; transition: 0.2s; }
         .opt-btn.selected { border-color: var(--fast-blue); background: #e3f2fd; font-weight: 600; }
-        
-        /* EQUATION EDITOR (INPUT) */
-        .eq-input { width: 100%; padding: 15px; font-size: 1.6em; border: 2px solid #ccc; border-radius: 12px; text-align: center; margin-bottom: 15px; outline: none; transition: 0.3s; }
-        .eq-input:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(0,121,107,0.2); }
-
+        .eq-input { width: 100%; padding: 15px; font-size: 1.6em; border: 2px solid #ccc; border-radius: 12px; text-align: center; margin-bottom: 15px; outline: none; }
         .submit-btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; width: 100%; font-size: 1.1em; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 0 #004D40; }
-        .submit-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #004D40; }
-        
-        #feedback { margin-top: 20px; font-weight: bold; min-height: 30px; text-align: center; font-size: 1.1em; }
+        #feedback { margin-top: 20px; font-weight: bold; text-align: center; font-size: 1.1em; min-height: 30px; }
         .progress-bar { width: 100%; height: 10px; background: #e0e0e0; border-radius: 5px; margin-top: 20px; overflow: hidden; }
-        #fill { height: 100%; background: #4CAF50; width: 0%; transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        
+        #fill { height: 100%; background: #4CAF50; width: 0%; transition: 0.6s; }
         .hint-text { font-size: 0.85em; color: #666; font-style: italic; margin-top: 10px; display: none; background: #fff9c4; padding: 10px; border-radius: 8px; border: 1px dashed #fbc02d; }
     </style>
 </head>
 <body>
 
-    <img src="Gemini_Generated_Image_t8043ht8043ht804.png" class="logo" alt="Gator Logo">
+    <img src="Gemini_Generated_Image_t8043ht8043ht804.png" style="width:70px; border-radius:15px; margin-bottom:10px;">
 
     <div class="header">
         <div class="stat-pill">⭐ Points: <span id="pts">0</span></div>
@@ -50,8 +32,8 @@
     </div>
 
     <div class="card">
-        <span id="std" class="std-tag">Benchmark Loading...</span>
-        <div id="q-area" class="q-text"></div>
+        <span id="std" class="std-tag">READY?</span>
+        <div id="q-area" class="q-text">Click below to start your Florida Math Quest!</div>
         <div id="interaction-area"></div>
         <button id="submit" class="submit-btn" onclick="checkAnswer()">Submit Answer</button>
         <div id="hint" class="hint-text"></div>
@@ -60,57 +42,68 @@
     </div>
 
     <script>
-        let state = JSON.parse(localStorage.getItem('fasttrack_master_v1')) || { points: 0, level: 1, correct: 0 };
+        let state = JSON.parse(localStorage.getItem('fasttrack_elite_final')) || { points: 0, level: 1, correct: 0 };
         let curQ = {};
 
         const engines = [
-            // MA.3.NSO.1.1: Place Value Flexibility (Multiselect)
+            // 1. ELAPSED TIME (MA.3.M.2.2)
             function() {
-                let th = (Math.floor(Math.random() * 5) + 1) * 1000;
-                let h = (Math.floor(Math.random() * 8) + 1) * 100;
-                let t = (Math.floor(Math.random() * 8) + 1) * 10;
-                let o = Math.floor(Math.random() * 8) + 1;
-                let n = th + h + t + o;
-                
-                let correct1 = `${th.toLocaleString()} + ${h} + ${t} + ${o}`;
-                let correct2 = `${(th + h) / 100} hundreds and ${t + o} ones`;
-                let correct3 = `${(th + h + t).toLocaleString()} + ${o}`;
-                let distractor = `${th.toLocaleString()} + ${t + o}`; // Missing the hundreds
-
+                let startH = Math.floor(Math.random() * 5) + 1;
+                let duration = [15, 30, 45, 60][Math.floor(Math.random() * 4)];
+                let endH = startH + (duration === 60 ? 1 : 0);
+                let endM = (duration === 60 ? "00" : duration);
+                return {
+                    type: "choice", std: "MA.3.M.2.2",
+                    q: `Soccer practice starts at ${startH}:00 PM and lasts for ${duration} minutes. What time does it end?`,
+                    opts: [`${endH}:${endM} PM`, `${startH}:${duration === 60 ? '30' : '10'} PM`, `${startH+2}:00 PM`],
+                    correct: `${endH}:${endM} PM`,
+                    hint: "Think about the clock face. 60 minutes is one full hour!"
+                };
+            },
+            // 2. FRACTION COMPARISON (MA.3.FR.2.1)
+            function() {
+                let d1 = [2, 3, 4, 6, 8][Math.floor(Math.random() * 5)];
+                let d2 = [2, 3, 4, 6, 8].filter(x => x !== d1)[Math.floor(Math.random() * 4)];
+                let bigger = d1 < d2 ? `1/${d1}` : `1/${d2}`;
+                return {
+                    type: "choice", std: "MA.3.FR.2.1",
+                    q: `Which fraction is <b>greater</b>?`,
+                    opts: [`1/${d1}`, `1/${d2}`, "They are equal"],
+                    correct: bigger,
+                    hint: "Imagine a pizza! If you share it with FEWER people, your slice is BIGGER."
+                };
+            },
+            // 3. TWO-STEP WORD PROBLEM (MA.3.AR.1.2) - BOSS LEVEL
+            function() {
+                let bags = Math.floor(Math.random() * 5) + 3;
+                let perBag = 5;
+                let eaten = 4;
+                let total = (bags * perBag) - eaten;
+                return {
+                    type: "input", std: "MA.3.AR.1.2",
+                    q: `Gator has ${bags} bags of oranges. Each bag has ${perBag} oranges. He eats ${eaten} oranges. How many oranges does he have left?`,
+                    correct: total.toString(),
+                    hint: "Step 1: Multiply bags by oranges. Step 2: Subtract what he ate."
+                };
+            },
+            // 4. MULTISELECT PLACE VALUE (MA.3.NSO.1.1)
+            function() {
+                let n = 2450 + Math.floor(Math.random()*10);
+                let opt1 = "2,000 + 400 + 50";
+                let opt2 = "24 hundreds and 50 ones";
                 return {
                     type: "multi", std: "MA.3.NSO.1.1",
-                    q: `Select <b>ALL</b> expressions equal to <b>${n.toLocaleString()}</b>:`,
-                    opts: [correct1, correct2, correct3, distractor].sort(() => Math.random() - 0.5),
+                    q: `Select <b>ALL</b> that equal ${n}:`,
+                    opts: [opt1, opt2, "20 hundreds and 5 ones"],
+                    correct: [opt1, opt2],
                     target: n,
-                    hint: "A number can be named by its place values or by regrouping hundreds into thousands!"
-                };
-            },
-            // MA.3.NSO.2.2: Multiplication (Equation Editor)
-            function() {
-                let a = Math.floor(Math.random() * 8) + 2;
-                let b = [10, 20, 30, 40, 50, 60, 70, 80, 90][Math.floor(Math.random() * 9)];
-                return {
-                    type: "input", std: "MA.3.NSO.2.2",
-                    q: `Solve the equation: <br><b>${a} × ${b} = ?</b>`,
-                    correct: (a * b).toString(),
-                    hint: "Multiply the non-zero digits first, then add the zero back to the end."
-                };
-            },
-            // MA.3.GR.2.3: Perimeter (Input)
-            function() {
-                let l = Math.floor(Math.random() * 10) + 2;
-                let w = Math.floor(Math.random() * 6) + 2;
-                return {
-                    type: "input", std: "MA.3.GR.2.3",
-                    q: `A rectangle has a length of ${l} units and a width of ${w} units. What is the <b>perimeter</b>?`,
-                    correct: ((l * 2) + (w * 2)).toString(),
-                    hint: "Perimeter is the distance around. Add all four sides: L + W + L + W."
-                };
+                    hint: "Remember: 10 hundreds = 1 thousand!"
+                }
             }
         ];
 
         function next() {
-            localStorage.setItem('fasttrack_master_v1', JSON.stringify(state));
+            localStorage.setItem('fasttrack_elite_final', JSON.stringify(state));
             document.getElementById('pts').innerText = state.points;
             document.getElementById('lvl').innerText = state.level;
             document.getElementById('fill').style.width = (state.correct % 10 * 10) + "%";
@@ -120,7 +113,7 @@
             curQ = engines[Math.floor(Math.random() * engines.length)]();
             document.getElementById('std').innerText = curQ.std;
             document.getElementById('q-area').innerHTML = curQ.q;
-            document.getElementById('hint').innerText = "💡 Hint: " + curQ.hint;
+            document.getElementById('hint').innerText = "💡 Tip: " + curQ.hint;
             
             const area = document.getElementById('interaction-area');
             area.innerHTML = '';
@@ -128,51 +121,29 @@
             if(curQ.type === "input") {
                 area.innerHTML = `<input type="text" id="ans-in" class="eq-input" inputmode="numeric" placeholder="?">`;
             } else {
-                curQ.opts.forEach(o => {
-                    area.innerHTML += `<button class="opt-btn" onclick="this.classList.toggle('selected')">${o}</button>`;
+                curQ.opts.sort(() => Math.random() - 0.5).forEach(o => {
+                    area.innerHTML += `<button class="opt-btn" onclick="toggleSelect(this)">${o}</button>`;
                 });
             }
         }
 
+        function toggleSelect(btn) {
+            if(curQ.type === "choice") {
+                document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+            }
+            btn.classList.toggle('selected');
+        }
+
         function checkAnswer() {
             let isRight = false;
-
             if(curQ.type === "input") {
-                let val = document.getElementById('ans-in').value.trim();
-                isRight = (val === curQ.correct);
-            } else {
-                let selected = Array.from(document.querySelectorAll('.opt-btn.selected'));
-                let score = 0;
-                let totalCorrectNeeded = 0;
-
-                // Mathematical validation for Multiselect
-                selected.forEach(btn => {
-                    let text = btn.innerText.toLowerCase();
-                    let val = 0;
-                    if(text.includes('hundreds')) {
-                        let p = text.split(' hundreds and ');
-                        val = (parseInt(p[0]) * 100) + parseInt(p[1]);
-                    } else {
-                        val = text.split('+').reduce((a, b) => a + parseInt(b.replace(/,/g, '')), 0);
-                    }
-                    if(val === curQ.target) score++;
-                    else score--; // Penalty for wrong choice
-                });
-
-                // Count how many correct options exist in the buttons
-                document.querySelectorAll('.opt-btn').forEach(btn => {
-                    let text = btn.innerText.toLowerCase();
-                    let val = 0;
-                    if(text.includes('hundreds')) {
-                        let p = text.split(' hundreds and ');
-                        val = (parseInt(p[0]) * 100) + parseInt(p[1]);
-                    } else {
-                        val = text.split('+').reduce((a, b) => a + parseInt(b.replace(/,/g, '')), 0);
-                    }
-                    if(val === curQ.target) totalCorrectNeeded++;
-                });
-
-                isRight = (score === totalCorrectNeeded);
+                isRight = document.getElementById('ans-in').value.trim() === curQ.correct;
+            } else if(curQ.type === "choice") {
+                let sel = document.querySelector('.opt-btn.selected');
+                isRight = sel && sel.innerText === curQ.correct;
+            } else if(curQ.type === "multi") {
+                let sel = Array.from(document.querySelectorAll('.opt-btn.selected')).map(b => b.innerText);
+                isRight = sel.length === curQ.correct.length && sel.every(v => curQ.correct.includes(v));
             }
 
             if(isRight) {
@@ -185,7 +156,6 @@
                 document.getElementById('hint').style.display = "block";
             }
         }
-
         window.onload = next;
     </script>
 </body>
