@@ -3,36 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida: Elite Edition</title>
+    <title>FastTrack Florida: Mastery Pro</title>
     <style>
-        :root { --primary: #00796B; --bg: #f0f4f4; --fast-blue: #2196F3; }
+        :root { --primary: #00796B; --bg: #f4f7f7; --fast-blue: #2196F3; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        
-        /* Dashboard Styling */
-        .header { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .stat-pill { background: white; padding: 5px 15px; border-radius: 20px; border: 2px solid var(--primary); font-weight: bold; font-size: 0.85em; }
-        
-        .card { background: white; width: 100%; max-width: 500px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); padding: 25px; box-sizing: border-box; border-top: 8px solid var(--primary); }
-        
-        .standard-label { color: #666; font-size: 0.75em; font-weight: bold; margin-bottom: 10px; display: block; }
-        .question-text { font-size: 1.2em; line-height: 1.4; margin-bottom: 20px; }
-
-        /* ITEM TYPES STYLING */
-        /* Multiple Choice & Multiselect */
-        .option-btn { display: block; width: 100%; padding: 15px; margin-bottom: 10px; border: 2px solid #ddd; border-radius: 10px; background: white; text-align: left; font-size: 1em; cursor: pointer; transition: 0.2s; }
-        .option-btn.selected { border-color: var(--fast-blue); background: #e3f2fd; }
-        
-        /* Equation Editor (Input) */
-        .equation-input { width: 100%; padding: 15px; font-size: 1.5em; border: 2px solid #ccc; border-radius: 10px; text-align: center; margin-bottom: 15px; box-sizing: border-box; }
-
-        /* Editing Task (Dropdown) */
-        .inline-select { padding: 5px; font-size: 1em; border: 2px solid var(--primary); border-radius: 5px; margin: 0 5px; }
-
-        .submit-btn { background: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 10px; font-weight: bold; width: 100%; font-size: 1.1em; cursor: pointer; margin-top: 10px; }
-        
-        #feedback { margin-top: 15px; font-weight: bold; height: 20px; text-align: center; }
-        .progress-bar { width: 100%; height: 8px; background: #ddd; border-radius: 4px; margin-top: 15px; overflow: hidden; }
-        #fill { height: 100%; background: #4CAF50; width: 0%; transition: 0.4s; }
+        .header { width: 100%; max-width: 500px; display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .stat-pill { background: white; padding: 8px 15px; border-radius: 20px; border: 2px solid var(--primary); font-weight: bold; font-size: 0.9em; }
+        .card { background: white; width: 100%; max-width: 500px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); padding: 25px; box-sizing: border-box; border-top: 10px solid var(--primary); }
+        .std-label { color: #888; font-size: 0.75em; font-weight: bold; margin-bottom: 10px; display: block; }
+        .q-text { font-size: 1.25em; line-height: 1.4; margin-bottom: 20px; color: #333; }
+        .option-btn { display: block; width: 100%; padding: 15px; margin-bottom: 10px; border: 2px solid #eee; border-radius: 12px; background: white; text-align: left; font-size: 1em; cursor: pointer; transition: 0.2s; }
+        .option-btn.selected { border-color: var(--fast-blue); background: #e3f2fd; box-shadow: inset 0 0 5px rgba(33,150,243,0.3); }
+        .eq-input { width: 100%; padding: 15px; font-size: 1.5em; border: 2px solid #ccc; border-radius: 12px; text-align: center; margin-bottom: 15px; outline: none; }
+        .eq-input:focus { border-color: var(--primary); }
+        .submit-btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; font-size: 1.1em; cursor: pointer; margin-top: 10px; }
+        #feedback { margin-top: 15px; font-weight: bold; height: 25px; text-align: center; font-size: 1.1em; }
+        .progress-bar { width: 100%; height: 10px; background: #e0e0e0; border-radius: 5px; margin-top: 20px; overflow: hidden; }
+        #fill { height: 100%; background: #4CAF50; width: 0%; transition: 0.5s; }
+        .debug-hint { font-size: 0.7em; color: #ccc; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -43,101 +31,78 @@
     </div>
 
     <div class="card">
-        <span id="std" class="standard-label">MA.3.NSO.1.1</span>
-        <div id="q-area" class="question-text">Loading...</div>
+        <span id="std" class="std-label">LOADING...</span>
+        <div id="q-area" class="q-text">Setting up your FAST quest...</div>
         <div id="interaction-area"></div>
         <button id="submit" class="submit-btn" onclick="checkAnswer()">Submit Answer</button>
         <div id="feedback"></div>
         <div class="progress-bar"><div id="fill"></div></div>
     </div>
+    
+    <div id="debug" class="debug-hint"></div>
 
     <script>
-        let state = JSON.parse(localStorage.getItem('fast_elite_v1')) || { points: 0, level: 1, correctCount: 0 };
-        let currentQuestion = {};
+        let state = JSON.parse(localStorage.getItem('fast_v5_prod')) || { points: 0, level: 1, correct: 0 };
+        let curQ = {};
 
-        // --- THE INFINITE ITEM TYPE ENGINES ---
         const engines = [
-            // 1. EQUATION EDITOR style (MA.3.NSO.2.2)
+            // Equation Editor Style
             function() {
-                let a = Math.floor(Math.random() * 8) + 2;
+                let a = Math.floor(Math.random() * 7) + 3;
                 let b = [10, 20, 30, 40, 50][Math.floor(Math.random()*5)];
-                return {
-                    type: "input", std: "MA.3.NSO.2.2",
-                    q: `Solve the equation: <br><b>${a} × ${b} = ?</b>`,
-                    correct: (a * b).toString(),
-                    hint: "Multiply the non-zero digits first, then add the zero."
-                };
+                return { type: "input", std: "MA.3.NSO.2.2", q: `Solve: <br><b>${a} × ${b} = </b>`, correct: (a * b).toString() };
             },
-            // 2. MULTISELECT style (MA.3.NSO.1.1)
+            // Multiselect Style
             function() {
-                let n = 2000 + (Math.floor(Math.random() * 9) * 100) + 45; 
-                let expanded = `2,000 + ${Math.floor((n%1000)/100)*100} + 40 + 5`;
-                return {
-                    type: "multiselect", std: "MA.3.NSO.1.1",
-                    q: `Select <b>ALL</b> the expressions that are equal to <b>${n.toLocaleString()}</b>.`,
-                    options: [expanded, `Two thousand, ${(n%1000)}`, `20 hundreds + 45 ones`, `${n-10} + 10`],
-                    correct: [expanded, `20 hundreds + 45 ones`, `${n-10} + 10`],
-                    hint: "A number can be shown in many ways (expanded, word, and regrouped form)."
-                };
-            },
-            // 3. EDITING TASK (Dropdown) style (MA.3.FR.1.1)
-            function() {
-                let d = [2, 3, 4, 6, 8][Math.floor(Math.random()*5)];
-                return {
-                    type: "dropdown", std: "MA.3.FR.1.1",
-                    q: `Complete the sentence: <br> A circle is divided into ${d} equal parts. Each part represents `,
-                    options: [`1/${d}`, `1/1`, `${d}/1`, `0`],
-                    correct: `1/${d}`,
-                    hint: "A unit fraction always has a 1 as the numerator."
+                let n = 3000 + (Math.floor(Math.random() * 5) * 100) + 72;
+                let exp = `3,000 + ${Math.floor((n%1000)/100)*100} + 70 + 2`;
+                return { 
+                    type: "multi", std: "MA.3.NSO.1.1", 
+                    q: `Select <b>ALL</b> that equal <b>${n.toLocaleString()}</b>:`,
+                    opts: [exp, `${n-2} + 2`, `30 hundreds, 72 ones`, `${n-100}`],
+                    correct: [exp, `${n-2} + 2`, `30 hundreds, 72 ones`]
                 };
             }
         ];
 
         function next() {
-            localStorage.setItem('fast_elite_v1', JSON.stringify(state));
+            localStorage.setItem('fast_v5_prod', JSON.stringify(state));
             document.getElementById('pts').innerText = state.points;
             document.getElementById('lvl').innerText = state.level;
-            document.getElementById('fill').style.width = (state.correctCount % 10 * 10) + "%";
+            document.getElementById('fill').style.width = (state.correct % 10 * 10) + "%";
             document.getElementById('feedback').innerText = "";
-
-            currentQuestion = engines[Math.floor(Math.random() * engines.length)]();
-            document.getElementById('std').innerText = currentQuestion.std;
-            document.getElementById('q-area').innerHTML = currentQuestion.q;
+            
+            curQ = engines[Math.floor(Math.random() * engines.length)]();
+            document.getElementById('std').innerText = curQ.std;
+            document.getElementById('q-area').innerHTML = curQ.q;
             
             const area = document.getElementById('interaction-area');
             area.innerHTML = '';
 
-            if(currentQuestion.type === "input") {
-                area.innerHTML = `<input type="number" id="ans-input" class="equation-input" placeholder="Enter number...">`;
-            } 
-            else if(currentQuestion.type === "multiselect") {
-                currentQuestion.options.forEach((opt, i) => {
-                    area.innerHTML += `<button class="option-btn" onclick="this.classList.toggle('selected')">${opt}</button>`;
+            if(curQ.type === "input") {
+                area.innerHTML = `<input type="text" id="ans-in" class="eq-input" inputmode="numeric" placeholder="?">`;
+                document.getElementById('debug').innerText = "Test Hint: " + curQ.correct;
+            } else {
+                curQ.opts.forEach(o => {
+                    area.innerHTML += `<button class="option-btn" onclick="this.classList.toggle('selected')">${o}</button>`;
                 });
-            }
-            else if(currentQuestion.type === "dropdown") {
-                let opts = currentQuestion.options.map(o => `<option value="${o}">${o}</option>`).join('');
-                area.innerHTML = `<select id="ans-drop" class="inline-select"><option value="">Select...</option>${opts}</select> of the whole.`;
+                document.getElementById('debug').innerText = "Test Hint: Select " + curQ.correct.length + " options";
             }
         }
 
         function checkAnswer() {
-            let isCorrect = false;
-
-            if(currentQuestion.type === "input") {
-                isCorrect = document.getElementById('ans-input').value === currentQuestion.correct;
-            } 
-            else if(currentQuestion.type === "multiselect") {
-                let selected = Array.from(document.querySelectorAll('.option-btn.selected')).map(b => b.innerText);
-                isCorrect = selected.length === currentQuestion.correct.length && selected.every(val => currentQuestion.correct.includes(val));
-            }
-            else if(currentQuestion.type === "dropdown") {
-                isCorrect = document.getElementById('ans-drop').value === currentQuestion.correct;
+            let right = false;
+            if(curQ.type === "input") {
+                let val = document.getElementById('ans-in').value.trim();
+                right = (val === curQ.correct);
+            } else {
+                let sel = Array.from(document.querySelectorAll('.option-btn.selected')).map(b => b.innerText);
+                right = (sel.length === curQ.correct.length && sel.every(v => curQ.correct.includes(v)));
             }
 
-            if(isCorrect) {
-                state.points += 10; state.correctCount++;
-                if(state.correctCount % 10 === 0) state.level++;
+            if(right) {
+                state.points += 10; state.correct++;
+                if(state.correct % 10 === 0) state.level++;
                 document.getElementById('feedback').innerHTML = "<span style='color:green'>Correct! 🐊</span>";
                 setTimeout(next, 1000);
             } else {
@@ -148,4 +113,119 @@
         window.onload = next;
     </script>
 </body>
-</html>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastTrack Florida: Mastery Pro</title>
+    <style>
+        :root { --primary: #00796B; --bg: #f4f7f7; --fast-blue: #2196F3; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .header { width: 100%; max-width: 500px; display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .stat-pill { background: white; padding: 8px 15px; border-radius: 20px; border: 2px solid var(--primary); font-weight: bold; font-size: 0.9em; }
+        .card { background: white; width: 100%; max-width: 500px; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); padding: 25px; box-sizing: border-box; border-top: 10px solid var(--primary); }
+        .std-label { color: #888; font-size: 0.75em; font-weight: bold; margin-bottom: 10px; display: block; }
+        .q-text { font-size: 1.25em; line-height: 1.4; margin-bottom: 20px; color: #333; }
+        .option-btn { display: block; width: 100%; padding: 15px; margin-bottom: 10px; border: 2px solid #eee; border-radius: 12px; background: white; text-align: left; font-size: 1em; cursor: pointer; transition: 0.2s; }
+        .option-btn.selected { border-color: var(--fast-blue); background: #e3f2fd; box-shadow: inset 0 0 5px rgba(33,150,243,0.3); }
+        .eq-input { width: 100%; padding: 15px; font-size: 1.5em; border: 2px solid #ccc; border-radius: 12px; text-align: center; margin-bottom: 15px; outline: none; }
+        .eq-input:focus { border-color: var(--primary); }
+        .submit-btn { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; font-size: 1.1em; cursor: pointer; margin-top: 10px; }
+        #feedback { margin-top: 15px; font-weight: bold; height: 25px; text-align: center; font-size: 1.1em; }
+        .progress-bar { width: 100%; height: 10px; background: #e0e0e0; border-radius: 5px; margin-top: 20px; overflow: hidden; }
+        #fill { height: 100%; background: #4CAF50; width: 0%; transition: 0.5s; }
+        .debug-hint { font-size: 0.7em; color: #ccc; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="stat-pill">⭐ Points: <span id="pts">0</span></div>
+        <div class="stat-pill">🏆 Level: <span id="lvl">1</span></div>
+    </div>
+
+    <div class="card">
+        <span id="std" class="std-label">LOADING...</span>
+        <div id="q-area" class="q-text">Setting up your FAST quest...</div>
+        <div id="interaction-area"></div>
+        <button id="submit" class="submit-btn" onclick="checkAnswer()">Submit Answer</button>
+        <div id="feedback"></div>
+        <div class="progress-bar"><div id="fill"></div></div>
+    </div>
+    
+    <div id="debug" class="debug-hint"></div>
+
+    <script>
+        let state = JSON.parse(localStorage.getItem('fast_v5_prod')) || { points: 0, level: 1, correct: 0 };
+        let curQ = {};
+
+        const engines = [
+            // Equation Editor Style
+            function() {
+                let a = Math.floor(Math.random() * 7) + 3;
+                let b = [10, 20, 30, 40, 50][Math.floor(Math.random()*5)];
+                return { type: "input", std: "MA.3.NSO.2.2", q: `Solve: <br><b>${a} × ${b} = </b>`, correct: (a * b).toString() };
+            },
+            // Multiselect Style
+            function() {
+                let n = 3000 + (Math.floor(Math.random() * 5) * 100) + 72;
+                let exp = `3,000 + ${Math.floor((n%1000)/100)*100} + 70 + 2`;
+                return { 
+                    type: "multi", std: "MA.3.NSO.1.1", 
+                    q: `Select <b>ALL</b> that equal <b>${n.toLocaleString()}</b>:`,
+                    opts: [exp, `${n-2} + 2`, `30 hundreds, 72 ones`, `${n-100}`],
+                    correct: [exp, `${n-2} + 2`, `30 hundreds, 72 ones`]
+                };
+            }
+        ];
+
+        function next() {
+            localStorage.setItem('fast_v5_prod', JSON.stringify(state));
+            document.getElementById('pts').innerText = state.points;
+            document.getElementById('lvl').innerText = state.level;
+            document.getElementById('fill').style.width = (state.correct % 10 * 10) + "%";
+            document.getElementById('feedback').innerText = "";
+            
+            curQ = engines[Math.floor(Math.random() * engines.length)]();
+            document.getElementById('std').innerText = curQ.std;
+            document.getElementById('q-area').innerHTML = curQ.q;
+            
+            const area = document.getElementById('interaction-area');
+            area.innerHTML = '';
+
+            if(curQ.type === "input") {
+                area.innerHTML = `<input type="text" id="ans-in" class="eq-input" inputmode="numeric" placeholder="?">`;
+                document.getElementById('debug').innerText = "Test Hint: " + curQ.correct;
+            } else {
+                curQ.opts.forEach(o => {
+                    area.innerHTML += `<button class="option-btn" onclick="this.classList.toggle('selected')">${o}</button>`;
+                });
+                document.getElementById('debug').innerText = "Test Hint: Select " + curQ.correct.length + " options";
+            }
+        }
+
+        function checkAnswer() {
+            let right = false;
+            if(curQ.type === "input") {
+                let val = document.getElementById('ans-in').value.trim();
+                right = (val === curQ.correct);
+            } else {
+                let sel = Array.from(document.querySelectorAll('.option-btn.selected')).map(b => b.innerText);
+                right = (sel.length === curQ.correct.length && sel.every(v => curQ.correct.includes(v)));
+            }
+
+            if(right) {
+                state.points += 10; state.correct++;
+                if(state.correct % 10 === 0) state.level++;
+                document.getElementById('feedback').innerHTML = "<span style='color:green'>Correct! 🐊</span>";
+                setTimeout(next, 1000);
+            } else {
+                document.getElementById('feedback').innerHTML = "<span style='color:orange'>Try again! ☀️</span>";
+            }
+        }
+
+        window.onload = next;
+    </script>
+</body>
+</html
