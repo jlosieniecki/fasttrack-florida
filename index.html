@@ -3,177 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida: Grade 3 Master</title>
-    
-    <meta name="theme-color" content="#00796B">
-    <link rel="apple-touch-icon" href="Gemini_Generated_Image_t8043ht8043ht804.png">
-    <link rel="manifest" href="manifest.json">
-
+    <title>FastTrack Florida: Elite Edition</title>
     <style>
-        :root { --primary: #00796B; --secondary: #004D40; --bg: #E0F7FA; --text: #002D20; --hint: #FFF9C4; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; text-align: center; background: var(--bg); color: var(--text); padding: 10px; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        :root { --primary: #00796B; --bg: #f0f4f4; --fast-blue: #2196F3; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         
-        .logo { width: 90px; height: 90px; margin: 15px auto; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: white; object-fit: cover; }
+        /* Dashboard Styling */
+        .header { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .stat-pill { background: white; padding: 5px 15px; border-radius: 20px; border: 2px solid var(--primary); font-weight: bold; font-size: 0.85em; }
         
-        .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 95%; max-width: 450px; margin-bottom: 10px; }
-        .stat-box { background: white; padding: 12px; border-radius: 15px; border: 2px solid var(--primary); font-weight: bold; font-size: 0.9em; }
+        .card { background: white; width: 100%; max-width: 500px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); padding: 25px; box-sizing: border-box; border-top: 8px solid var(--primary); }
         
-        .progress-container { width: 95%; max-width: 450px; background: #B2DFDB; height: 12px; border-radius: 6px; margin-bottom: 15px; overflow: hidden; border: 1px solid var(--secondary); }
-        #progress-fill { width: 0%; height: 100%; background: #4CAF50; transition: 0.4s ease-out; }
+        .standard-label { color: #666; font-size: 0.75em; font-weight: bold; margin-bottom: 10px; display: block; }
+        .question-text { font-size: 1.2em; line-height: 1.4; margin-bottom: 20px; }
 
-        .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 95%; max-width: 450px; border: 3px solid var(--primary); box-sizing: border-box; }
+        /* ITEM TYPES STYLING */
+        /* Multiple Choice & Multiselect */
+        .option-btn { display: block; width: 100%; padding: 15px; margin-bottom: 10px; border: 2px solid #ddd; border-radius: 10px; background: white; text-align: left; font-size: 1em; cursor: pointer; transition: 0.2s; }
+        .option-btn.selected { border-color: var(--fast-blue); background: #e3f2fd; }
         
-        .cat-tag { font-size: 0.7em; color: #666; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 10px; }
-        #question-text { font-size: 1.25em; margin: 15px 0; min-height: 50px; }
+        /* Equation Editor (Input) */
+        .equation-input { width: 100%; padding: 15px; font-size: 1.5em; border: 2px solid #ccc; border-radius: 10px; text-align: center; margin-bottom: 15px; box-sizing: border-box; }
+
+        /* Editing Task (Dropdown) */
+        .inline-select { padding: 5px; font-size: 1em; border: 2px solid var(--primary); border-radius: 5px; margin: 0 5px; }
+
+        .submit-btn { background: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 10px; font-weight: bold; width: 100%; font-size: 1.1em; cursor: pointer; margin-top: 10px; }
         
-        .btn { background: var(--primary); color: white; padding: 16px; border-radius: 15px; border: none; cursor: pointer; font-size: 1.1em; margin: 8px 0; width: 100%; font-weight: bold; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
-        .btn:active { transform: scale(0.97); background: var(--secondary); }
-        
-        .btn-hint { background: #FF9800; font-size: 0.85em; width: auto; padding: 8px 20px; margin-top: 15px; }
-        .hint-box { background: var(--hint); border: 2px dashed #FBC02D; padding: 15px; border-radius: 15px; margin-top: 15px; display: none; text-align: left; font-size: 0.9em; line-height: 1.4; }
-        
-        #feedback { font-weight: bold; margin-top: 15px; font-size: 1.2em; min-height: 30px; }
+        #feedback { margin-top: 15px; font-weight: bold; height: 20px; text-align: center; }
+        .progress-bar { width: 100%; height: 8px; background: #ddd; border-radius: 4px; margin-top: 15px; overflow: hidden; }
+        #fill { height: 100%; background: #4CAF50; width: 0%; transition: 0.4s; }
     </style>
 </head>
 <body>
 
-    <img src="Gemini_Generated_Image_t8043ht8043ht804.png" alt="FastTrack Gator" class="logo">
-
-    <div class="stats-container">
-        <div class="stat-box">⭐ Points: <span id="pts">0</span></div>
-        <div class="stat-box">🏆 Mastery: Lvl <span id="lvl">1</span></div>
+    <div class="header">
+        <div class="stat-pill">⭐ Points: <span id="pts">0</span></div>
+        <div class="stat-pill">🏆 Level: <span id="lvl">1</span></div>
     </div>
 
-    <div class="progress-container"><div id="progress-fill"></div></div>
-
     <div class="card">
-        <span id="cat-tag" class="cat-tag">FAST Standard Practice</span>
-        <div id="question-text">Loading your math quest...</div>
-        <div id="options"></div>
-        
-        <button class="btn btn-hint" onclick="toggleHint()">💡 Need a Hint?</button>
-        <div id="hint-box" class="hint-box"></div>
-        
+        <span id="std" class="standard-label">MA.3.NSO.1.1</span>
+        <div id="q-area" class="question-text">Loading...</div>
+        <div id="interaction-area"></div>
+        <button id="submit" class="submit-btn" onclick="checkAnswer()">Submit Answer</button>
         <div id="feedback"></div>
+        <div class="progress-bar"><div id="fill"></div></div>
     </div>
 
     <script>
-        // --- DATA PERSISTENCE (Saves to Phone) ---
-        let state = JSON.parse(localStorage.getItem('fastTrack_v4')) || { points: 0, level: 1, correctInLevel: 0 };
+        let state = JSON.parse(localStorage.getItem('fast_elite_v1')) || { points: 0, level: 1, correctCount: 0 };
+        let currentQuestion = {};
 
-        function save() {
-            localStorage.setItem('fastTrack_v4', JSON.stringify(state));
-            renderStats();
-        }
-
-        function renderStats() {
-            document.getElementById('pts').innerText = state.points;
-            document.getElementById('lvl').innerText = state.level;
-            let progress = (state.correctInLevel / 10) * 100;
-            document.getElementById('progress-fill').style.width = progress + "%";
-            
-            if (state.correctInLevel >= 10) {
-                state.level++;
-                state.correctInLevel = 0;
-                alert("🌟 EXCELLENT! You reached Mastery Level " + state.level);
-                save();
-            }
-        }
-
-        // --- MATH ENGINES (Based on FAST & B1G-M docs) ---
+        // --- THE INFINITE ITEM TYPE ENGINES ---
         const engines = [
-            // MA.3.NSO.1.1: Decomposing numbers
+            // 1. EQUATION EDITOR style (MA.3.NSO.2.2)
             function() {
-                let n = Math.floor(Math.random() * 8999) + 1000;
-                let th = Math.floor(n/1000)*1000;
-                let h = Math.floor((n%1000)/100)*100;
-                let t = Math.floor((n%100)/10)*10;
-                let o = n%10;
-                let ans = `${th} + ${h} + ${t} + ${o}`.replace("+ 0", "").trim();
+                let a = Math.floor(Math.random() * 8) + 2;
+                let b = [10, 20, 30, 40, 50][Math.floor(Math.random()*5)];
                 return {
-                    q: `What is the expanded form of ${n.toLocaleString()}?`,
-                    a: [ans, `${th} + ${t} + ${o}`, `${n} + 1`, `${th} + ${h} + 0`],
-                    cat: "Number Sense",
-                    hint: "Think about each place value: Thousands, Hundreds, Tens, and Ones. (B1G-M MA.3.NSO.1.1)"
+                    type: "input", std: "MA.3.NSO.2.2",
+                    q: `Solve the equation: <br><b>${a} × ${b} = ?</b>`,
+                    correct: (a * b).toString(),
+                    hint: "Multiply the non-zero digits first, then add the zero."
                 };
             },
-            // MA.3.NSO.2.2: Multiplication with 10s/100s
+            // 2. MULTISELECT style (MA.3.NSO.1.1)
             function() {
-                let f = Math.floor(Math.random() * 8) + 2;
-                let m = [20, 30, 40, 50, 60, 70, 80, 90, 100, 200][Math.floor(Math.random()*10)];
-                let res = f * m;
+                let n = 2000 + (Math.floor(Math.random() * 9) * 100) + 45; 
+                let expanded = `2,000 + ${Math.floor((n%1000)/100)*100} + 40 + 5`;
                 return {
-                    q: `Solve: ${f} × ${m} = ?`,
-                    a: [res, res - 10, res + 10, f + m],
-                    cat: "Operations",
-                    hint: "Multiply the non-zero digits first, then tack the zeros onto the end of your answer!"
+                    type: "multiselect", std: "MA.3.NSO.1.1",
+                    q: `Select <b>ALL</b> the expressions that are equal to <b>${n.toLocaleString()}</b>.`,
+                    options: [expanded, `Two thousand, ${(n%1000)}`, `20 hundreds + 45 ones`, `${n-10} + 10`],
+                    correct: [expanded, `20 hundreds + 45 ones`, `${n-10} + 10`],
+                    hint: "A number can be shown in many ways (expanded, word, and regrouped form)."
                 };
             },
-            // MA.3.GR.2.3: Perimeter
+            // 3. EDITING TASK (Dropdown) style (MA.3.FR.1.1)
             function() {
-                let l = Math.floor(Math.random() * 9) + 2;
-                let w = Math.floor(Math.random() * 6) + 2;
-                let p = (l * 2) + (w * 2);
+                let d = [2, 3, 4, 6, 8][Math.floor(Math.random()*5)];
                 return {
-                    q: `A rectangle is ${l} units long and ${w} units wide. What is the perimeter?`,
-                    a: [p, l * w, l + w, p + 2],
-                    cat: "Geometry",
-                    hint: "Perimeter is the distance AROUND. Add all four sides: L + W + L + W."
+                    type: "dropdown", std: "MA.3.FR.1.1",
+                    q: `Complete the sentence: <br> A circle is divided into ${d} equal parts. Each part represents `,
+                    options: [`1/${d}`, `1/1`, `${d}/1`, `0`],
+                    correct: `1/${d}`,
+                    hint: "A unit fraction always has a 1 as the numerator."
                 };
             }
         ];
 
-        let currentCorrect;
-
-        function nextQuestion() {
-            save();
-            const engine = engines[Math.floor(Math.random() * engines.length)];
-            const data = engine();
-            
-            document.getElementById('cat-tag').innerText = data.cat;
-            document.getElementById('question-text').innerText = data.q;
-            document.getElementById('hint-box').innerText = data.hint;
-            document.getElementById('hint-box').style.display = 'none';
+        function next() {
+            localStorage.setItem('fast_elite_v1', JSON.stringify(state));
+            document.getElementById('pts').innerText = state.points;
+            document.getElementById('lvl').innerText = state.level;
+            document.getElementById('fill').style.width = (state.correctCount % 10 * 10) + "%";
             document.getElementById('feedback').innerText = "";
-            
-            currentCorrect = data.a[0];
-            let shuffled = [...data.a].sort(() => Math.random() - 0.5);
-            
-            const optionsDiv = document.getElementById('options');
-            optionsDiv.innerHTML = '';
-            
-            shuffled.forEach(opt => {
-                const b = document.createElement('button');
-                b.className = 'btn';
-                b.innerText = opt;
-                b.onclick = () => check(opt);
-                optionsDiv.appendChild(b);
-            });
-        }
 
-        function check(val) {
-            if(val == currentCorrect) {
-                state.points += 10;
-                state.correctInLevel += 1;
-                document.getElementById('feedback').innerText = "Correct! 🐊";
-                document.getElementById('feedback').style.color = "green";
-                setTimeout(nextQuestion, 1000);
-            } else {
-                document.getElementById('feedback').innerText = "Try again! ☀️";
-                document.getElementById('feedback').style.color = "orange";
+            currentQuestion = engines[Math.floor(Math.random() * engines.length)]();
+            document.getElementById('std').innerText = currentQuestion.std;
+            document.getElementById('q-area').innerHTML = currentQuestion.q;
+            
+            const area = document.getElementById('interaction-area');
+            area.innerHTML = '';
+
+            if(currentQuestion.type === "input") {
+                area.innerHTML = `<input type="number" id="ans-input" class="equation-input" placeholder="Enter number...">`;
+            } 
+            else if(currentQuestion.type === "multiselect") {
+                currentQuestion.options.forEach((opt, i) => {
+                    area.innerHTML += `<button class="option-btn" onclick="this.classList.toggle('selected')">${opt}</button>`;
+                });
+            }
+            else if(currentQuestion.type === "dropdown") {
+                let opts = currentQuestion.options.map(o => `<option value="${o}">${o}</option>`).join('');
+                area.innerHTML = `<select id="ans-drop" class="inline-select"><option value="">Select...</option>${opts}</select> of the whole.`;
             }
         }
 
-        function toggleHint() {
-            const h = document.getElementById('hint-box');
-            h.style.display = h.style.display === 'none' ? 'block' : 'none';
+        function checkAnswer() {
+            let isCorrect = false;
+
+            if(currentQuestion.type === "input") {
+                isCorrect = document.getElementById('ans-input').value === currentQuestion.correct;
+            } 
+            else if(currentQuestion.type === "multiselect") {
+                let selected = Array.from(document.querySelectorAll('.option-btn.selected')).map(b => b.innerText);
+                isCorrect = selected.length === currentQuestion.correct.length && selected.every(val => currentQuestion.correct.includes(val));
+            }
+            else if(currentQuestion.type === "dropdown") {
+                isCorrect = document.getElementById('ans-drop').value === currentQuestion.correct;
+            }
+
+            if(isCorrect) {
+                state.points += 10; state.correctCount++;
+                if(state.correctCount % 10 === 0) state.level++;
+                document.getElementById('feedback').innerHTML = "<span style='color:green'>Correct! 🐊</span>";
+                setTimeout(next, 1000);
+            } else {
+                document.getElementById('feedback').innerHTML = "<span style='color:orange'>Try again! ☀️</span>";
+            }
         }
 
-        // Initialize App
-        window.onload = () => {
-            renderStats();
-            nextQuestion();
-        };
+        window.onload = next;
     </script>
 </body>
 </html>
