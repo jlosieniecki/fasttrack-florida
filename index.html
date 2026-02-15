@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FAST Grade 3 Math - Blueprint Edition</title>
+    <title>FAST Grade 3 Math - Standard Mastery</title>
     <style>
         :root { --header: #2C3E50; --bg: #F5F7FA; --active: #00609C; --text: #333; --panel-border: #b5b5b5; }
         
@@ -17,12 +17,23 @@
         .screen { display: none; height: 100%; width: 100%; flex-direction: column; }
         .screen.active { display: flex; }
 
-        /* MENU */
+        /* MENU - ACCORDION STYLE */
         .menu-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 20px; }
-        .menu-card { background: white; padding: 30px; border-radius: 4px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); text-align: center; color: #333; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; }
-        .std-btn { display: block; width: 100%; padding: 12px 15px; margin: 8px 0; border: 1px solid #ccc; background: #fff; text-align: left; cursor: pointer; font-size: 0.95em; border-left: 5px solid #ccc; }
-        .std-btn:hover { background: #f0f8ff; border-left-color: var(--active); }
-        .std-btn strong { color: #003057; display: block; margin-bottom: 2px; }
+        .menu-card { background: white; padding: 20px; border-radius: 4px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); text-align: center; color: #333; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; }
+        
+        /* Expandable Details */
+        details { width: 100%; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; }
+        summary { background: #f0f0f0; padding: 12px; cursor: pointer; font-weight: bold; text-align: left; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+        summary:after { content: '+'; font-weight: bold; }
+        details[open] summary:after { content: '-'; }
+        details[open] summary { background: var(--active); color: white; }
+        
+        .sub-btn { display: block; width: 100%; padding: 10px 15px; border: none; border-bottom: 1px solid #eee; background: #fff; text-align: left; cursor: pointer; font-size: 0.9em; padding-left: 20px; transition: 0.2s; }
+        .sub-btn:hover { background: #eef6fc; padding-left: 25px; color: var(--active); font-weight: bold; }
+        .sub-btn:last-child { border-bottom: none; }
+
+        .main-btn { display: block; width: 100%; padding: 15px; margin-bottom: 20px; background: #eef6fc; border: 2px solid #003057; color: #003057; font-weight: bold; cursor: pointer; border-radius: 4px; text-align: left; }
+        .main-btn:hover { background: #003057; color: white; }
 
         /* TEST INTERFACE */
         .top-bar { background: #fff; border-bottom: 2px solid #000; padding: 0 20px; height: 55px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
@@ -34,42 +45,34 @@
         .right-pane { width: 55%; }
         @media (max-width: 768px) { .main-stage { flex-direction: column; } .left-pane { width: 100%; height: 35%; border-bottom: 2px solid #999; } .right-pane { width: 100%; height: 65%; } }
 
-        /* QUESTIONS */
+        /* QUESTIONS & ITEMS */
         .q-header { font-weight: bold; color: #444; margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px; text-transform: uppercase; font-size: 0.85em; letter-spacing: 0.5px; }
         .q-text { font-size: 1.2em; line-height: 1.6; color: #000; margin-bottom: 25px; }
-
-        /* ITEM STYLES */
         .part-header { font-weight: bold; margin-top: 20px; margin-bottom: 10px; color: #000; border-top: 1px dashed #ccc; padding-top: 10px; }
-        .inline-select { display: inline-block; font-size: 1em; padding: 4px 10px; margin: 0 4px; border: 2px solid #333; background: #fff; color: #000; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0 rgba(0,0,0,0.1); }
+        .inline-select { display: inline-block; font-size: 1em; padding: 4px 10px; margin: 0 4px; border: 2px solid #333; background: #fff; color: #000; font-weight: bold; cursor: pointer; }
         .shaded-box { background: #E8E8E8; padding: 20px; border: 1px solid #999; display: inline-block; min-width: 300px; }
         .input-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .input-box { font-size: 1.2em; padding: 8px; width: 120px; text-align: center; border: 1px solid #555; background: white; border-radius: 2px; }
-        .input-box::placeholder { color: #ccc; font-style: italic; }
-
         .match-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .match-table th { background: #f0f0f0; border: 1px solid #999; padding: 10px; }
         .match-table td { border: 1px solid #999; padding: 10px; text-align: center; }
         .radio-big { width: 22px; height: 22px; cursor: pointer; accent-color: #000; }
-
         .opt-row { display: flex; padding: 12px; margin-bottom: 10px; cursor: pointer; align-items: center; border: 1px solid transparent; }
         .opt-row:hover { background: #f5f5f5; }
         .opt-row.selected { background: #e6f3ff; border: 1px solid var(--active); font-weight: bold; }
-        .bubble { width: 20px; height: 20px; border: 1px solid #333; border-radius: 50%; margin-right: 15px; flex-shrink: 0; background: white; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); }
-        .opt-row.selected .bubble { background: #000; border-color: #000; box-shadow: none; }
+        .bubble { width: 20px; height: 20px; border: 1px solid #333; border-radius: 50%; margin-right: 15px; flex-shrink: 0; background: white; }
+        .opt-row.selected .bubble { background: #000; border-color: #000; }
         .bubble.square { border-radius: 2px; }
+        
+        svg { max-height: 250px; display: block; margin: auto; }
 
         /* NAV & REPORT */
         .nav-bar { background: #f0f0f0; border-top: 1px solid #999; height: 65px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; flex-shrink: 0; }
-        .nav-btn { background: #fff; color: #333; border: 1px solid #999; padding: 10px 25px; font-weight: bold; font-size: 1em; cursor: pointer; min-width: 100px; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .nav-btn { background: #fff; color: #333; border: 1px solid #999; padding: 10px 25px; font-weight: bold; font-size: 1em; cursor: pointer; min-width: 100px; border-radius: 2px; }
         .nav-btn.primary { background: var(--active); color: white; border-color: var(--active); }
-        
         .level-badge { padding: 10px 20px; color: white; font-weight: bold; font-size: 1.5em; border-radius: 30px; margin: 15px 0; display: inline-block; }
         .l3 { background: #FBC02D; color: #000; } .l4 { background: #4CAF50; }
-        .grid-rep { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
-        .rep-box { padding: 15px; background: #f9f9f9; border-left: 6px solid #ccc; font-size: 0.9em; }
-        .good { border-left-color: #4CAF50; } .bad { border-left-color: #D32F2F; }
-
-        svg { max-height: 250px; display: block; margin: auto; }
+        .rep-box { padding: 15px; background: #f9f9f9; border-left: 6px solid #ccc; font-size: 0.9em; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -77,21 +80,72 @@
     <div id="screen-menu" class="screen active">
         <div class="menu-container">
             <div class="menu-card">
-                <h1 style="margin:0; color:#003057;">FAST Math Simulator</h1>
-                <p style="color:#666;">Grade 3 B.E.S.T. Standards • Full Blueprint</p>
+                <h2 style="margin:0 0 20px 0; color:#003057;">FAST Math Mastery</h2>
                 
-                <button class="std-btn" onclick="startTest('ALL', 40)" style="border-left-color: #003057; background:#eef6fc;">
-                    <strong>🚀 Full FAST Mock Exam</strong>
-                    <small>40 Questions • Exact Blueprint Coverage</small>
+                <button class="main-btn" onclick="startTest('ALL', 40)">
+                    🚀 Full Operational Mock (40 Items)
                 </button>
                 
-                <h3 style="text-align:left; margin-top:20px; border-bottom:1px solid #eee;">Domain Practice</h3>
-                <button class="std-btn" onclick="startTest('NSO', 15)"><strong>Number Sense (NSO)</strong> <small>Place Value, Operations</small></button>
-                <button class="std-btn" onclick="startTest('FR', 15)"><strong>Fractions (FR)</strong> <small>Models, Comparisons</small></button>
-                <button class="std-btn" onclick="startTest('AR', 15)"><strong>Algebraic Reasoning (AR)</strong> <small>Logic, Patterns</small></button>
-                <button class="std-btn" onclick="startTest('GR', 15)"><strong>Geometry (GR)</strong> <small>Attributes, Area/Perimeter</small></button>
-                <button class="std-btn" onclick="startTest('M', 10)"><strong>Measurement (M)</strong> <small>Time, Length, Mass</small></button>
-                <button class="std-btn" onclick="startTest('DP', 10)"><strong>Data Analysis (DP)</strong> <small>Graphs, Tables</small></button>
+                <h4 style="text-align:left; margin-bottom:10px; color:#666;">Individual Standard Practice</h4>
+
+                <details>
+                    <summary>🔢 Number Sense (NSO)</summary>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.1.1', 5)">NSO.1.1: Expanded Form</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.1.2', 5)">NSO.1.2: Compose/Decompose</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.1.3', 5)">NSO.1.3: Comparing Numbers</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.1.4', 5)">NSO.1.4: Rounding</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.2.1', 5)">NSO.2.1: Add/Subtract</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.2.2', 5)">NSO.2.2: Multiplication Facts</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.2.3', 5)">NSO.2.3: Mult Strategies</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.2.4', 5)">NSO.2.4: Division Facts</button>
+                </details>
+
+                <details>
+                    <summary>🍕 Fractions (FR)</summary>
+                    <button class="sub-btn" onclick="startTest('MA.3.FR.1.1', 5)">FR.1.1: Represent Fractions</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.FR.1.2', 5)">FR.1.2: Number Lines</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.FR.1.3', 5)">FR.1.3: Whole Numbers</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.FR.2.1', 5)">FR.2.1: Comparing Fractions</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.FR.2.2', 5)">FR.2.2: Equivalent Fractions</button>
+                </details>
+
+                <details>
+                    <summary>🧠 Algebraic Reasoning (AR)</summary>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.1.1', 5)">AR.1.1: Distributive Property</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.1.2', 5)">AR.1.2: Multi-Step Logic</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.2.1', 5)">AR.2.1: Missing Factors (Div)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.2.2', 5)">AR.2.2: Equations</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.2.3', 5)">AR.2.3: Missing Factors (Mult)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.3.1', 5)">AR.3.1: Identify Patterns</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.3.2', 5)">AR.3.2: Explain Patterns</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.3.3', 5)">AR.3.3: Input/Output Tables</button>
+                </details>
+
+                <details>
+                    <summary>📐 Geometry (GR)</summary>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.1.1', 5)">GR.1.1: Point, Line, Ray</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.1.2', 5)">GR.1.2: Shape Attributes</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.1.3', 5)">GR.1.3: Symmetry</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.1', 5)">GR.2.1: Area (Tiling)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.2', 5)">GR.2.2: Area (Formula)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.3', 5)">GR.2.3: Perimeter (Missing Side)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.4', 5)">GR.2.4: Area vs Perimeter</button>
+                </details>
+
+                <details>
+                    <summary>📏 Measurement (M)</summary>
+                    <button class="sub-btn" onclick="startTest('MA.3.M.1.1', 5)">M.1.1: Length Conversions</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.M.1.2', 5)">M.1.2: Mass & Capacity</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.M.2.1', 5)">M.2.1: Telling Time</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.M.2.2', 5)">M.2.2: Elapsed Time</button>
+                </details>
+
+                <details>
+                    <summary>📊 Data Analysis (DP)</summary>
+                    <button class="sub-btn" onclick="startTest('MA.3.DP.1.1', 5)">DP.1.1: Scaled Graphs</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.DP.1.2', 5)">DP.1.2: Interpret Data</button>
+                </details>
+
             </div>
         </div>
     </div>
@@ -101,7 +155,7 @@
             <div><strong>Student: Guest</strong> | G3 Math</div>
             <div>
                 <button class="tool-btn" onclick="toggleZoom()">🔍 Zoom</button>
-                <button class="tool-btn" onclick="alert('Line Reader Tool Active')">📏 Line Reader</button>
+                <button class="tool-btn" onclick="toggleRef()">📄 Formulas</button>
                 <button class="tool-btn" style="color:#D32F2F; border-color:#D32F2F;" onclick="location.reload()">Exit</button>
             </div>
         </div>
@@ -169,7 +223,7 @@
             </svg>`;
         }
 
-        // --- COMPLETE STANDARD GENERATORS (UNIQUE LOGIC) ---
+        // --- FULL STANDARDS GENERATOR (With Randomization Logic) ---
         const STANDARDS = {
             // NSO
             "MA.3.NSO.1.1": () => { 
@@ -299,33 +353,30 @@
             }
         };
 
-        // --- THE "DECK" ALGORITHM (Prevent Repetition) ---
+        // --- DECK SHUFFLE LOGIC ---
         let queue = [], curIdx = 0, answers = [];
 
         function startTest(mode, count) {
             queue = []; answers = [];
             let allKeys = Object.keys(STANDARDS);
             
-            // Filter by Mode
+            // Filter mode (e.g. "MA.3.NSO.1.1" or "ALL")
             if(mode !== 'ALL') {
                 allKeys = allKeys.filter(k => k.includes(mode));
             }
 
             // Create Deck
-            let deck = [...allKeys]; // Copy
+            let deck = [...allKeys]; 
             
             for(let i=0; i<count; i++) {
-                if(deck.length === 0) deck = [...allKeys]; // Refill if empty
+                if(deck.length === 0) deck = [...allKeys]; // Reshuffle if empty
                 
-                // Randomly pull from deck
-                let randIndex = Math.floor(Math.random() * deck.length);
-                let selectedKey = deck[randIndex];
-                
-                // Remove used key so it doesn't repeat until deck refills
-                deck.splice(randIndex, 1);
+                // Random Pull
+                let r = Math.floor(Math.random() * deck.length);
+                let k = deck[r];
+                deck.splice(r, 1); // Remove used standard
 
-                // Generate Question
-                queue.push(STANDARDS[selectedKey]());
+                queue.push(STANDARDS[k]());
             }
 
             curIdx = 0;
