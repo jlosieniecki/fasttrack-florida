@@ -3,277 +3,330 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAST Grade 3 Math - Official Simulator</title>
+    <title>FAST Grade 3 Math Portal</title>
     <style>
-        :root { --header: #2C3E50; --bg: #EAEAEA; --active: #3498DB; --text: #333; }
-        body { font-family: 'Arial', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; transition: transform 0.2s; transform-origin: top left; }
+        :root { --header: #2C3E50; --bg: #EAEAEA; --active: #3498DB; --text: #333; --panel-bg: #fff; }
+        body { font-family: 'Arial', sans-serif; background: var(--bg); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* HEADER */
-        .top-bar { background: var(--header); color: white; padding: 0 20px; height: 60px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .tool-group { display: flex; gap: 10px; }
-        .tool-btn { background: transparent; border: 1px solid #7F8C8D; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.9em; }
+        /* --- SCREENS --- */
+        .screen { display: none; height: 100%; width: 100%; flex-direction: column; }
+        .screen.active { display: flex; }
+
+        /* --- LOGIN / MENU SCREEN --- */
+        .menu-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, #2C3E50, #4CA1AF); color: white; }
+        .menu-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); text-align: center; color: #333; width: 500px; }
+        .menu-btn { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 1.1em; cursor: pointer; transition: 0.2s; background: #f9f9f9; text-align: left; position: relative; }
+        .menu-btn:hover { background: #e3f2fd; border-color: var(--active); }
+        .menu-btn strong { display: block; color: var(--header); }
+        .menu-btn small { color: #666; font-size: 0.85em; }
+
+        /* --- TEST INTERFACE (Cambium Style) --- */
+        .top-bar { background: var(--header); color: white; padding: 0 20px; height: 60px; display: flex; justify-content: space-between; align-items: center; }
+        .tool-btn { background: transparent; border: 1px solid #7F8C8D; color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-left: 5px; font-size: 0.9em; }
         .tool-btn:hover { background: rgba(255,255,255,0.1); }
-        .tool-btn.active { background: var(--active); border-color: var(--active); }
 
-        /* MAIN CONTENT */
-        .main-stage { display: flex; flex: 1; padding: 10px; gap: 10px; overflow: hidden; position: relative; }
-        
-        /* SPLIT LAYOUT */
-        .split-pane { background: white; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow-y: auto; padding: 25px; position: relative; }
-        .left-pane { width: 45%; border-right: 1px solid #ddd; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #FAFAFA; }
+        .main-stage { flex: 1; padding: 15px; overflow: hidden; display: flex; gap: 15px; }
+        .pane { background: white; border-radius: 4px; padding: 25px; overflow-y: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .left-pane { width: 45%; border-right: 4px solid #ddd; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #FAFAFA; }
         .right-pane { width: 55%; }
         .full-pane { width: 100%; }
 
-        /* GRAPHICS GENERATOR */
-        svg { max-width: 100%; max-height: 300px; }
-        .data-key-box { border: 2px solid #333; padding: 15px; background: #fff; display: inline-block; text-align: left; border-radius: 8px; }
-        .key-row { font-size: 1.2em; margin: 5px 0; display: flex; align-items: center; gap: 10px; }
+        /* GRAPHICS */
+        svg { max-width: 100%; max-height: 350px; }
+        .key-box { border: 2px solid #333; padding: 15px; background: white; border-radius: 8px; font-size: 1.1em; }
 
-        /* QUESTION STYLES */
-        .q-header { color: #555; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
-        .q-content { font-size: 1.3em; line-height: 1.5; color: #222; margin-bottom: 20px; }
+        /* QUESTIONS */
+        .q-header { color: #555; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .q-text { font-size: 1.3em; line-height: 1.5; color: #222; margin-bottom: 25px; }
         
-        /* INTERACTION */
-        .opt-row { display: flex; padding: 12px; margin-bottom: 8px; cursor: pointer; border: 1px solid transparent; border-radius: 4px; transition: 0.1s; }
+        .opt-row { display: flex; padding: 12px; margin-bottom: 10px; cursor: pointer; border: 1px solid transparent; border-radius: 6px; transition: 0.1s; align-items: center; }
         .opt-row:hover { background: #F4F6F7; border-color: #ddd; }
-        .opt-row.selected { background: #EBF5FB; border-color: var(--active); }
-        .bubble { width: 22px; height: 22px; border: 2px solid #95A5A6; border-radius: 50%; margin-right: 15px; }
+        .opt-row.selected { background: #EBF5FB; border-color: var(--active); font-weight: bold; }
+        .bubble { width: 24px; height: 24px; border: 2px solid #95A5A6; border-radius: 50%; margin-right: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
         .opt-row.selected .bubble { background: var(--active); border-color: var(--active); }
+        .bubble.square { border-radius: 4px; }
 
-        .input-box { font-size: 1.2em; padding: 8px; width: 80px; text-align: center; border: 2px solid #ccc; border-radius: 4px; }
-        .input-box:focus { border-color: var(--active); outline: none; }
-
+        .input-box { font-size: 1.4em; padding: 8px; width: 100px; text-align: center; border: 2px solid #ccc; border-radius: 4px; }
+        
         /* FOOTER */
         .nav-bar { background: white; border-top: 1px solid #ccc; height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; }
         .nav-btn { background: var(--active); color: white; border: none; padding: 12px 30px; border-radius: 4px; font-size: 1.1em; font-weight: bold; cursor: pointer; }
-        .nav-btn.secondary { background: white; color: #333; border: 2px solid #ccc; }
 
-        /* TOOLS OVERLAYS */
-        #line-reader { position: absolute; width: 100%; height: 60px; background: rgba(255, 255, 0, 0.3); border-top: 2px solid red; border-bottom: 2px solid red; top: 100px; left: 0; cursor: grab; display: none; z-index: 100; pointer-events: auto; }
+        /* REPORT CARD */
+        .report-header { text-align: center; margin-bottom: 30px; }
+        .score-badge { display: inline-block; padding: 10px 20px; border-radius: 20px; font-weight: bold; color: white; margin: 10px; font-size: 1.2em; }
+        .level-5 { background: #009688; } .level-4 { background: #4CAF50; }
+        .level-3 { background: #FFC107; color: #333; } .level-2 { background: #FF9800; } .level-1 { background: #F44336; }
         
-        #ref-sheet-modal { position: fixed; top: 10%; left: 50%; transform: translateX(-50%); width: 600px; height: 70vh; background: white; border: 1px solid #ccc; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none; z-index: 200; flex-direction: column; }
-        .ref-header { background: #333; color: white; padding: 10px; display: flex; justify-content: space-between; }
-        .ref-content { padding: 20px; overflow-y: auto; font-family: "Times New Roman", serif; }
-        .ref-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .ref-table th, .ref-table td { border: 1px solid #000; padding: 8px; text-align: center; }
+        .strength-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; }
+        .strength-box { padding: 15px; border-radius: 8px; background: #f9f9f9; border-left: 5px solid #ccc; }
+        .good { border-color: #4CAF50; } .bad { border-color: #F44336; }
 
-        .zoom-125 { transform: scale(1.25); width: 80vw; height: 80vh; }
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        <div style="font-weight:bold;">Student: Guest (G3 Math)</div>
-        <div class="tool-group">
-            <button class="tool-btn" onclick="toggleZoom()">🔍 Zoom</button>
-            <button class="tool-btn" onclick="toggleLineReader()">📏 Line Reader</button>
-            <button class="tool-btn" onclick="toggleRef()">📄 Formulas</button>
-        </div>
-        <button class="tool-btn" style="background:#C0392B; border-color:#C0392B;" onclick="location.reload()">Exit</button>
-    </div>
-
-    <div id="stage" class="main-stage">
-        </div>
-
-    <div id="line-reader" draggable="true"></div>
-
-    <div id="ref-sheet-modal">
-        <div class="ref-header">
-            <span>Grade 3 Mathematics Reference Sheet</span>
-            <button onclick="toggleRef()" style="background:none; border:none; color:white; cursor:pointer;">✕</button>
-        </div>
-        <div class="ref-content">
-            <h3>Customary Conversions</h3>
-            <table class="ref-table">
-                <tr><td>1 foot = 12 inches</td><td>1 yard = 3 feet</td></tr>
-                <tr><td>1 mile = 5,280 feet</td><td>1 mile = 1,760 yards</td></tr>
-                <tr><td>1 cup = 8 fluid ounces</td><td>1 pint = 2 cups</td></tr>
-                <tr><td>1 quart = 2 pints</td><td>1 gallon = 4 quarts</td></tr>
-                <tr><td>1 pound = 16 ounces</td><td>1 ton = 2,000 pounds</td></tr>
-            </table>
-            <h3>Metric Conversions</h3>
-            <table class="ref-table">
-                <tr><td>1 meter = 100 centimeters</td><td>1 meter = 1000 millimeters</td></tr>
-                <tr><td>1 kilometer = 1000 meters</td><td>1 liter = 1000 milliliters</td></tr>
-                <tr><td>1 gram = 1000 milligrams</td><td>1 kilogram = 1000 grams</td></tr>
-            </table>
-            <h3>Time Conversions</h3>
-            <table class="ref-table">
-                <tr><td>1 minute = 60 seconds</td><td>1 hour = 60 minutes</td></tr>
-                <tr><td>1 day = 24 hours</td><td>1 year = 365 days</td></tr>
-            </table>
+    <div id="screen-menu" class="screen active">
+        <div class="menu-container">
+            <div class="menu-card">
+                <img src="Gemini_Generated_Image_t8043ht8043ht804.png" style="width:80px; border-radius:10px; margin-bottom:20px;">
+                <h2>Welcome to FAST Math</h2>
+                <p>Select a mode to begin your practice:</p>
+                
+                <button class="menu-btn" onclick="startTest('ALL')">
+                    <strong>🚀 Full FAST Mock Test</strong>
+                    <small>Mix of all domains (35-40 Question Simulation)</small>
+                </button>
+                <button class="menu-btn" onclick="startTest('MA.3.FR')">
+                    <strong>🍕 Fractions Practice</strong>
+                    <small>Partitioning, Equivalence, Comparing</small>
+                </button>
+                <button class="menu-btn" onclick="startTest('MA.3.NSO')">
+                    <strong>🔢 Number Sense & Ops</strong>
+                    <small>Place Value, Multiplication, Division</small>
+                </button>
+                <button class="menu-btn" onclick="startTest('MA.3.GR')">
+                    <strong>📐 Geometry & Measurement</strong>
+                    <small>Perimeter, Area, Time, Shapes</small>
+                </button>
+                <button class="menu-btn" onclick="startTest('MA.3.AR')">
+                    <strong>🧠 Algebraic Reasoning</strong>
+                    <small>Patterns, Multi-step Problems</small>
+                </button>
+            </div>
         </div>
     </div>
 
-    <div class="nav-bar">
-        <button class="nav-btn secondary" onclick="prevQ()">Back</button>
-        <div>Question <span id="q-idx">1</span> of 5</div>
-        <button class="nav-btn" onclick="nextQ()">Next</button>
+    <div id="screen-test" class="screen">
+        <div class="top-bar">
+            <div><strong>G3 Math Practice</strong> | <span id="mode-label">Full Test</span></div>
+            <div>
+                <button class="tool-btn" onclick="toggleZoom()">🔍 Zoom</button>
+                <button class="tool-btn" onclick="alert('Formula Sheet Loaded')">📄 Formulas</button>
+                <button class="tool-btn" style="background:#C0392B; border-color:#C0392B" onclick="location.reload()">Exit</button>
+            </div>
+        </div>
+
+        <div id="stage" class="main-stage"></div>
+
+        <div class="nav-bar">
+            <button class="nav-btn" style="background:white; color:#333; border:2px solid #ccc;" onclick="prevQ()">Back</button>
+            <div>Question <span id="q-idx">1</span> of <span id="q-total">10</span></div>
+            <button class="nav-btn" onclick="nextQ()">Next</button>
+        </div>
+    </div>
+
+    <div id="screen-report" class="screen">
+        <div class="menu-container" style="background: white; color: #333;">
+            <div class="menu-card" style="width: 700px; box-shadow: none; border: 1px solid #ddd;">
+                <div class="report-header">
+                    <h1>FAST Assessment Report</h1>
+                    <div id="final-level" class="score-badge level-3">Level 3</div>
+                    <p id="final-score-text">On Track for Success</p>
+                </div>
+                
+                <div class="strength-grid" id="breakdown-area">
+                    </div>
+
+                <button class="menu-btn" style="margin-top:30px; text-align:center; background:var(--active); color:white;" onclick="location.reload()">Return to Menu</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // --- REAL GRAPHICS GENERATORS ---
-        function getPieChart() {
-            // SVG for 1/8 shaded
-            return `
-            <svg viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="48" fill="white" stroke="#333" stroke-width="2"/>
-                <path d="M50,50 L50,2 A48,48 0 0,1 84,16 Z" fill="#3498DB" stroke="#333"/> <line x1="50" y1="2" x2="50" y2="98" stroke="#333"/>
-                <line x1="2" y1="50" x2="98" y2="50" stroke="#333"/>
-                <line x1="16" y1="16" x2="84" y2="84" stroke="#333"/>
-                <line x1="16" y1="84" x2="84" y2="16" stroke="#333"/>
-            </svg>`;
-        }
-
-        function getDataKey() {
-            return `
-            <div class="data-key-box">
-                <div class="key-row">📚 = 3 Students</div>
-                <hr>
-                <div class="key-row"><b>Sci-Fi:</b> 📚📚</div>
-                <div class="key-row"><b>Comic:</b> 📚</div>
-                <div class="key-row"><b>Fantasy:</b> 📚📚📚</div>
-            </div>`;
-        }
-
-        function getRectangle() {
-            return `
-            <div style="width:200px; height:100px; border:3px solid #333; background:#ddd; display:flex; align-items:center; justify-content:center; position:relative;">
-                <span style="position:absolute; top:-25px;">9 units</span>
-                <span style="position:absolute; left:-60px;">4 units</span>
-                <span style="font-weight:bold; color:#555;">Rectangle</span>
-            </div>`;
-        }
-
-        // --- QUESTION CONTENT ---
-        const questions = [
+        // --- DATA ---
+        const ALL_QUESTIONS = [
+            // FRACTIONS
             {
-                type: "input",
-                layout: "split",
-                visual: getPieChart(),
-                text: "<b>Sample Item 1:</b><br>A circle with one part shaded is shown.<br>Create a fraction that represents the shaded part of the circle.",
+                id: 1, cat: "MA.3.FR.1.1", type: "input", layout: "split",
+                visual: `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="#333" stroke-width="2"/><path d="M50,50 L50,5 A45,45 0 0,1 81.8,18.2 Z" fill="#3498DB" stroke="#333"/><line x1="50" y1="5" x2="50" y2="95" stroke="#333"/><line x1="5" y1="50" x2="95" y2="50" stroke="#333"/><line x1="18.2" y1="18.2" x2="81.8" y2="81.8" stroke="#333"/><line x1="18.2" y1="81.8" x2="81.8" y2="18.2" stroke="#333"/></svg>`,
+                text: "<b>Fractions:</b> A circle is divided into 8 equal parts. One part is shaded.<br>Write the fraction that represents the shaded part.",
                 ans: "1/8"
             },
+            // NUMBER SENSE
             {
-                type: "choice",
-                layout: "full",
-                text: "<b>Sample Item 2:</b><br>What is the expanded form of 7,403?",
+                id: 2, cat: "MA.3.NSO.1.2", type: "choice", layout: "full",
+                text: "<b>Place Value:</b> What is the expanded form of 7,403?",
                 opts: ["700 + 40 + 3", "7,000 + 40 + 3", "7,000 + 400 + 3", "7,000 + 400 + 30"],
                 ans: 2
             },
+            // GEOMETRY (Fixed Rectangle)
             {
-                type: "input-group",
-                layout: "split",
-                visual: getDataKey(),
-                text: "<b>Sample Item 3:</b><br>The data key shows students' favorite books.<br>If 📚 = 3 students, how many symbols would you draw for a category with 12 students?",
-                ans: "4"
-            },
-            {
-                type: "multi-select",
-                layout: "split",
-                visual: getRectangle(),
-                text: "<b>Sample Item 11:</b><br>Select <b>ALL</b> expressions that represent the <b>Perimeter</b> of the rectangle.",
-                opts: ["9 × 4", "9 + 4 + 9 + 4", "9 + 4", "(9 × 2) + (4 × 2)"],
+                id: 3, cat: "MA.3.GR.2.3", type: "multi-select", layout: "split",
+                visual: `<svg viewBox="0 0 300 150">
+                    <rect x="50" y="25" width="200" height="100" fill="#EAEAEA" stroke="#333" stroke-width="3"/>
+                    <text x="150" y="20" text-anchor="middle" font-weight="bold">9 units</text>
+                    <text x="150" y="140" text-anchor="middle" font-weight="bold">9 units</text>
+                    <text x="35" y="80" text-anchor="middle" font-weight="bold" transform="rotate(-90,35,80)">4 units</text>
+                    <text x="265" y="80" text-anchor="middle" font-weight="bold" transform="rotate(90,265,80)">4 units</text>
+                </svg>`,
+                text: "<b>Geometry:</b> Select <b>ALL</b> expressions that represent the <b>Perimeter</b> of the rectangle shown.",
+                opts: ["9 × 4", "9 + 9 + 4 + 4", "9 + 4", "(9 × 2) + (4 × 2)"],
                 ans: [1, 3]
             },
+            // ALGEBRAIC REASONING
             {
-                type: "input",
-                layout: "full",
-                text: "<b>Sample Item 9:</b><br>Jamael works on homework from 3:57 p.m. to 4:32 p.m.<br>How many total minutes did he work?",
+                id: 4, cat: "MA.3.AR.1.2", type: "input", layout: "full",
+                text: "<b>Word Problem:</b> Jamael works on homework from 3:57 p.m. to 4:32 p.m. How many total minutes did he work?",
                 ans: "35"
+            },
+            // DATA
+            {
+                id: 5, cat: "MA.3.DP.1.1", type: "input", layout: "split",
+                visual: `<div class="key-box"><b>Key:</b> 📚 = 3 Students<hr><b>Sci-Fi:</b> 📚📚<br><b>Fantasy:</b> 📚📚📚</div>`,
+                text: "<b>Data:</b> How many more students liked Fantasy books than Sci-Fi books?",
+                ans: "3"
             }
         ];
 
+        let activeQuestions = [];
         let curIdx = 0;
-        let userAns = [null, null, null, [], null];
+        let userAnswers = {};
 
-        function render() {
-            const q = questions[curIdx];
+        // --- NAVIGATION LOGIC ---
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function startTest(mode) {
+            if(mode === 'ALL') {
+                activeQuestions = [...ALL_QUESTIONS]; // In a real app, shuffle/randomize here
+                document.getElementById('mode-label').innerText = "Full Mock Exam";
+            } else {
+                activeQuestions = ALL_QUESTIONS.filter(q => q.cat.startsWith(mode));
+                document.getElementById('mode-label').innerText = "Domain Practice: " + mode;
+            }
+
+            if(activeQuestions.length === 0) { alert("No questions loaded for this domain yet!"); return; }
+
+            curIdx = 0;
+            userAnswers = {};
+            document.getElementById('q-total').innerText = activeQuestions.length;
+            showScreen('screen-test');
+            renderQ();
+        }
+
+        function renderQ() {
+            const q = activeQuestions[curIdx];
             const stage = document.getElementById('stage');
-            
-            let leftContent = "";
+            const saved = userAnswers[curIdx];
+
+            let left = "";
             let rightClass = "full-pane";
             
             if(q.layout === "split") {
-                leftContent = `<div class="left-pane">${q.visual}</div>`;
+                left = `<div class="left-pane">${q.visual}</div>`;
                 rightClass = "right-pane";
             }
 
-            let interaction = "";
+            let interact = "";
             if(q.type === "choice") {
                 q.opts.forEach((o, i) => {
-                    let sel = userAns[curIdx] === i ? "selected" : "";
-                    interaction += `<div class="opt-row ${sel}" onclick="saveChoice(${i})"><div class="bubble"></div>${o}</div>`;
+                    let s = saved === i ? "selected" : "";
+                    interact += `<div class="opt-row ${s}" onclick="saveAns(${i})"><div class="bubble"></div>${o}</div>`;
                 });
             } else if(q.type === "multi-select") {
                 q.opts.forEach((o, i) => {
-                    let sel = userAns[curIdx].includes(i) ? "selected" : "";
-                    interaction += `<div class="opt-row ${sel}" onclick="saveMulti(${i})"><div class="bubble" style="border-radius:4px"></div>${o}</div>`;
+                    let s = (saved && saved.includes(i)) ? "selected" : "";
+                    interact += `<div class="opt-row ${s}" onclick="saveMulti(${i})"><div class="bubble square"></div>${o}</div>`;
                 });
-            } else if(q.type === "input" || q.type === "input-group") {
-                interaction = `<input class="input-box" value="${userAns[curIdx] || ''}" oninput="userAns[curIdx]=this.value" placeholder="?">`;
+            } else if(q.type === "input") {
+                interact = `<input class="input-box" value="${saved || ''}" onchange="saveAns(this.value)" placeholder="?">`;
             }
 
             stage.innerHTML = `
-                ${leftContent}
-                <div class="split-pane ${rightClass}">
+                ${left}
+                <div class="pane ${rightClass}">
                     <div class="q-header">Question ${curIdx+1}</div>
-                    <div class="q-content">${q.text}</div>
-                    <div>${interaction}</div>
+                    <div class="q-text">${q.text}</div>
+                    <div>${interact}</div>
                 </div>
             `;
-            
             document.getElementById('q-idx').innerText = curIdx + 1;
         }
 
-        // --- SAVING ANSWERS ---
-        window.saveChoice = (i) => { userAns[curIdx] = i; render(); };
-        window.saveMulti = (i) => {
-            let arr = userAns[curIdx];
-            if(arr.includes(i)) arr = arr.filter(x => x !== i);
-            else arr.push(i);
-            userAns[curIdx] = arr;
-            render();
-        };
+        // --- ANSWER HANDLING ---
+        window.saveAns = (val) => { userAnswers[curIdx] = val; renderQ(); }
+        window.saveMulti = (val) => {
+            let arr = userAnswers[curIdx] || [];
+            if(arr.includes(val)) arr = arr.filter(x => x !== val); else arr.push(val);
+            userAnswers[curIdx] = arr;
+            renderQ();
+        }
 
-        // --- NAVIGATION ---
-        window.nextQ = () => { if(curIdx < questions.length-1) { curIdx++; render(); } else { alert("Test Complete! Review answers?"); } };
-        window.prevQ = () => { if(curIdx > 0) { curIdx--; render(); } };
-
-        // --- TOOLS ---
-        let zoom = 1;
-        window.toggleZoom = () => {
-            zoom = zoom === 1 ? 1.25 : 1;
-            document.body.style.transform = `scale(${zoom})`;
-            // Adjust origin to keep centered/top-left based on preference
-            document.body.style.width = zoom === 1 ? "100%" : "80%";
-        };
-
-        window.toggleRef = () => {
-            const m = document.getElementById('ref-sheet-modal');
-            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
-        };
-
-        window.toggleLineReader = () => {
-            const lr = document.getElementById('line-reader');
-            lr.style.display = lr.style.display === 'block' ? 'none' : 'block';
-        };
-
-        // --- DRAGGABLE LINE READER ---
-        const lr = document.getElementById('line-reader');
-        let isDown = false, offset = [0,0];
-
-        lr.addEventListener('mousedown', (e) => { isDown = true; offset = [lr.offsetLeft - e.clientX, lr.offsetTop - e.clientY]; });
-        document.addEventListener('mouseup', () => { isDown = false; });
-        document.addEventListener('mousemove', (e) => {
-            if(isDown) {
-                lr.style.left = (e.clientX + offset[0]) + 'px';
-                lr.style.top  = (e.clientY + offset[1]) + 'px';
+        window.nextQ = () => {
+            if(curIdx < activeQuestions.length - 1) {
+                curIdx++; renderQ();
+            } else {
+                finishTest();
             }
-        });
+        }
+        window.prevQ = () => { if(curIdx > 0) { curIdx--; renderQ(); } }
 
-        // INIT
-        render();
-    </script>
-</body>
-</html>
+        // --- SCORING & REPORTING ---
+        function finishTest() {
+            let score = 0;
+            let breakdown = { "MA.3.NSO": {c:0,t:0}, "MA.3.FR": {c:0,t:0}, "MA.3.AR": {c:0,t:0}, "MA.3.GR": {c:0,t:0}, "MA.3.DP": {c:0,t:0} };
+
+            activeQuestions.forEach((q, i) => {
+                let ans = userAnswers[i];
+                let correct = false;
+                
+                // Logic
+                if(q.type === "choice" && ans === q.ans) correct = true;
+                if(q.type === "input" && ans === q.ans) correct = true;
+                if(q.type === "multi-select") {
+                    if(ans && ans.length === q.ans.length && q.ans.every(v => ans.includes(v))) correct = true;
+                }
+
+                // Stats
+                let domain = q.cat.split('.').slice(0,3).join('.');
+                if(!breakdown[domain]) breakdown[domain] = {c:0,t:0}; // Catch-all
+                breakdown[domain].t++;
+                if(correct) { score++; breakdown[domain].c++; }
+            });
+
+            // Calculate Level
+            let pct = (score / activeQuestions.length) * 100;
+            let level = 1; let lvlText = "Level 1"; let lvlClass = "level-1"; let msg = "Needs Improvement";
+            if(pct >= 40) { level=2; lvlText="Level 2"; lvlClass="level-2"; msg="Below Satisfactory"; }
+            if(pct >= 60) { level=3; lvlText="Level 3"; lvlClass="level-3"; msg="On Grade Level"; }
+            if(pct >= 80) { level=4; lvlText="Level 4"; lvlClass="level-4"; msg="Proficient"; }
+            if(pct === 100) { level=5; lvlText="Level 5"; lvlClass="level-5"; msg="Mastery"; }
+
+            // Render Report
+            document.getElementById('final-level').innerText = lvlText;
+            document.getElementById('final-level').className = "score-badge " + lvlClass;
+            document.getElementById('final-score-text').innerText = `${msg} (${Math.round(pct)}%)`;
+
+            let html = "";
+            for(let key in breakdown) {
+                if(breakdown[key].t === 0) continue;
+                let domainPct = (breakdown[key].c / breakdown[key].t) * 100;
+                let statusClass = domainPct >= 60 ? "good" : "bad";
+                let statusText = domainPct >= 60 ? "✅ Strength" : "⚠️ Weakness";
+                
+                // Friendly Names
+                let name = key;
+                if(key.includes("FR")) name = "Fractions";
+                if(key.includes("NSO")) name = "Number Sense";
+                if(key.includes("GR")) name = "Geometry";
+                if(key.includes("AR")) name = "Algebra";
+                if(key.includes("DP")) name = "Data";
+
+                html += `
+                <div class="strength-box ${statusClass}">
+                    <h3>${name}</h3>
+                    <p>${breakdown[key].c}/${breakdown[key].t} Correct (${Math.round(domainPct)}%)</p>
+                    <strong>${statusText}</strong>
+                </div>`;
+            }
+            document.getElementById('breakdown-area').innerHTML = html;
+            
+            showScreen('screen-report');
+        }
+
+        // TOOL
+        let z = 1;
+        window.toggleZoom = () => { z = z===1 ?
