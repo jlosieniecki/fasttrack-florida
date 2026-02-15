@@ -3,200 +3,292 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida: Full Mock Exam</title>
+    <title>FAST Grade 3 Mathematics - Practice Test</title>
     <style>
-        :root { --primary: #005696; --bg: #F0F4F8; --fast-blue: #0076D6; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        
-        .card { background: white; width: 100%; max-width: 700px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 30px; border-top: 6px solid var(--primary); }
-        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
-        .progress-box { font-size: 0.9em; font-weight: bold; color: #555; }
-        
-        .q-text { font-size: 1.25em; margin-bottom: 25px; line-height: 1.6; }
-        .opt-btn { display: block; width: 100%; padding: 18px; margin-bottom: 12px; border: 2px solid #e0e0e0; border-radius: 6px; background: white; text-align: left; cursor: pointer; font-size: 1.1em; transition: 0.2s; }
-        .opt-btn.selected { border-color: var(--fast-blue); background: #E3F2FD; font-weight: 600; border-width: 3px; }
+        :root { --header-bg: #2C3E50; --tool-bg: #ECF0F1; --active-blue: #3498DB; --text-color: #333; }
+        body { font-family: 'Arial', sans-serif; background: #E0E0E0; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-        .submit-btn { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 6px; font-weight: bold; width: 100%; font-size: 1.2em; cursor: pointer; margin-top: 25px; }
+        /* --- CAMBIUM HEADER --- */
+        .top-bar { background: var(--header-bg); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; height: 50px; }
+        .user-info { font-weight: bold; font-size: 1.1em; display: flex; align-items: center; gap: 10px; }
+        .test-tools { display: flex; gap: 15px; }
+        .tool-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.9em; display: flex; align-items: center; gap: 5px; }
+        .tool-btn:hover { background: rgba(255,255,255,0.1); }
 
-        /* REPORT CARD STYLES */
-        .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .report-item { padding: 15px; background: #f9f9f9; border-radius: 8px; border-left: 5px solid #ccc; }
-        .status-strong { border-left-color: #4CAF50; }
-        .status-weak { border-left-color: #F44336; }
-        .status-avg { border-left-color: #FF9800; }
+        /* --- MAIN TEST AREA --- */
+        .test-container { display: flex; flex: 1; background: white; margin: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); overflow: hidden; position: relative; }
+        
+        /* SPLIT SCREEN (Standard in FAST) */
+        .split-left { width: 45%; border-right: 4px solid #ddd; padding: 25px; overflow-y: auto; background: #FAFAFA; }
+        .split-right { width: 55%; padding: 25px; overflow-y: auto; position: relative; }
+        .full-width { width: 100%; padding: 25px; overflow-y: auto; }
+
+        /* QUESTION STYLES */
+        .q-number { font-weight: bold; color: #666; margin-bottom: 10px; text-transform: uppercase; font-size: 0.9em; }
+        .q-text { font-size: 1.3em; line-height: 1.5; margin-bottom: 20px; color: #222; }
+        
+        /* INTERACTION ELEMENTS */
+        .opt-row { display: flex; align-items: flex-start; margin-bottom: 15px; cursor: pointer; }
+        .bubble { width: 24px; height: 24px; border: 2px solid #aaa; border-radius: 50%; margin-right: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: bold; color: transparent; transition: 0.2s; }
+        .bubble.square { border-radius: 4px; } /* For multiselect */
+        .opt-row:hover .bubble { border-color: var(--active-blue); background: #F0F8FF; }
+        .opt-row.selected .bubble { background: var(--active-blue); border-color: var(--active-blue); color: white; }
+        .opt-text { font-size: 1.15em; padding-top: 2px; }
+
+        .input-box { border: 2px solid #ccc; padding: 8px 12px; font-size: 1.2em; border-radius: 4px; width: 100px; text-align: center; background: #fff; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        .input-box:focus { border-color: var(--active-blue); outline: none; }
+
+        /* --- FOOTER NAVIGATION --- */
+        .nav-bar { background: white; border-top: 1px solid #ccc; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; height: 60px; }
+        .nav-btn { background: var(--active-blue); color: white; border: none; padding: 10px 25px; border-radius: 4px; font-size: 1.1em; font-weight: bold; cursor: pointer; box-shadow: 0 2px 0 #2070A0; }
+        .nav-btn:active { transform: translateY(2px); box-shadow: none; }
+        .nav-btn.secondary { background: white; color: #333; border: 2px solid #ccc; box-shadow: none; }
+        .nav-btn:disabled { background: #ccc; cursor: not-allowed; opacity: 0.6; }
+
+        /* --- REVIEW SCREEN --- */
+        .review-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 15px; margin-top: 20px; }
+        .review-item { border: 2px solid #ccc; padding: 15px; text-align: center; border-radius: 4px; cursor: pointer; font-weight: bold; background: white; }
+        .review-item.answered { border-color: var(--active-blue); background: #E3F2FD; color: var(--active-blue); }
+        .review-item.flagged { border-color: #FFA500; background: #FFF3E0; }
+
+        /* --- RESULTS REPORT --- */
+        .report-card { max-width: 800px; margin: 20px auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow-y: auto; height: 80%; }
+        .stat-bar { height: 12px; background: #eee; border-radius: 6px; overflow: hidden; margin-top: 8px; }
+        .stat-fill { height: 100%; background: var(--active-blue); width: 0%; transition: 1s; }
+        .cat-row { margin-bottom: 25px; }
+
+        /* UTILS */
+        .hidden { display: none !important; }
+        .image-placeholder { background: #eee; border: 2px dashed #ccc; width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; color: #777; font-weight: bold; border-radius: 8px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
-    <img src="Gemini_Generated_Image_t8043ht8043ht804.png" style="width:60px; margin-bottom:15px; border-radius: 8px;">
-
-    <div class="card" id="test-container">
-        <div class="header">
-            <div><b>FAST Grade 3 Mathematics</b></div>
-            <div class="progress-box">Question <span id="q-num">1</span> of <span id="total-q">10</span></div>
+    <div class="top-bar">
+        <div class="user-info">
+            <span style="background:white; color:#2C3E50; padding:2px 8px; border-radius:50%; font-size:0.8em;">G3</span>
+            <span>Student: Guest</span>
         </div>
-
-        <div id="q-area" class="q-text"></div>
-        <div id="interaction-area"></div>
-        
-        <button id="submit" class="submit-btn" onclick="submitAnswer()">Submit Answer</button>
+        <div class="test-tools">
+            <button class="tool-btn" onclick="alert('Simulated Zoom Tool')">🔍 Zoom</button>
+            <button class="tool-btn" onclick="alert('Simulated Line Reader')">📏 Line Reader</button>
+            <button class="tool-btn" onclick="alert('Reference Sheet PDF')">📄 Reference</button>
+            <button class="tool-btn" style="border-color:#e74c3c; background:#c0392b;" onclick="endTest()">🛑 Pause</button>
+        </div>
     </div>
 
-    <div class="card" id="report-card" style="display:none;">
-        <h2>🎓 Student Performance Report</h2>
-        <p>This breakdown shows strengths and weaknesses based on the Florida B.E.S.T. Standards.</p>
-        
-        <div class="report-grid" id="breakdown"></div>
-        
-        <button class="submit-btn" onclick="location.reload()">Take Another Test</button>
+    <div id="test-view" class="test-container">
+        </div>
+
+    <div id="review-view" class="test-container hidden" style="display:block; overflow-y:auto; padding:30px;">
+        <h2 style="color:#2C3E50; border-bottom:2px solid #eee; padding-bottom:10px;">Review Your Answers</h2>
+        <p>Click on a question number to return to it. Items with a <b>Checkmark</b> are answered.</p>
+        <div id="review-grid" class="review-grid"></div>
+        <button class="submit-btn" style="background:#27ae60; color:white; border:none; padding:15px 30px; font-size:1.2em; border-radius:5px; margin-top:40px; cursor:pointer;" onclick="submitFinal()">Submit Test</button>
+    </div>
+
+    <div class="nav-bar">
+        <button id="btn-back" class="nav-btn secondary" onclick="prevQ()">Back</button>
+        <div style="font-weight:bold; color:#555;">Question <span id="q-idx">1</span> / <span id="q-total">10</span></div>
+        <button id="btn-next" class="nav-btn" onclick="nextQ()">Next</button>
+    </div>
+
+    <div id="report-view" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999; display:flex; justify-content:center; align-items:center;">
+        <div class="report-card">
+            <h1 style="color:#2C3E50; margin-top:0;">F.A.S.T. Assessment Report</h1>
+            <p style="font-size:1.1em; color:#555;">Mock Operational Result - Grade 3 Mathematics</p>
+            <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
+            
+            <div id="report-content"></div>
+            
+            <button class="nav-btn" style="margin-top:20px;" onclick="location.reload()">Exit to Portal</button>
+        </div>
     </div>
 
     <script>
-        // CONFIGURATION: Set to 35 for a full simulation, or 10 for a demo
-        const TEST_LENGTH = 10; 
-        
-        // BLUEPRINT WEIGHTS (Used to pick questions)
-        // NSO: 30%, FR: 20%, AR: 15%, M: 15%, GR/DP: 20%
-        const blueprint = [
-            { cat: "NSO", weight: 0.3, name: "Number Sense & Ops" },
-            { cat: "FR",  weight: 0.2, name: "Fractions" },
-            { cat: "AR",  weight: 0.15, name: "Algebraic Reasoning" },
-            { cat: "M",   weight: 0.15, name: "Measurement" },
-            { cat: "GR",  weight: 0.2, name: "Geometry & Data" }
+        // --- REAL QUESTION BANK FROM PDFS ---
+        const questions = [
+            {
+                id: 1, cat: "MA.3.FR.1.1", type: "input", layout: "split",
+                img: "Circle with 1 of 8 parts shaded",
+                q: "<b>Sample Item 1:</b><br>A circle with one part shaded is shown.<br>Create a fraction that represents the shaded part of the circle.",
+                ans: "1/8"
+            },
+            {
+                id: 2, cat: "MA.3.NSO.1.2", type: "choice", layout: "full",
+                q: "<b>Sample Item 2:</b><br>What is the expanded form of 7,403?",
+                opts: ["700 + 40 + 3", "7,000 + 40 + 3", "7,000 + 400 + 3", "7,000 + 400 + 30"],
+                ans: 2 // Index of correct
+            },
+            {
+                id: 3, cat: "MA.3.DP.1.1", type: "multi-input", layout: "split",
+                img: "<b>Data:</b><br>• 6 students: Sci-Fi<br>• 3 students: Comic<br>• 9 students: Fantasy<br>• Total: 18 students<br><br><b>Key:</b> 📚 = 3 students",
+                q: "<b>Sample Item 3:</b><br>Ms. Devitt asks her 18 students about their favorite books.<br>How many symbols (📚) should be drawn for each category?<br><br>Sci-Fi: <input class='input-box' id='i3a'><br>Comic: <input class='input-box' id='i3b'><br>Fantasy: <input class='input-box' id='i3c'>",
+                ans: ["2", "1", "3"]
+            },
+            {
+                id: 4, cat: "MA.3.M.1.1", type: "input", layout: "full",
+                img: "Ruler showing light string end at 10.5 inches (simulated)",
+                q: "<b>Sample Item 4:</b><br>Robert measures a string of lights. The string ends exactly halfway between 10 and 11 inches.<br>How long, in inches, is the string?",
+                ans: "10.5"
+            },
+            {
+                id: 5, cat: "MA.3.AR.2.3", type: "multi-part", layout: "full",
+                q: "<b>Sample Item 5:</b><br><b>Part A:</b> Which expression finds the unknown <i>u</i> in <i>u</i> × 12 = 24?<br><div class='opt-row' onclick='selectOpt(this, 0)'><div class='bubble'>A</div>24 ÷ 12</div><div class='opt-row' onclick='selectOpt(this, 1)'><div class='bubble'>B</div>24 × 12</div><br><b>Part B:</b> What is the value of <i>u</i>?<br><input class='input-box' id='i5'>",
+                ans: [0, "2"] // A and 2
+            },
+            {
+                id: 9, cat: "MA.3.M.2.2", type: "multi-input", layout: "full",
+                q: "<b>Sample Item 9:</b><br>Jamael starts homework at 3:57 p.m. and finishes at 4:32 p.m. He works on Math and Science.<br>If he spent equal time on both, how many minutes did he work on each subject?<br><br>Total Minutes: <span style='color:#666; font-style:italic'>(Calculate First)</span><br>Math: <input class='input-box' id='i9a'><br>Science: <input class='input-box' id='i9b'>",
+                ans: ["17.5", "17.5"] // 35 total / 2. (Or just open ended summing to 35)
+            },
+            {
+                id: 11, cat: "MA.3.GR.2.3", type: "multi-select", layout: "split",
+                img: "Rectangle: 9 units by 4 units",
+                q: "<b>Sample Item 11:</b><br>Select <b>ALL</b> correct expressions for the Area and Perimeter.<br>",
+                opts: ["Area: 9 × 4", "Perimeter: 9 + 4", "Perimeter: 9 + 9 + 4 + 4", "Area: 9 + 9 + 4 + 4"],
+                ans: [0, 2] // Indices
+            }
         ];
 
-        let testQueue = [];
-        let currentQIndex = 0;
-        let results = { NSO: {c:0, t:0}, FR: {c:0, t:0}, AR: {c:0, t:0}, M: {c:0, t:0}, GR: {c:0, t:0} };
+        let curIdx = 0;
+        let userAnswers = new Array(questions.length).fill(null);
 
-        // --- QUESTION BANK (infinite generators) ---
-        const questionBank = {
-            NSO: [
-                () => { // NSO.1.1 Place Value
-                   let n = 1000 + Math.floor(Math.random()*8000);
-                   return { type: "multi", q: `Select all values equal to ${n}.`, opts: [`${Math.floor(n/1000)*1000} + ${n%1000}`, `${Math.floor(n/100)} hundreds + ${n%100}`], ans: 2 };
-                },
-                () => { // NSO.2.2 Mult
-                   let a = Math.floor(Math.random()*8)+2, b = Math.floor(Math.random()*8)+2;
-                   return { type: "input", q: `Solve: ${a} × ${b} = ?`, ans: (a*b).toString() };
-                }
-            ],
-            FR: [
-                () => { // FR.1.1 Unit Fractions
-                    let d = [3,4,6,8][Math.floor(Math.random()*4)];
-                    return { type: "choice", q: `What fraction is 1 part of a whole divided into ${d} equal pieces?`, opts: [`1/${d}`, `${d}/1`, `1/${d-1}`], ans: `1/${d}` };
-                }
-            ],
-            AR: [
-                () => { // AR.1.2 Word Problems
-                    let a = 5, b = 3, c = 2; 
-                    return { type: "input", q: `Leo has ${a} packs of ${b} cards. He gives ${c} away. How many left?`, ans: ((a*b)-c).toString() };
-                }
-            ],
-            M: [
-                () => { // M.1.1 Measurement
-                    let cm = 5; 
-                    return { type: "choice", q: `${cm} cm is equal to how many mm?`, opts: [`${cm*10}`, `${cm*100}`, `${cm}`], ans: `${cm*10}` };
-                }
-            ],
-            GR: [
-                () => { // GR.1.2 Geometry
-                    return { type: "choice", q: "Which shape has 4 right angles?", opts: ["Rectangle", "Trapezoid", "Rhombus"], ans: "Rectangle" };
-                }
-            ]
-        };
-
-        function initTest() {
-            // Build the test based on blueprint weights
-            for(let i=0; i<TEST_LENGTH; i++) {
-                let rand = Math.random();
-                let cat = "GR"; // Default
-                let accum = 0;
-                for(let b of blueprint) {
-                    accum += b.weight;
-                    if(rand < accum) { cat = b.cat; break; }
-                }
-                let engine = questionBank[cat][Math.floor(Math.random() * questionBank[cat].length)];
-                let q = engine();
-                q.cat = cat;
-                testQueue.push(q);
-            }
-            document.getElementById('total-q').innerText = TEST_LENGTH;
-            renderQuestion();
-        }
-
-        function renderQuestion() {
-            let q = testQueue[currentQIndex];
-            document.getElementById('q-num').innerText = currentQIndex + 1;
-            document.getElementById('q-area').innerText = q.q;
+        function renderQ() {
+            const q = questions[curIdx];
+            const container = document.getElementById('test-view');
             
+            // Build Layout
             let html = "";
-            if(q.type === "choice") {
-                q.opts.forEach(o => html += `<button class="opt-btn" onclick="selectOpt(this)">${o}</button>`);
-            } else if(q.type === "input") {
-                html = `<input type="text" id="ans-in" style="font-size:1.5em; padding:10px; width:100px; text-align:center;">`;
-            } else if(q.type === "multi") {
-                q.opts.forEach(o => html += `<button class="opt-btn" onclick="this.classList.toggle('selected')">${o}</button>`);
-            }
-            document.getElementById('interaction-area').innerHTML = html;
-        }
-
-        function selectOpt(btn) {
-            document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-        }
-
-        function submitAnswer() {
-            let q = testQueue[currentQIndex];
-            let isCorrect = false;
-
-            // Simplified check logic for demo
-            if(q.type === "choice") {
-                let sel = document.querySelector('.selected');
-                if(sel && sel.innerText === q.ans) isCorrect = true;
-            } else if(q.type === "input") {
-                if(document.getElementById('ans-in').value === q.ans) isCorrect = true;
-            } else if (q.type === "multi") {
-                isCorrect = true; // Giving free pass for demo purposes
-            }
-
-            // Record Stats
-            results[q.cat].t++;
-            if(isCorrect) results[q.cat].c++;
-
-            currentQIndex++;
-            if(currentQIndex < TEST_LENGTH) {
-                renderQuestion();
+            if(q.layout === "split") {
+                html = `<div class="split-left"><div class="image-placeholder">${q.img || "Visual Material"}</div></div>
+                        <div class="split-right"><div class="q-number">Question ${curIdx+1}</div><div class="q-text">${q.q}</div><div id="opts-area"></div></div>`;
             } else {
-                showReport();
+                html = `<div class="full-width"><div class="q-number">Question ${curIdx+1}</div><div class="q-text">${q.q}</div><div id="opts-area"></div></div>`;
+            }
+            container.innerHTML = html;
+
+            // Inject Options based on Type
+            const optsArea = document.getElementById('opts-area');
+            if(q.type === "choice" || q.type === "multi-select") {
+                q.opts.forEach((o, i) => {
+                    let isSel = (userAnswers[curIdx] && userAnswers[curIdx].includes(i));
+                    let shape = q.type === "multi-select" ? "square" : "";
+                    optsArea.innerHTML += `<div class="opt-row ${isSel?'selected':''}" onclick="toggleOpt(${i}, '${q.type}')">
+                        <div class="bubble ${shape}"></div><div class="opt-text">${o}</div>
+                    </div>`;
+                });
+            } else if (q.type === "input") {
+                optsArea.innerHTML = `<input class="input-box" id="ans-in" value="${userAnswers[curIdx] || ''}" oninput="saveInput(this.value)">`;
+            }
+
+            // Update Nav State
+            document.getElementById('q-idx').innerText = curIdx + 1;
+            document.getElementById('q-total').innerText = questions.length;
+            document.getElementById('btn-back').disabled = (curIdx === 0);
+            document.getElementById('btn-next').innerText = (curIdx === questions.length - 1) ? "Review" : "Next";
+        }
+
+        // --- INTERACTION HANDLERS ---
+        function toggleOpt(idx, type) {
+            let current = userAnswers[curIdx] || [];
+            if(type === "choice") {
+                userAnswers[curIdx] = [idx];
+            } else {
+                if(!Array.isArray(current)) current = [];
+                if(current.includes(idx)) current = current.filter(i => i !== idx);
+                else current.push(idx);
+                userAnswers[curIdx] = current;
+            }
+            renderQ(); // Re-render to show selection
+        }
+
+        function saveInput(val) {
+            userAnswers[curIdx] = val;
+        }
+
+        // --- NAVIGATION ---
+        function nextQ() {
+            if(curIdx < questions.length - 1) {
+                curIdx++;
+                renderQ();
+            } else {
+                showReview();
+            }
+        }
+        function prevQ() {
+            if(curIdx > 0) {
+                curIdx--;
+                renderQ();
             }
         }
 
-        function showReport() {
-            document.getElementById('test-container').style.display = 'none';
-            document.getElementById('report-card').style.display = 'block';
+        // --- REVIEW & REPORT ---
+        function showReview() {
+            document.getElementById('test-view').classList.add('hidden');
+            document.getElementById('review-view').classList.remove('hidden');
+            document.querySelector('.nav-bar').classList.add('hidden'); // Hide bottom nav in review
             
             let html = "";
-            blueprint.forEach(b => {
-                let stats = results[b.cat];
-                if(stats.t === 0) return;
-                let pct = (stats.c / stats.t) * 100;
-                let status = "status-avg";
-                let msg = "On Track";
-                if(pct > 80) { status = "status-strong"; msg = "Mastered 🌟"; }
-                if(pct < 50) { status = "status-weak"; msg = "Needs Practice ⚠️"; }
-                
-                html += `
-                <div class="report-item ${status}">
-                    <div style="font-weight:bold; font-size:1.1em;">${b.name}</div>
-                    <div style="color:#666; margin-top:5px;">Score: ${stats.c}/${stats.t} (${Math.round(pct)}%)</div>
-                    <div style="font-weight:bold; margin-top:5px;">${msg}</div>
-                </div>`;
+            questions.forEach((q, i) => {
+                let ans = userAnswers[i];
+                let status = (ans !== null && ans !== "" && (!Array.isArray(ans) || ans.length > 0)) ? "answered" : "";
+                html += `<div class="review-item ${status}" onclick="gotoQ(${i})">${i+1}<br>${status?'✅':'⚠️'}</div>`;
             });
-            document.getElementById('breakdown').innerHTML = html;
+            document.getElementById('review-grid').innerHTML = html;
         }
 
-        window.onload = initTest;
+        function gotoQ(i) {
+            curIdx = i;
+            document.getElementById('test-view').classList.remove('hidden');
+            document.getElementById('review-view').classList.add('hidden');
+            document.querySelector('.nav-bar').classList.remove('hidden');
+            renderQ();
+        }
+
+        function submitFinal() {
+            // Calculate Score based on Reporting Categories
+            let scores = { "NSO": {c:0, t:0}, "FR": {c:0, t:0}, "AR": {c:0, t:0}, "M": {c:0, t:0}, "GR": {c:0, t:0}, "DP": {c:0, t:0} };
+            
+            questions.forEach((q, i) => {
+                let cat = q.cat.split('.')[2]; // Extract NSO, FR, etc.
+                if(!scores[cat]) scores[cat] = {c:0, t:0};
+                scores[cat].t++;
+
+                // Simplified Grading Logic for Demo
+                let isCorr = false;
+                if(q.type === "choice" && userAnswers[i][0] === q.ans) isCorr = true;
+                if(q.type === "input" && userAnswers[i] === q.ans) isCorr = true;
+                if(q.type === "multi-select") {
+                    // Check if arrays match
+                    if(userAnswers[i] && q.ans.every(v => userAnswers[i].includes(v)) && userAnswers[i].length === q.ans.length) isCorr = true;
+                }
+                // (Note: Advanced grading for multi-part items would go here)
+                
+                if(isCorr) scores[cat].c++;
+            });
+
+            // Generate Report HTML
+            let reportHtml = "";
+            for(let key in scores) {
+                if(scores[key].t === 0) continue;
+                let pct = (scores[key].c / scores[key].t) * 100;
+                let color = pct > 75 ? "#2ecc71" : (pct > 40 ? "#f1c40f" : "#e74c3c");
+                reportHtml += `
+                <div class="cat-row">
+                    <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
+                        <span>${key} Mastery</span>
+                        <span>${scores[key].c}/${scores[key].t}</span>
+                    </div>
+                    <div class="stat-bar"><div class="stat-fill" style="width:${pct}%; background:${color}"></div></div>
+                </div>`;
+            }
+
+            document.getElementById('report-content').innerHTML = reportHtml;
+            document.getElementById('report-view').classList.remove('hidden');
+        }
+
+        window.onload = renderQ;
     </script>
 </body>
 </html>
