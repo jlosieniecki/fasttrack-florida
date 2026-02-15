@@ -3,292 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAST Grade 3 Mathematics - Practice Test</title>
+    <title>FAST Grade 3 Math - Official Simulator</title>
     <style>
-        :root { --header-bg: #2C3E50; --tool-bg: #ECF0F1; --active-blue: #3498DB; --text-color: #333; }
-        body { font-family: 'Arial', sans-serif; background: #E0E0E0; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        :root { --header: #2C3E50; --bg: #EAEAEA; --active: #3498DB; --text: #333; }
+        body { font-family: 'Arial', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; transition: transform 0.2s; transform-origin: top left; }
 
-        /* --- CAMBIUM HEADER --- */
-        .top-bar { background: var(--header-bg); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; height: 50px; }
-        .user-info { font-weight: bold; font-size: 1.1em; display: flex; align-items: center; gap: 10px; }
-        .test-tools { display: flex; gap: 15px; }
-        .tool-btn { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 0.9em; display: flex; align-items: center; gap: 5px; }
+        /* HEADER */
+        .top-bar { background: var(--header); color: white; padding: 0 20px; height: 60px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .tool-group { display: flex; gap: 10px; }
+        .tool-btn { background: transparent; border: 1px solid #7F8C8D; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.9em; }
         .tool-btn:hover { background: rgba(255,255,255,0.1); }
+        .tool-btn.active { background: var(--active); border-color: var(--active); }
 
-        /* --- MAIN TEST AREA --- */
-        .test-container { display: flex; flex: 1; background: white; margin: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); overflow: hidden; position: relative; }
+        /* MAIN CONTENT */
+        .main-stage { display: flex; flex: 1; padding: 10px; gap: 10px; overflow: hidden; position: relative; }
         
-        /* SPLIT SCREEN (Standard in FAST) */
-        .split-left { width: 45%; border-right: 4px solid #ddd; padding: 25px; overflow-y: auto; background: #FAFAFA; }
-        .split-right { width: 55%; padding: 25px; overflow-y: auto; position: relative; }
-        .full-width { width: 100%; padding: 25px; overflow-y: auto; }
+        /* SPLIT LAYOUT */
+        .split-pane { background: white; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow-y: auto; padding: 25px; position: relative; }
+        .left-pane { width: 45%; border-right: 1px solid #ddd; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #FAFAFA; }
+        .right-pane { width: 55%; }
+        .full-pane { width: 100%; }
+
+        /* GRAPHICS GENERATOR */
+        svg { max-width: 100%; max-height: 300px; }
+        .data-key-box { border: 2px solid #333; padding: 15px; background: #fff; display: inline-block; text-align: left; border-radius: 8px; }
+        .key-row { font-size: 1.2em; margin: 5px 0; display: flex; align-items: center; gap: 10px; }
 
         /* QUESTION STYLES */
-        .q-number { font-weight: bold; color: #666; margin-bottom: 10px; text-transform: uppercase; font-size: 0.9em; }
-        .q-text { font-size: 1.3em; line-height: 1.5; margin-bottom: 20px; color: #222; }
+        .q-header { color: #555; font-weight: bold; margin-bottom: 15px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        .q-content { font-size: 1.3em; line-height: 1.5; color: #222; margin-bottom: 20px; }
         
-        /* INTERACTION ELEMENTS */
-        .opt-row { display: flex; align-items: flex-start; margin-bottom: 15px; cursor: pointer; }
-        .bubble { width: 24px; height: 24px; border: 2px solid #aaa; border-radius: 50%; margin-right: 15px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: bold; color: transparent; transition: 0.2s; }
-        .bubble.square { border-radius: 4px; } /* For multiselect */
-        .opt-row:hover .bubble { border-color: var(--active-blue); background: #F0F8FF; }
-        .opt-row.selected .bubble { background: var(--active-blue); border-color: var(--active-blue); color: white; }
-        .opt-text { font-size: 1.15em; padding-top: 2px; }
+        /* INTERACTION */
+        .opt-row { display: flex; padding: 12px; margin-bottom: 8px; cursor: pointer; border: 1px solid transparent; border-radius: 4px; transition: 0.1s; }
+        .opt-row:hover { background: #F4F6F7; border-color: #ddd; }
+        .opt-row.selected { background: #EBF5FB; border-color: var(--active); }
+        .bubble { width: 22px; height: 22px; border: 2px solid #95A5A6; border-radius: 50%; margin-right: 15px; }
+        .opt-row.selected .bubble { background: var(--active); border-color: var(--active); }
 
-        .input-box { border: 2px solid #ccc; padding: 8px 12px; font-size: 1.2em; border-radius: 4px; width: 100px; text-align: center; background: #fff; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
-        .input-box:focus { border-color: var(--active-blue); outline: none; }
+        .input-box { font-size: 1.2em; padding: 8px; width: 80px; text-align: center; border: 2px solid #ccc; border-radius: 4px; }
+        .input-box:focus { border-color: var(--active); outline: none; }
 
-        /* --- FOOTER NAVIGATION --- */
-        .nav-bar { background: white; border-top: 1px solid #ccc; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; height: 60px; }
-        .nav-btn { background: var(--active-blue); color: white; border: none; padding: 10px 25px; border-radius: 4px; font-size: 1.1em; font-weight: bold; cursor: pointer; box-shadow: 0 2px 0 #2070A0; }
-        .nav-btn:active { transform: translateY(2px); box-shadow: none; }
-        .nav-btn.secondary { background: white; color: #333; border: 2px solid #ccc; box-shadow: none; }
-        .nav-btn:disabled { background: #ccc; cursor: not-allowed; opacity: 0.6; }
+        /* FOOTER */
+        .nav-bar { background: white; border-top: 1px solid #ccc; height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; }
+        .nav-btn { background: var(--active); color: white; border: none; padding: 12px 30px; border-radius: 4px; font-size: 1.1em; font-weight: bold; cursor: pointer; }
+        .nav-btn.secondary { background: white; color: #333; border: 2px solid #ccc; }
 
-        /* --- REVIEW SCREEN --- */
-        .review-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 15px; margin-top: 20px; }
-        .review-item { border: 2px solid #ccc; padding: 15px; text-align: center; border-radius: 4px; cursor: pointer; font-weight: bold; background: white; }
-        .review-item.answered { border-color: var(--active-blue); background: #E3F2FD; color: var(--active-blue); }
-        .review-item.flagged { border-color: #FFA500; background: #FFF3E0; }
+        /* TOOLS OVERLAYS */
+        #line-reader { position: absolute; width: 100%; height: 60px; background: rgba(255, 255, 0, 0.3); border-top: 2px solid red; border-bottom: 2px solid red; top: 100px; left: 0; cursor: grab; display: none; z-index: 100; pointer-events: auto; }
+        
+        #ref-sheet-modal { position: fixed; top: 10%; left: 50%; transform: translateX(-50%); width: 600px; height: 70vh; background: white; border: 1px solid #ccc; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none; z-index: 200; flex-direction: column; }
+        .ref-header { background: #333; color: white; padding: 10px; display: flex; justify-content: space-between; }
+        .ref-content { padding: 20px; overflow-y: auto; font-family: "Times New Roman", serif; }
+        .ref-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .ref-table th, .ref-table td { border: 1px solid #000; padding: 8px; text-align: center; }
 
-        /* --- RESULTS REPORT --- */
-        .report-card { max-width: 800px; margin: 20px auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow-y: auto; height: 80%; }
-        .stat-bar { height: 12px; background: #eee; border-radius: 6px; overflow: hidden; margin-top: 8px; }
-        .stat-fill { height: 100%; background: var(--active-blue); width: 0%; transition: 1s; }
-        .cat-row { margin-bottom: 25px; }
-
-        /* UTILS */
-        .hidden { display: none !important; }
-        .image-placeholder { background: #eee; border: 2px dashed #ccc; width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; color: #777; font-weight: bold; border-radius: 8px; margin-bottom: 15px; }
+        .zoom-125 { transform: scale(1.25); width: 80vw; height: 80vh; }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
-        <div class="user-info">
-            <span style="background:white; color:#2C3E50; padding:2px 8px; border-radius:50%; font-size:0.8em;">G3</span>
-            <span>Student: Guest</span>
+        <div style="font-weight:bold;">Student: Guest (G3 Math)</div>
+        <div class="tool-group">
+            <button class="tool-btn" onclick="toggleZoom()">🔍 Zoom</button>
+            <button class="tool-btn" onclick="toggleLineReader()">📏 Line Reader</button>
+            <button class="tool-btn" onclick="toggleRef()">📄 Formulas</button>
         </div>
-        <div class="test-tools">
-            <button class="tool-btn" onclick="alert('Simulated Zoom Tool')">🔍 Zoom</button>
-            <button class="tool-btn" onclick="alert('Simulated Line Reader')">📏 Line Reader</button>
-            <button class="tool-btn" onclick="alert('Reference Sheet PDF')">📄 Reference</button>
-            <button class="tool-btn" style="border-color:#e74c3c; background:#c0392b;" onclick="endTest()">🛑 Pause</button>
-        </div>
+        <button class="tool-btn" style="background:#C0392B; border-color:#C0392B;" onclick="location.reload()">Exit</button>
     </div>
 
-    <div id="test-view" class="test-container">
+    <div id="stage" class="main-stage">
         </div>
 
-    <div id="review-view" class="test-container hidden" style="display:block; overflow-y:auto; padding:30px;">
-        <h2 style="color:#2C3E50; border-bottom:2px solid #eee; padding-bottom:10px;">Review Your Answers</h2>
-        <p>Click on a question number to return to it. Items with a <b>Checkmark</b> are answered.</p>
-        <div id="review-grid" class="review-grid"></div>
-        <button class="submit-btn" style="background:#27ae60; color:white; border:none; padding:15px 30px; font-size:1.2em; border-radius:5px; margin-top:40px; cursor:pointer;" onclick="submitFinal()">Submit Test</button>
+    <div id="line-reader" draggable="true"></div>
+
+    <div id="ref-sheet-modal">
+        <div class="ref-header">
+            <span>Grade 3 Mathematics Reference Sheet</span>
+            <button onclick="toggleRef()" style="background:none; border:none; color:white; cursor:pointer;">✕</button>
+        </div>
+        <div class="ref-content">
+            <h3>Customary Conversions</h3>
+            <table class="ref-table">
+                <tr><td>1 foot = 12 inches</td><td>1 yard = 3 feet</td></tr>
+                <tr><td>1 mile = 5,280 feet</td><td>1 mile = 1,760 yards</td></tr>
+                <tr><td>1 cup = 8 fluid ounces</td><td>1 pint = 2 cups</td></tr>
+                <tr><td>1 quart = 2 pints</td><td>1 gallon = 4 quarts</td></tr>
+                <tr><td>1 pound = 16 ounces</td><td>1 ton = 2,000 pounds</td></tr>
+            </table>
+            <h3>Metric Conversions</h3>
+            <table class="ref-table">
+                <tr><td>1 meter = 100 centimeters</td><td>1 meter = 1000 millimeters</td></tr>
+                <tr><td>1 kilometer = 1000 meters</td><td>1 liter = 1000 milliliters</td></tr>
+                <tr><td>1 gram = 1000 milligrams</td><td>1 kilogram = 1000 grams</td></tr>
+            </table>
+            <h3>Time Conversions</h3>
+            <table class="ref-table">
+                <tr><td>1 minute = 60 seconds</td><td>1 hour = 60 minutes</td></tr>
+                <tr><td>1 day = 24 hours</td><td>1 year = 365 days</td></tr>
+            </table>
+        </div>
     </div>
 
     <div class="nav-bar">
-        <button id="btn-back" class="nav-btn secondary" onclick="prevQ()">Back</button>
-        <div style="font-weight:bold; color:#555;">Question <span id="q-idx">1</span> / <span id="q-total">10</span></div>
-        <button id="btn-next" class="nav-btn" onclick="nextQ()">Next</button>
-    </div>
-
-    <div id="report-view" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999; display:flex; justify-content:center; align-items:center;">
-        <div class="report-card">
-            <h1 style="color:#2C3E50; margin-top:0;">F.A.S.T. Assessment Report</h1>
-            <p style="font-size:1.1em; color:#555;">Mock Operational Result - Grade 3 Mathematics</p>
-            <hr style="border:0; border-top:1px solid #eee; margin:20px 0;">
-            
-            <div id="report-content"></div>
-            
-            <button class="nav-btn" style="margin-top:20px;" onclick="location.reload()">Exit to Portal</button>
-        </div>
+        <button class="nav-btn secondary" onclick="prevQ()">Back</button>
+        <div>Question <span id="q-idx">1</span> of 5</div>
+        <button class="nav-btn" onclick="nextQ()">Next</button>
     </div>
 
     <script>
-        // --- REAL QUESTION BANK FROM PDFS ---
+        // --- REAL GRAPHICS GENERATORS ---
+        function getPieChart() {
+            // SVG for 1/8 shaded
+            return `
+            <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="48" fill="white" stroke="#333" stroke-width="2"/>
+                <path d="M50,50 L50,2 A48,48 0 0,1 84,16 Z" fill="#3498DB" stroke="#333"/> <line x1="50" y1="2" x2="50" y2="98" stroke="#333"/>
+                <line x1="2" y1="50" x2="98" y2="50" stroke="#333"/>
+                <line x1="16" y1="16" x2="84" y2="84" stroke="#333"/>
+                <line x1="16" y1="84" x2="84" y2="16" stroke="#333"/>
+            </svg>`;
+        }
+
+        function getDataKey() {
+            return `
+            <div class="data-key-box">
+                <div class="key-row">📚 = 3 Students</div>
+                <hr>
+                <div class="key-row"><b>Sci-Fi:</b> 📚📚</div>
+                <div class="key-row"><b>Comic:</b> 📚</div>
+                <div class="key-row"><b>Fantasy:</b> 📚📚📚</div>
+            </div>`;
+        }
+
+        function getRectangle() {
+            return `
+            <div style="width:200px; height:100px; border:3px solid #333; background:#ddd; display:flex; align-items:center; justify-content:center; position:relative;">
+                <span style="position:absolute; top:-25px;">9 units</span>
+                <span style="position:absolute; left:-60px;">4 units</span>
+                <span style="font-weight:bold; color:#555;">Rectangle</span>
+            </div>`;
+        }
+
+        // --- QUESTION CONTENT ---
         const questions = [
             {
-                id: 1, cat: "MA.3.FR.1.1", type: "input", layout: "split",
-                img: "Circle with 1 of 8 parts shaded",
-                q: "<b>Sample Item 1:</b><br>A circle with one part shaded is shown.<br>Create a fraction that represents the shaded part of the circle.",
+                type: "input",
+                layout: "split",
+                visual: getPieChart(),
+                text: "<b>Sample Item 1:</b><br>A circle with one part shaded is shown.<br>Create a fraction that represents the shaded part of the circle.",
                 ans: "1/8"
             },
             {
-                id: 2, cat: "MA.3.NSO.1.2", type: "choice", layout: "full",
-                q: "<b>Sample Item 2:</b><br>What is the expanded form of 7,403?",
+                type: "choice",
+                layout: "full",
+                text: "<b>Sample Item 2:</b><br>What is the expanded form of 7,403?",
                 opts: ["700 + 40 + 3", "7,000 + 40 + 3", "7,000 + 400 + 3", "7,000 + 400 + 30"],
-                ans: 2 // Index of correct
+                ans: 2
             },
             {
-                id: 3, cat: "MA.3.DP.1.1", type: "multi-input", layout: "split",
-                img: "<b>Data:</b><br>• 6 students: Sci-Fi<br>• 3 students: Comic<br>• 9 students: Fantasy<br>• Total: 18 students<br><br><b>Key:</b> 📚 = 3 students",
-                q: "<b>Sample Item 3:</b><br>Ms. Devitt asks her 18 students about their favorite books.<br>How many symbols (📚) should be drawn for each category?<br><br>Sci-Fi: <input class='input-box' id='i3a'><br>Comic: <input class='input-box' id='i3b'><br>Fantasy: <input class='input-box' id='i3c'>",
-                ans: ["2", "1", "3"]
+                type: "input-group",
+                layout: "split",
+                visual: getDataKey(),
+                text: "<b>Sample Item 3:</b><br>The data key shows students' favorite books.<br>If 📚 = 3 students, how many symbols would you draw for a category with 12 students?",
+                ans: "4"
             },
             {
-                id: 4, cat: "MA.3.M.1.1", type: "input", layout: "full",
-                img: "Ruler showing light string end at 10.5 inches (simulated)",
-                q: "<b>Sample Item 4:</b><br>Robert measures a string of lights. The string ends exactly halfway between 10 and 11 inches.<br>How long, in inches, is the string?",
-                ans: "10.5"
+                type: "multi-select",
+                layout: "split",
+                visual: getRectangle(),
+                text: "<b>Sample Item 11:</b><br>Select <b>ALL</b> expressions that represent the <b>Perimeter</b> of the rectangle.",
+                opts: ["9 × 4", "9 + 4 + 9 + 4", "9 + 4", "(9 × 2) + (4 × 2)"],
+                ans: [1, 3]
             },
             {
-                id: 5, cat: "MA.3.AR.2.3", type: "multi-part", layout: "full",
-                q: "<b>Sample Item 5:</b><br><b>Part A:</b> Which expression finds the unknown <i>u</i> in <i>u</i> × 12 = 24?<br><div class='opt-row' onclick='selectOpt(this, 0)'><div class='bubble'>A</div>24 ÷ 12</div><div class='opt-row' onclick='selectOpt(this, 1)'><div class='bubble'>B</div>24 × 12</div><br><b>Part B:</b> What is the value of <i>u</i>?<br><input class='input-box' id='i5'>",
-                ans: [0, "2"] // A and 2
-            },
-            {
-                id: 9, cat: "MA.3.M.2.2", type: "multi-input", layout: "full",
-                q: "<b>Sample Item 9:</b><br>Jamael starts homework at 3:57 p.m. and finishes at 4:32 p.m. He works on Math and Science.<br>If he spent equal time on both, how many minutes did he work on each subject?<br><br>Total Minutes: <span style='color:#666; font-style:italic'>(Calculate First)</span><br>Math: <input class='input-box' id='i9a'><br>Science: <input class='input-box' id='i9b'>",
-                ans: ["17.5", "17.5"] // 35 total / 2. (Or just open ended summing to 35)
-            },
-            {
-                id: 11, cat: "MA.3.GR.2.3", type: "multi-select", layout: "split",
-                img: "Rectangle: 9 units by 4 units",
-                q: "<b>Sample Item 11:</b><br>Select <b>ALL</b> correct expressions for the Area and Perimeter.<br>",
-                opts: ["Area: 9 × 4", "Perimeter: 9 + 4", "Perimeter: 9 + 9 + 4 + 4", "Area: 9 + 9 + 4 + 4"],
-                ans: [0, 2] // Indices
+                type: "input",
+                layout: "full",
+                text: "<b>Sample Item 9:</b><br>Jamael works on homework from 3:57 p.m. to 4:32 p.m.<br>How many total minutes did he work?",
+                ans: "35"
             }
         ];
 
         let curIdx = 0;
-        let userAnswers = new Array(questions.length).fill(null);
+        let userAns = [null, null, null, [], null];
 
-        function renderQ() {
+        function render() {
             const q = questions[curIdx];
-            const container = document.getElementById('test-view');
+            const stage = document.getElementById('stage');
             
-            // Build Layout
-            let html = "";
+            let leftContent = "";
+            let rightClass = "full-pane";
+            
             if(q.layout === "split") {
-                html = `<div class="split-left"><div class="image-placeholder">${q.img || "Visual Material"}</div></div>
-                        <div class="split-right"><div class="q-number">Question ${curIdx+1}</div><div class="q-text">${q.q}</div><div id="opts-area"></div></div>`;
-            } else {
-                html = `<div class="full-width"><div class="q-number">Question ${curIdx+1}</div><div class="q-text">${q.q}</div><div id="opts-area"></div></div>`;
+                leftContent = `<div class="left-pane">${q.visual}</div>`;
+                rightClass = "right-pane";
             }
-            container.innerHTML = html;
 
-            // Inject Options based on Type
-            const optsArea = document.getElementById('opts-area');
-            if(q.type === "choice" || q.type === "multi-select") {
+            let interaction = "";
+            if(q.type === "choice") {
                 q.opts.forEach((o, i) => {
-                    let isSel = (userAnswers[curIdx] && userAnswers[curIdx].includes(i));
-                    let shape = q.type === "multi-select" ? "square" : "";
-                    optsArea.innerHTML += `<div class="opt-row ${isSel?'selected':''}" onclick="toggleOpt(${i}, '${q.type}')">
-                        <div class="bubble ${shape}"></div><div class="opt-text">${o}</div>
-                    </div>`;
+                    let sel = userAns[curIdx] === i ? "selected" : "";
+                    interaction += `<div class="opt-row ${sel}" onclick="saveChoice(${i})"><div class="bubble"></div>${o}</div>`;
                 });
-            } else if (q.type === "input") {
-                optsArea.innerHTML = `<input class="input-box" id="ans-in" value="${userAnswers[curIdx] || ''}" oninput="saveInput(this.value)">`;
+            } else if(q.type === "multi-select") {
+                q.opts.forEach((o, i) => {
+                    let sel = userAns[curIdx].includes(i) ? "selected" : "";
+                    interaction += `<div class="opt-row ${sel}" onclick="saveMulti(${i})"><div class="bubble" style="border-radius:4px"></div>${o}</div>`;
+                });
+            } else if(q.type === "input" || q.type === "input-group") {
+                interaction = `<input class="input-box" value="${userAns[curIdx] || ''}" oninput="userAns[curIdx]=this.value" placeholder="?">`;
             }
 
-            // Update Nav State
+            stage.innerHTML = `
+                ${leftContent}
+                <div class="split-pane ${rightClass}">
+                    <div class="q-header">Question ${curIdx+1}</div>
+                    <div class="q-content">${q.text}</div>
+                    <div>${interaction}</div>
+                </div>
+            `;
+            
             document.getElementById('q-idx').innerText = curIdx + 1;
-            document.getElementById('q-total').innerText = questions.length;
-            document.getElementById('btn-back').disabled = (curIdx === 0);
-            document.getElementById('btn-next').innerText = (curIdx === questions.length - 1) ? "Review" : "Next";
         }
 
-        // --- INTERACTION HANDLERS ---
-        function toggleOpt(idx, type) {
-            let current = userAnswers[curIdx] || [];
-            if(type === "choice") {
-                userAnswers[curIdx] = [idx];
-            } else {
-                if(!Array.isArray(current)) current = [];
-                if(current.includes(idx)) current = current.filter(i => i !== idx);
-                else current.push(idx);
-                userAnswers[curIdx] = current;
-            }
-            renderQ(); // Re-render to show selection
-        }
-
-        function saveInput(val) {
-            userAnswers[curIdx] = val;
-        }
+        // --- SAVING ANSWERS ---
+        window.saveChoice = (i) => { userAns[curIdx] = i; render(); };
+        window.saveMulti = (i) => {
+            let arr = userAns[curIdx];
+            if(arr.includes(i)) arr = arr.filter(x => x !== i);
+            else arr.push(i);
+            userAns[curIdx] = arr;
+            render();
+        };
 
         // --- NAVIGATION ---
-        function nextQ() {
-            if(curIdx < questions.length - 1) {
-                curIdx++;
-                renderQ();
-            } else {
-                showReview();
+        window.nextQ = () => { if(curIdx < questions.length-1) { curIdx++; render(); } else { alert("Test Complete! Review answers?"); } };
+        window.prevQ = () => { if(curIdx > 0) { curIdx--; render(); } };
+
+        // --- TOOLS ---
+        let zoom = 1;
+        window.toggleZoom = () => {
+            zoom = zoom === 1 ? 1.25 : 1;
+            document.body.style.transform = `scale(${zoom})`;
+            // Adjust origin to keep centered/top-left based on preference
+            document.body.style.width = zoom === 1 ? "100%" : "80%";
+        };
+
+        window.toggleRef = () => {
+            const m = document.getElementById('ref-sheet-modal');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        };
+
+        window.toggleLineReader = () => {
+            const lr = document.getElementById('line-reader');
+            lr.style.display = lr.style.display === 'block' ? 'none' : 'block';
+        };
+
+        // --- DRAGGABLE LINE READER ---
+        const lr = document.getElementById('line-reader');
+        let isDown = false, offset = [0,0];
+
+        lr.addEventListener('mousedown', (e) => { isDown = true; offset = [lr.offsetLeft - e.clientX, lr.offsetTop - e.clientY]; });
+        document.addEventListener('mouseup', () => { isDown = false; });
+        document.addEventListener('mousemove', (e) => {
+            if(isDown) {
+                lr.style.left = (e.clientX + offset[0]) + 'px';
+                lr.style.top  = (e.clientY + offset[1]) + 'px';
             }
-        }
-        function prevQ() {
-            if(curIdx > 0) {
-                curIdx--;
-                renderQ();
-            }
-        }
+        });
 
-        // --- REVIEW & REPORT ---
-        function showReview() {
-            document.getElementById('test-view').classList.add('hidden');
-            document.getElementById('review-view').classList.remove('hidden');
-            document.querySelector('.nav-bar').classList.add('hidden'); // Hide bottom nav in review
-            
-            let html = "";
-            questions.forEach((q, i) => {
-                let ans = userAnswers[i];
-                let status = (ans !== null && ans !== "" && (!Array.isArray(ans) || ans.length > 0)) ? "answered" : "";
-                html += `<div class="review-item ${status}" onclick="gotoQ(${i})">${i+1}<br>${status?'✅':'⚠️'}</div>`;
-            });
-            document.getElementById('review-grid').innerHTML = html;
-        }
-
-        function gotoQ(i) {
-            curIdx = i;
-            document.getElementById('test-view').classList.remove('hidden');
-            document.getElementById('review-view').classList.add('hidden');
-            document.querySelector('.nav-bar').classList.remove('hidden');
-            renderQ();
-        }
-
-        function submitFinal() {
-            // Calculate Score based on Reporting Categories
-            let scores = { "NSO": {c:0, t:0}, "FR": {c:0, t:0}, "AR": {c:0, t:0}, "M": {c:0, t:0}, "GR": {c:0, t:0}, "DP": {c:0, t:0} };
-            
-            questions.forEach((q, i) => {
-                let cat = q.cat.split('.')[2]; // Extract NSO, FR, etc.
-                if(!scores[cat]) scores[cat] = {c:0, t:0};
-                scores[cat].t++;
-
-                // Simplified Grading Logic for Demo
-                let isCorr = false;
-                if(q.type === "choice" && userAnswers[i][0] === q.ans) isCorr = true;
-                if(q.type === "input" && userAnswers[i] === q.ans) isCorr = true;
-                if(q.type === "multi-select") {
-                    // Check if arrays match
-                    if(userAnswers[i] && q.ans.every(v => userAnswers[i].includes(v)) && userAnswers[i].length === q.ans.length) isCorr = true;
-                }
-                // (Note: Advanced grading for multi-part items would go here)
-                
-                if(isCorr) scores[cat].c++;
-            });
-
-            // Generate Report HTML
-            let reportHtml = "";
-            for(let key in scores) {
-                if(scores[key].t === 0) continue;
-                let pct = (scores[key].c / scores[key].t) * 100;
-                let color = pct > 75 ? "#2ecc71" : (pct > 40 ? "#f1c40f" : "#e74c3c");
-                reportHtml += `
-                <div class="cat-row">
-                    <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
-                        <span>${key} Mastery</span>
-                        <span>${scores[key].c}/${scores[key].t}</span>
-                    </div>
-                    <div class="stat-bar"><div class="stat-fill" style="width:${pct}%; background:${color}"></div></div>
-                </div>`;
-            }
-
-            document.getElementById('report-content').innerHTML = reportHtml;
-            document.getElementById('report-view').classList.remove('hidden');
-        }
-
-        window.onload = renderQ;
+        // INIT
+        render();
     </script>
 </body>
 </html>
