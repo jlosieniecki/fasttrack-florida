@@ -3,156 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida: Infinite Quest</title>
+    <title>FastTrack Florida: Mastery Edition</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#00796B">
     <link rel="apple-touch-icon" href="Gemini_Generated_Image_t8043ht8043ht804.png">
     <style>
-        :root { --primary: #00796B; --secondary: #004D40; --bg: #E0F7FA; --text: #002D20; --hint: #FFF9C4; }
-        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: var(--bg); color: var(--text); padding: 10px; margin: 0; }
-        .logo { width: 80px; height: 80px; margin: 10px auto; display: block; border-radius: 15px; background: white; object-fit: cover; }
-        .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 500px; margin: 10px auto; border: 3px solid var(--primary); }
-        .btn { background: var(--primary); color: white; padding: 15px 20px; border-radius: 15px; border: none; cursor: pointer; font-size: 1.1em; margin: 8px auto; width: 95%; display: block; font-weight: bold; transition: 0.2s; }
-        .btn:hover { background: var(--secondary); transform: translateY(-2px); }
-        .progress-bar-container { width: 90%; background: #B2DFDB; border-radius: 10px; margin: 10px auto; height: 12px; overflow: hidden; border: 1px solid #004D40; }
+        :root { --primary: #00796B; --secondary: #004D40; --bg: #E0F7FA; --text: #002D20; --hint-bg: #FFF9C4; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; background: var(--bg); color: var(--text); padding: 10px; margin: 0; }
+        .logo { width: 90px; height: 90px; margin: 10px auto; display: block; border-radius: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: white; object-fit: cover; }
+        .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 450px; margin: 10px auto; border: 3px solid var(--primary); }
+        .btn { background: var(--primary); color: white; padding: 16px; border-radius: 15px; border: none; cursor: pointer; font-size: 1.1em; margin: 8px auto; width: 100%; font-weight: bold; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
+        .progress-bar-container { width: 90%; background: #B2DFDB; border-radius: 10px; margin: 10px auto; height: 14px; overflow: hidden; border: 1px solid var(--secondary); }
         #progress-fill { width: 0%; height: 100%; background: #4CAF50; transition: 0.5s; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; font-size: 0.85em; }
-        .stat-box { background: white; padding: 10px; border-radius: 10px; border: 1px solid var(--primary); }
-        .cat-tag { font-size: 0.75em; color: #666; font-weight: bold; text-transform: uppercase; }
-        #feedback { font-weight: bold; margin-top: 10px; font-size: 1.1em; height: 25px; }
-        .hint-box { background: var(--hint); border: 1px dashed #FBC02D; padding: 10px; border-radius: 10px; margin-top: 10px; display: none; font-size: 0.85em; text-align: left; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 450px; margin: 0 auto 10px; font-size: 0.9em; font-weight: bold; }
+        .stat-box { background: white; padding: 10px; border-radius: 12px; border: 1.5px solid var(--primary); }
+        .cat-tag { font-size: 0.75em; color: #666; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        #feedback { font-weight: bold; margin-top: 12px; font-size: 1.2em; height: 30px; }
+        .hint-box { background: var(--hint-bg); border: 2px dashed #FBC02D; padding: 15px; border-radius: 15px; margin-top: 15px; display: none; text-align: left; font-size: 0.9em; line-height: 1.4; }
     </style>
 </head>
 <body>
 
-    <img src="Gemini_Generated_Image_t8043ht8043ht804.png" class="logo">
+    <img src="Gemini_Generated_Image_t8043ht8043ht804.png" alt="FastTrack Logo" class="logo">
     
     <div class="stats-grid">
-        <div class="stat-box">⭐ Total Points: <span id="total-points">0</span></div>
-        <div class="stat-box">🏆 Mastery Level: <span id="mastery-lvl">1</span></div>
+        <div class="stat-box">⭐ Points: <span id="total-points">0</span></div>
+        <div class="stat-box">🏆 Mastery: Lvl <span id="mastery-lvl">1</span></div>
     </div>
 
     <div class="progress-bar-container"><div id="progress-fill"></div></div>
 
     <div class="card" id="quiz-box">
-        <span id="category-tag" class="cat-tag">GENERATING QUESTION...</span>
+        <span id="category-tag" class="cat-tag">Generating...</span>
         <h3 id="question-text">---</h3>
         <div id="options-container"></div>
-        <button class="btn" style="background:#FF9800; font-size: 0.8em; width: auto; padding: 8px 15px;" onclick="toggleHint()">💡 Hint</button>
+        
+        <button class="btn" style="background:#FF9800; font-size: 0.85em; width: auto; padding: 10px 20px;" onclick="toggleHint()">💡 Guided Instruction</button>
         <div id="hint-text" class="hint-box"></div>
+        
         <div id="feedback"></div>
     </div>
 
     <script>
-        // PROGRESS SYSTEM (Saves to Phone)
-        let stats = JSON.parse(localStorage.getItem('fastTrackStats')) || { points: 0, level: 1, correctCount: 0 };
+        // PERSISTENCE ENGINE
+        let stats = JSON.parse(localStorage.getItem('ft_mastery_stats')) || { points: 0, level: 1, correctCount: 0 };
 
-        function saveStats() {
-            localStorage.setItem('fastTrackStats', JSON.stringify(stats));
-            updateUI();
+        function save() {
+            localStorage.setItem('ft_mastery_stats', JSON.stringify(stats));
+            renderUI();
         }
 
-        function updateUI() {
+        function renderUI() {
             document.getElementById('total-points').innerText = stats.points;
             document.getElementById('mastery-lvl').innerText = stats.level;
-            let progress = (stats.correctCount % 10) * 10; 
+            let progress = (stats.correctCount % 10) * 10;
             document.getElementById('progress-fill').style.width = (stats.correctCount > 0 && progress === 0) ? "100%" : progress + "%";
             
-            if (stats.correctCount > 0 && stats.correctCount % 10 === 0 && progress === 0 && !window.leveledUp) {
+            if (stats.correctCount > 0 && stats.correctCount % 10 === 0 && progress === 0) {
                 stats.level++;
-                window.leveledUp = true;
-                alert("🌟 LEVEL UP! You reached Mastery Level " + stats.level);
-                saveStats();
-            } else if (progress !== 0) {
-                window.leveledUp = false;
+                alert("🎉 MASTERED! You've reached Level " + stats.level);
+                save();
             }
         }
 
-        // INFINITE ENGINES BASED ON FLORIDA B.E.S.T.
+        // INFINITE MATH ENGINES (Based on FAST/B1G-M Documents)
         const engines = [
-            // Engine 1: Expanded Form (MA.3.NSO.1.1)
+            // MA.3.NSO.1.1: Expanded Form
             function() {
-                let th = Math.floor(Math.random() * 9) + 1;
-                let h = Math.floor(Math.random() * 9);
-                let t = Math.floor(Math.random() * 9);
-                let o = Math.floor(Math.random() * 9) + 1;
-                let num = (th*1000) + (h*100) + (t*10) + o;
+                let n = Math.floor(Math.random() * 8999) + 1000;
+                let th = Math.floor(n/1000)*1000;
+                let h = Math.floor((n%1000)/100)*100;
+                let t = Math.floor((n%100)/10)*10;
+                let o = n%10;
+                let correct = `${th} + ${h} + ${t} + ${o}`.replace("+ 0 ", "");
                 return {
-                    q: `What is the expanded form of ${num.toLocaleString()}?`,
-                    a: [`${th*1000} + ${h*100} + ${t*10} + ${o}`, `${th*100} + ${h*10} + ${o}`, `${th*1000} + ${h*10} + ${o}`, `${th*1000} + ${h*100} + ${t*100}`],
-                    c: 0, cat: "Number Sense", hint: "Decompose the number by its place values: thousands, hundreds, tens, and ones."
+                    q: `What is the expanded form of ${n.toLocaleString()}?`,
+                    a: [correct, `${th} + ${t} + ${o}`, `${n} + 0`, `${th} + ${h} + ${o}`],
+                    c: 0, cat: "Number Sense", hint: "Decompose by place value! Thousands + Hundreds + Tens + Ones."
                 };
             },
-            // Engine 2: Multiplication (MA.3.NSO.2.2)
+            // MA.3.GR.2.3: Perimeter vs Area
             function() {
-                let factor = Math.floor(Math.random() * 8) + 2;
-                let multi = [10, 20, 30, 40, 50, 60, 100, 200, 300][Math.floor(Math.random()*9)];
-                let correct = factor * multi;
-                return {
-                    q: `Solve: ${factor} × ${multi} = ?`,
-                    a: [correct, correct - 10, correct + 10, factor + multi],
-                    c: 0, cat: "Multiplication", hint: "Multiply the basic facts first, then add the zeros from the multiple of 10 or 100."
-                };
-            },
-            // Engine 3: Perimeter (MA.3.GR.2.3)
-            function() {
-                let l = Math.floor(Math.random() * 10) + 2;
+                let l = Math.floor(Math.random() * 8) + 2;
                 let w = Math.floor(Math.random() * 5) + 2;
-                let correct = (l * 2) + (w * 2);
+                let p = (l*2)+(w*2);
                 return {
-                    q: `A rectangle has a length of ${l} and a width of ${w}. What is the perimeter?`,
-                    a: [correct, l * w, l + w, (l * 2) + w],
-                    c: 0, cat: "Geometry", hint: "Perimeter is the distance around the outside. Add all four sides together!"
+                    q: `A rectangle has a length of ${l} units and a width of ${w} units. What is the PERIMETER?`,
+                    a: [p, l*w, l+w, l*w*2],
+                    c: 0, cat: "Geometry", hint: "Perimeter is the distance AROUND. Add all 4 sides: " + l + "+" + w + "+" + l + "+" + w + "."
                 };
-            }
-        ];
-
-        let currentQ = {};
-
-        function nextQuestion() {
-            let engine = engines[Math.floor(Math.random() * engines.length)];
-            currentQ = engine();
-            let correctVal = currentQ.a[0];
-            currentQ.a.sort(() => Math.random() - 0.5);
-            currentQ.c = currentQ.a.indexOf(correctVal);
-
-            document.getElementById('category-tag').innerText = currentQ.cat;
-            document.getElementById('question-text').innerText = currentQ.q;
-            document.getElementById('hint-text').innerText = currentQ.hint;
-            document.getElementById('hint-text').style.display = 'none';
-            document.getElementById('feedback').innerText = "";
-            
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-            currentQ.a.forEach((opt, idx) => {
-                const b = document.createElement('button');
-                b.innerText = opt;
-                b.className = 'btn';
-                b.onclick = () => check(idx);
-                container.appendChild(b);
-            });
-        }
-
-        function toggleHint() {
-            const h = document.getElementById('hint-text');
-            h.style.display = h.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function check(idx) {
-            if(idx === currentQ.c) {
-                stats.points += 10;
-                stats.correctCount++;
-                document.getElementById('feedback').innerText = "Correct! +10 pts 🐊";
-                document.getElementById('feedback').style.color = "green";
-                saveStats();
-                setTimeout(nextQuestion, 1200);
-            } else {
-                document.getElementById('feedback').innerText = "Try again! ☀️";
-                document.getElementById('feedback').style.color = "orange";
-            }
-        }
-
-        window.onload = () => { updateUI(); nextQuestion(); };
-    </script>
-</body>
-</html>
+            },
+            // MA.3.NSO.2.2: Multiples of 10
+            function() {
+                let f = Math.floor(Math.random() * 7) + 3;
+                let m = [20, 30, 40, 50, 60][Math.floor(Math.random()*5)];
+                return {
+                    q: `Solve: ${f} × ${m} = ?`,
+                    a: [f*m, (f*m)-10, (f*m)+10, f+m],
+                    c: 0, cat: "Operations", hint: "
