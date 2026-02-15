@@ -3,102 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida: Mastery Edition</title>
-    <link rel="manifest" href="manifest.json">
+    <title>FastTrack Florida: Grade 3 Master</title>
+    
     <meta name="theme-color" content="#00796B">
     <link rel="apple-touch-icon" href="Gemini_Generated_Image_t8043ht8043ht804.png">
+    <link rel="manifest" href="manifest.json">
+
     <style>
-        :root { --primary: #00796B; --secondary: #004D40; --bg: #E0F7FA; --text: #002D20; --hint-bg: #FFF9C4; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center; background: var(--bg); color: var(--text); padding: 10px; margin: 0; }
-        .logo { width: 90px; height: 90px; margin: 10px auto; display: block; border-radius: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: white; object-fit: cover; }
-        .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 450px; margin: 10px auto; border: 3px solid var(--primary); }
-        .btn { background: var(--primary); color: white; padding: 16px; border-radius: 15px; border: none; cursor: pointer; font-size: 1.1em; margin: 8px auto; width: 100%; font-weight: bold; transition: 0.2s; }
-        .btn:active { transform: scale(0.98); }
-        .progress-bar-container { width: 90%; background: #B2DFDB; border-radius: 10px; margin: 10px auto; height: 14px; overflow: hidden; border: 1px solid var(--secondary); }
-        #progress-fill { width: 0%; height: 100%; background: #4CAF50; transition: 0.5s; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 450px; margin: 0 auto 10px; font-size: 0.9em; font-weight: bold; }
-        .stat-box { background: white; padding: 10px; border-radius: 12px; border: 1.5px solid var(--primary); }
-        .cat-tag { font-size: 0.75em; color: #666; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px; }
-        #feedback { font-weight: bold; margin-top: 12px; font-size: 1.2em; height: 30px; }
-        .hint-box { background: var(--hint-bg); border: 2px dashed #FBC02D; padding: 15px; border-radius: 15px; margin-top: 15px; display: none; text-align: left; font-size: 0.9em; line-height: 1.4; }
+        :root { --primary: #00796B; --secondary: #004D40; --bg: #E0F7FA; --text: #002D20; --hint: #FFF9C4; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; text-align: center; background: var(--bg); color: var(--text); padding: 10px; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        
+        .logo { width: 90px; height: 90px; margin: 15px auto; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); background: white; object-fit: cover; }
+        
+        .stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 95%; max-width: 450px; margin-bottom: 10px; }
+        .stat-box { background: white; padding: 12px; border-radius: 15px; border: 2px solid var(--primary); font-weight: bold; font-size: 0.9em; }
+        
+        .progress-container { width: 95%; max-width: 450px; background: #B2DFDB; height: 12px; border-radius: 6px; margin-bottom: 15px; overflow: hidden; border: 1px solid var(--secondary); }
+        #progress-fill { width: 0%; height: 100%; background: #4CAF50; transition: 0.4s ease-out; }
+
+        .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); width: 95%; max-width: 450px; border: 3px solid var(--primary); box-sizing: border-box; }
+        
+        .cat-tag { font-size: 0.7em; color: #666; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 10px; }
+        #question-text { font-size: 1.25em; margin: 15px 0; min-height: 50px; }
+        
+        .btn { background: var(--primary); color: white; padding: 16px; border-radius: 15px; border: none; cursor: pointer; font-size: 1.1em; margin: 8px 0; width: 100%; font-weight: bold; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
+        .btn:active { transform: scale(0.97); background: var(--secondary); }
+        
+        .btn-hint { background: #FF9800; font-size: 0.85em; width: auto; padding: 8px 20px; margin-top: 15px; }
+        .hint-box { background: var(--hint); border: 2px dashed #FBC02D; padding: 15px; border-radius: 15px; margin-top: 15px; display: none; text-align: left; font-size: 0.9em; line-height: 1.4; }
+        
+        #feedback { font-weight: bold; margin-top: 15px; font-size: 1.2em; min-height: 30px; }
     </style>
 </head>
 <body>
 
-    <img src="Gemini_Generated_Image_t8043ht8043ht804.png" alt="FastTrack Logo" class="logo">
-    
-    <div class="stats-grid">
-        <div class="stat-box">⭐ Points: <span id="total-points">0</span></div>
-        <div class="stat-box">🏆 Mastery: Lvl <span id="mastery-lvl">1</span></div>
+    <img src="Gemini_Generated_Image_t8043ht8043ht804.png" alt="FastTrack Gator" class="logo">
+
+    <div class="stats-container">
+        <div class="stat-box">⭐ Points: <span id="pts">0</span></div>
+        <div class="stat-box">🏆 Mastery: Lvl <span id="lvl">1</span></div>
     </div>
 
-    <div class="progress-bar-container"><div id="progress-fill"></div></div>
+    <div class="progress-container"><div id="progress-fill"></div></div>
 
-    <div class="card" id="quiz-box">
-        <span id="category-tag" class="cat-tag">Generating...</span>
-        <h3 id="question-text">---</h3>
-        <div id="options-container"></div>
+    <div class="card">
+        <span id="cat-tag" class="cat-tag">FAST Standard Practice</span>
+        <div id="question-text">Loading your math quest...</div>
+        <div id="options"></div>
         
-        <button class="btn" style="background:#FF9800; font-size: 0.85em; width: auto; padding: 10px 20px;" onclick="toggleHint()">💡 Guided Instruction</button>
-        <div id="hint-text" class="hint-box"></div>
+        <button class="btn btn-hint" onclick="toggleHint()">💡 Need a Hint?</button>
+        <div id="hint-box" class="hint-box"></div>
         
         <div id="feedback"></div>
     </div>
 
     <script>
-        // PERSISTENCE ENGINE
-        let stats = JSON.parse(localStorage.getItem('ft_mastery_stats')) || { points: 0, level: 1, correctCount: 0 };
+        // --- DATA PERSISTENCE (Saves to Phone) ---
+        let state = JSON.parse(localStorage.getItem('fastTrack_v4')) || { points: 0, level: 1, correctInLevel: 0 };
 
         function save() {
-            localStorage.setItem('ft_mastery_stats', JSON.stringify(stats));
-            renderUI();
+            localStorage.setItem('fastTrack_v4', JSON.stringify(state));
+            renderStats();
         }
 
-        function renderUI() {
-            document.getElementById('total-points').innerText = stats.points;
-            document.getElementById('mastery-lvl').innerText = stats.level;
-            let progress = (stats.correctCount % 10) * 10;
-            document.getElementById('progress-fill').style.width = (stats.correctCount > 0 && progress === 0) ? "100%" : progress + "%";
+        function renderStats() {
+            document.getElementById('pts').innerText = state.points;
+            document.getElementById('lvl').innerText = state.level;
+            let progress = (state.correctInLevel / 10) * 100;
+            document.getElementById('progress-fill').style.width = progress + "%";
             
-            if (stats.correctCount > 0 && stats.correctCount % 10 === 0 && progress === 0) {
-                stats.level++;
-                alert("🎉 MASTERED! You've reached Level " + stats.level);
+            if (state.correctInLevel >= 10) {
+                state.level++;
+                state.correctInLevel = 0;
+                alert("🌟 EXCELLENT! You reached Mastery Level " + state.level);
                 save();
             }
         }
 
-        // INFINITE MATH ENGINES (Based on FAST/B1G-M Documents)
+        // --- MATH ENGINES (Based on FAST & B1G-M docs) ---
         const engines = [
-            // MA.3.NSO.1.1: Expanded Form
+            // MA.3.NSO.1.1: Decomposing numbers
             function() {
                 let n = Math.floor(Math.random() * 8999) + 1000;
                 let th = Math.floor(n/1000)*1000;
                 let h = Math.floor((n%1000)/100)*100;
                 let t = Math.floor((n%100)/10)*10;
                 let o = n%10;
-                let correct = `${th} + ${h} + ${t} + ${o}`.replace("+ 0 ", "");
+                let ans = `${th} + ${h} + ${t} + ${o}`.replace("+ 0", "").trim();
                 return {
                     q: `What is the expanded form of ${n.toLocaleString()}?`,
-                    a: [correct, `${th} + ${t} + ${o}`, `${n} + 0`, `${th} + ${h} + ${o}`],
-                    c: 0, cat: "Number Sense", hint: "Decompose by place value! Thousands + Hundreds + Tens + Ones."
+                    a: [ans, `${th} + ${t} + ${o}`, `${n} + 1`, `${th} + ${h} + 0`],
+                    cat: "Number Sense",
+                    hint: "Think about each place value: Thousands, Hundreds, Tens, and Ones. (B1G-M MA.3.NSO.1.1)"
                 };
             },
-            // MA.3.GR.2.3: Perimeter vs Area
+            // MA.3.NSO.2.2: Multiplication with 10s/100s
             function() {
-                let l = Math.floor(Math.random() * 8) + 2;
-                let w = Math.floor(Math.random() * 5) + 2;
-                let p = (l*2)+(w*2);
-                return {
-                    q: `A rectangle has a length of ${l} units and a width of ${w} units. What is the PERIMETER?`,
-                    a: [p, l*w, l+w, l*w*2],
-                    c: 0, cat: "Geometry", hint: "Perimeter is the distance AROUND. Add all 4 sides: " + l + "+" + w + "+" + l + "+" + w + "."
-                };
-            },
-            // MA.3.NSO.2.2: Multiples of 10
-            function() {
-                let f = Math.floor(Math.random() * 7) + 3;
-                let m = [20, 30, 40, 50, 60][Math.floor(Math.random()*5)];
+                let f = Math.floor(Math.random() * 8) + 2;
+                let m = [20, 30, 40, 50, 60, 70, 80, 90, 100, 200][Math.floor(Math.random()*10)];
+                let res = f * m;
                 return {
                     q: `Solve: ${f} × ${m} = ?`,
-                    a: [f*m, (f*m)-10, (f*m)+10, f+m],
-                    c: 0, cat: "Operations", hint: "
+                    a: [res, res - 10, res + 10, f + m],
+                    cat: "Operations",
+                    hint: "Multiply the non-zero digits first, then tack the zeros onto the end of your answer!"
+                };
+            },
+            // MA.3.GR.2.3: Perimeter
+            function() {
+                let l = Math.floor(Math.random() * 9) + 2;
+                let w = Math.floor(Math.random() * 6) + 2;
+                let p = (l * 2) + (w * 2);
+                return {
+                    q: `A rectangle is ${l} units long and ${w} units wide. What is the perimeter?`,
+                    a: [p, l * w, l + w, p + 2],
+                    cat: "Geometry",
+                    hint: "Perimeter is the distance AROUND. Add all four sides: L + W + L + W."
+                };
+            }
+        ];
+
+        let currentCorrect;
+
+        function nextQuestion() {
+            save();
+            const engine = engines[Math.floor(Math.random() * engines.length)];
+            const data = engine();
+            
+            document.getElementById('cat-tag').innerText = data.cat;
+            document.getElementById('question-text').innerText = data.q;
+            document.getElementById('hint-box').innerText = data.hint;
+            document.getElementById('hint-box').style.display = 'none';
+            document.getElementById('feedback').innerText = "";
+            
+            currentCorrect = data.a[0];
+            let shuffled = [...data.a].sort(() => Math.random() - 0.5);
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            shuffled.forEach(opt => {
+                const b = document.createElement('button');
+                b.className = 'btn';
+                b.innerText = opt;
+                b.onclick = () => check(opt);
+                optionsDiv.appendChild(b);
+            });
+        }
+
+        function check(val) {
+            if(val == currentCorrect) {
+                state.points += 10;
+                state.correctInLevel += 1;
+                document.getElementById('feedback').innerText = "Correct! 🐊";
+                document.getElementById('feedback').style.color = "green";
+                setTimeout(nextQuestion, 1000);
+            } else {
+                document.getElementById('feedback').innerText = "Try again! ☀️";
+                document.getElementById('feedback').style.color = "orange";
+            }
+        }
+
+        function toggleHint() {
+            const h = document.getElementById('hint-box');
+            h.style.display = h.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Initialize App
+        window.onload = () => {
+            renderStats();
+            nextQuestion();
+        };
+    </script>
+</body>
+</html>
