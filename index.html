@@ -3,139 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastTrack Florida: Grade 3 FAST Simulator</title>
+    <title>FastTrack Florida: Infinite Quest</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00796B">
+    <link rel="apple-touch-icon" href="Gemini_Generated_Image_t8043ht8043ht804.png">
     <style>
-        :root { --primary: #00796B; --secondary: #004D40; --bg: #E0F7FA; --text: #002D20; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: var(--bg); color: var(--text); padding: 10px; margin: 0; }
-        
-        /* LOGO STYLING */
-        .logo { 
-            width: 120px; 
-            height: 120px; 
-            margin: 15px auto; 
-            display: block; 
-            border-radius: 20px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            background: white;
-            object-fit: cover;
-        }
-
-        .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 500px; margin: 10px auto; border: 3px solid var(--primary); position: relative; }
-        .btn { background: var(--primary); color: white; padding: 15px 20px; border-radius: 15px; border: none; cursor: pointer; font-size: 1.1em; margin: 8px auto; width: 90%; display: block; font-weight: bold; transition: 0.2s; }
-        .btn:hover { background: var(--secondary); transform: translateY(-2px); }
-        .progress-container { width: 90%; background: #B2DFDB; border-radius: 10px; margin: 10px auto; height: 10px; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: var(--primary); transition: 0.4s; }
-        #feedback { font-weight: bold; margin-top: 15px; font-size: 1.2em; height: 30px; }
-        .cat-tag { font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: block; }
-        
-        .blueprint-info { background: #fff; padding: 15px; border-radius: 15px; font-size: 0.85em; text-align: left; margin-top: 30px; border: 1px dashed var(--primary); }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        td, th { padding: 5px; border-bottom: 1px solid #ddd; }
+        :root { --primary: #00796B; --secondary: #004D40; --bg: #E0F7FA; --text: #002D20; --hint: #FFF9C4; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: var(--bg); color: var(--text); padding: 10px; margin: 0; }
+        .logo { width: 80px; height: 80px; margin: 10px auto; display: block; border-radius: 15px; background: white; object-fit: cover; }
+        .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 500px; margin: 10px auto; border: 3px solid var(--primary); }
+        .btn { background: var(--primary); color: white; padding: 15px 20px; border-radius: 15px; border: none; cursor: pointer; font-size: 1.1em; margin: 8px auto; width: 95%; display: block; font-weight: bold; }
+        .progress-bar-container { width: 90%; background: #B2DFDB; border-radius: 10px; margin: 10px auto; height: 12px; overflow: hidden; border: 1px solid #004D40; }
+        #progress-fill { width: 0%; height: 100%; background: #4CAF50; transition: 0.5s; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; font-size: 0.85em; }
+        .stat-box { background: white; padding: 10px; border-radius: 10px; border: 1px solid var(--primary); }
+        .cat-tag { font-size: 0.75em; color: #666; font-weight: bold; text-transform: uppercase; }
+        #feedback { font-weight: bold; margin-top: 10px; font-size: 1.1em; height: 25px; }
     </style>
 </head>
 <body>
 
-    <img src="Gemini_Generated_Image_t8043ht8043ht804.png" alt="FastTrack Logo" class="logo">
+    <img src="Gemini_Generated_Image_t8043ht8043ht804.png" class="logo">
     
-    <h1>FastTrack Florida</h1>
-    <div class="progress-container"><div id="progress-bar"></div></div>
-    <div id="score-display" style="font-weight: bold;">Question 1 of 10</div>
+    <div class="stats-grid">
+        <div class="stat-box">⭐ Total Points: <span id="total-points">0</span></div>
+        <div class="stat-box">🏆 Mastery Level: <span id="mastery-lvl">1</span></div>
+    </div>
+
+    <div class="progress-bar-container"><div id="progress-fill"></div></div>
 
     <div class="card" id="quiz-box">
-        <span id="category-tag" class="cat-tag">Loading...</span>
-        <h3 id="question-text">Loading Quest...</h3>
+        <span id="category-tag" class="cat-tag">GENERATING QUESTION...</span>
+        <h3 id="question-text">---</h3>
         <div id="options-container"></div>
         <div id="feedback"></div>
     </div>
 
-    <div class="blueprint-info">
-        <strong>📊 2025 FAST Blueprint Alignment</strong>
-        <p>This session is balanced according to February 2025 FLDOE specifications.</p>
-        <table>
-            <tr><th>Reporting Category</th><th>Item Weight</th></tr>
-            <tr><td>Number Sense & Additive</td><td>23-29%</td></tr>
-            <tr><td>Multiplicative Reasoning</td><td>23-29%</td></tr>
-            <tr><td>Fractional Reasoning</td><td>23-29%</td></tr>
-            <tr><td>Geometric & Data</td><td>23-29%</td></tr>
-        </table>
-    </div>
-
     <script>
-        const quizData = [
-            { q: "What is the expanded form of 5,783?", a: ["5,000+700+80+3", "500+70+8+3", "5,000+70+8+3", "5,700+83"], c: 0, cat: "Number Sense & Additive" },
-            { q: "Round 745 to the nearest 100.", a: ["700", "750", "800", "740"], c: 0, cat: "Number Sense & Additive" },
-            { q: "Find the product: 6 x 300", a: ["1,800", "180", "630", "2,400"], c: 0, cat: "Multiplicative Reasoning" },
-            { q: "A rectangle is 12 units long and 4 units wide. What is the area?", a: ["16 sq units", "48 sq units", "24 sq units", "36 sq units"], c: 1, cat: "Multiplicative Reasoning" },
-            { q: "Which fraction is equivalent to 1 (one whole)?", a: ["1/3", "3/1", "3/3", "0/3"], c: 2, cat: "Fractional Reasoning" },
-            { q: "Which symbol makes this true? 3/8 ___ 5/8", a: [">", "<", "="], c: 1, cat: "Fractional Reasoning" },
-            { q: "A bus ride starts at 6:45 AM and ends at 8:15 AM. How long was the ride?", a: ["1 hour", "1 hour 15 mins", "1 hour 30 mins", "2 hours"], c: 2, cat: "Geometric & Data" },
-            { q: "Which shape has exactly 4 sides and parallel opposite sides?", a: ["Triangle", "Parallelogram", "Pentagon", "Hexagon"], c: 1, cat: "Geometric & Data" },
-            { q: "Which number is EVEN?", a: ["13", "21", "44", "79"], c: 2, cat: "Number Sense & Additive" },
-            { q: "Solve: 56 ÷ 7 = ?", a: ["6", "7", "8", "9"], c: 2, cat: "Multiplicative Reasoning" }
+        // PROGRESS SYSTEM (Saves to Phone)
+        let stats = JSON.parse(localStorage.getItem('fastTrackStats')) || { points: 0, level: 1, correctCount: 0 };
+
+        function saveStats() {
+            localStorage.setItem('fastTrackStats', JSON.stringify(stats));
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('total-points').innerText = stats.points;
+            document.getElementById('mastery-lvl').innerText = stats.level;
+            let progress = (stats.correctCount % 10) * 10; 
+            document.getElementById('progress-fill').style.width = progress + "%";
+            
+            // Level Up logic
+            if (stats.correctCount > 0 && stats.correctCount % 10 === 0 && progress === 0) {
+                stats.level++;
+                alert("🌟 LEVEL UP! You are now Level " + stats.level);
+                saveStats();
+            }
+        }
+
+        // INFINITE QUESTION ENGINES
+        const engines = [
+            // Engine 1: Expanded Form (MA.3.NSO.1.1)
+            function() {
+                let th = Math.floor(Math.random() * 9) + 1;
+                let h = Math.floor(Math.random() * 9);
+                let t = Math.floor(Math.random() * 9);
+                let o = Math.floor(Math.random() * 9) + 1;
+                let num = (th*1000) + (h*100) + (t*10) + o;
+                let correct = `${th*1000} + ${h*100} + ${t*10} + ${o}`;
+                return {
+                    q: `What is the expanded form of ${num.toLocaleString()}?`,
+                    a: [correct, `${th*100} + ${h*10} + ${o}`, `${th*1000} + ${t*100} + ${o}`, `${th*1000} + ${h*100} + ${t*100}`],
+                    c: 0, cat: "Number Sense"
+                };
+            },
+            // Engine 2: Multiplication Multiples (MA.3.NSO.2.2)
+            function() {
+                let factor = Math.floor(Math.random() * 8) + 2;
+                let multi = [10, 20, 30, 40, 50, 60, 70, 80, 90][Math.floor(Math.random()*9)];
+                let correct = factor * multi;
+                return {
+                    q: `Solve: ${factor} × ${multi} = ?`,
+                    a: [correct, correct - 10, correct + 10, factor + multi],
+                    c: 0, cat: "Multiplication"
+                };
+            },
+            // Engine 3: Identifying Fractions (MA.3.FR.1.1)
+            function() {
+                let denoms = [2, 3, 4, 6, 8, 10];
+                let d = denoms[Math.floor(Math.random()*denoms.length)];
+                return {
+                    q: `A pizza is cut into ${d} equal slices. You eat 1 slice. What fraction did you eat?`,
+                    a: [`1/${d}`, `${d}/1`, `1/2`, `0/${d}`],
+                    c: 0, cat: "Fractions"
+                };
+            }
         ];
 
-        quizData.sort(() => Math.random() - 0.5);
+        let currentQ = {};
 
-        let currentQuestion = 0;
-        let score = 0;
-        let categoryScores = {};
+        function nextQuestion() {
+            let engine = engines[Math.floor(Math.random() * engines.length)];
+            currentQ = engine();
+            
+            // Shuffle Answers
+            let originalA = [...currentQ.a];
+            let correctVal = originalA[0];
+            currentQ.a.sort(() => Math.random() - 0.5);
+            currentQ.c = currentQ.a.indexOf(correctVal);
 
-        function loadQuestion() {
-            const q = quizData[currentQuestion];
-            document.getElementById('category-tag').innerText = q.cat;
-            document.getElementById('question-text').innerText = q.q;
-            document.getElementById('score-display').innerText = `Question ${currentQuestion + 1} of ${quizData.length}`;
-            document.getElementById('progress-bar').style.width = `${((currentQuestion) / quizData.length) * 100}%`;
+            document.getElementById('category-tag').innerText = currentQ.cat;
+            document.getElementById('question-text').innerText = currentQ.q;
+            document.getElementById('feedback').innerText = "";
             
             const container = document.getElementById('options-container');
             container.innerHTML = '';
-            document.getElementById('feedback').innerText = '';
-
-            q.a.forEach((opt, idx) => {
+            currentQ.a.forEach((opt, idx) => {
                 const b = document.createElement('button');
                 b.innerText = opt;
                 b.className = 'btn';
-                b.onclick = () => checkAnswer(idx, q.cat);
+                b.onclick = () => check(idx);
                 container.appendChild(b);
             });
         }
 
-        function checkAnswer(idx, cat) {
-            const isCorrect = idx === quizData[currentQuestion].c;
-            if(!categoryScores[cat]) categoryScores[cat] = { got: 0, total: 0 };
-            categoryScores[cat].total++;
-
-            if(isCorrect) {
-                score++;
-                categoryScores[cat].got++;
-                document.getElementById('feedback').innerText = "Correct! 🐊";
+        function check(idx) {
+            if(idx === currentQ.c) {
+                stats.points += 10;
+                stats.correctCount++;
+                document.getElementById('feedback').innerText = "Correct! +10 pts 🐊";
                 document.getElementById('feedback').style.color = "green";
+                saveStats();
+                setTimeout(nextQuestion, 1200);
             } else {
-                document.getElementById('feedback').innerText = "Keep going! ☀️";
+                document.getElementById('feedback').innerText = "Try again! ☀️";
                 document.getElementById('feedback').style.color = "orange";
             }
-
-            currentQuestion++;
-            setTimeout(() => {
-                if(currentQuestion < quizData.length) loadQuestion();
-                else showResults();
-            }, 1000);
         }
 
-        function showResults() {
-            document.getElementById('progress-bar').style.width = "100%";
-            let reportHTML = `<h2>FAST Results</h2><p>Total Score: ${score}/10</p><hr><p><strong>Performance by Category:</strong></p>`;
-            
-            for(let cat in categoryScores) {
-                let pct = Math.round((categoryScores[cat].got / categoryScores[cat].total) * 100);
-                reportHTML += `<div style="text-align:left; margin-bottom:10px;">${cat}: ${pct}%</div>`;
-            }
-
-            reportHTML += `<button class="btn" onclick="location.reload()">Try Again</button>`;
-            document.getElementById('quiz-box').innerHTML = reportHTML;
-        }
-
-        window.onload = loadQuestion;
+        window.onload = () => { updateUI(); nextQuestion(); };
     </script>
 </body>
 </html>
