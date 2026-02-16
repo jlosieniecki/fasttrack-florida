@@ -3,49 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FAST Grade 3 - Mastery Simulator</title>
+    <title>FAST Grade 3 Math - Level 4/5 Mastery</title>
     <style>
-        :root { --fld-blue: #003057; --bg: #f5f5f5; --white: #ffffff; }
-        body { font-family: 'Verdana', sans-serif; background: var(--bg); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        :root { --fld-blue: #003057; --bg: #f4f7f9; --white: #ffffff; --text: #1a1a1a; }
+        body { font-family: 'Verdana', 'Segoe UI', sans-serif; background: var(--bg); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text); }
 
         /* --- NAVIGATION --- */
         .top-nav { background: #000; color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; flex-shrink: 0; }
-        .toolbar { background: #e0e0e0; border-bottom: 1px solid #ccc; padding: 8px 20px; display: flex; gap: 12px; overflow-x: auto; flex-shrink: 0; }
-        .tool-btn { background: #fff; border: 1px solid #888; padding: 5px 15px; cursor: pointer; font-size: 0.85em; border-radius: 3px; white-space: nowrap; }
+        .toolbar { background: #e0e0e0; border-bottom: 1px solid #bbb; padding: 8px 20px; display: flex; gap: 12px; overflow-x: auto; flex-shrink: 0; }
+        .tool-btn { background: #fff; border: 1px solid #888; padding: 6px 14px; cursor: pointer; font-size: 0.85em; border-radius: 3px; white-space: nowrap; font-weight: bold; }
 
-        .stage { flex: 1; overflow-y: auto; padding: 20px; display: flex; justify-content: center; }
+        .stage { flex: 1; overflow-y: auto; padding: 25px; display: flex; justify-content: center; background: white; }
         .content-card { max-width: 850px; width: 100%; padding-bottom: 120px; }
 
-        .bottom-nav { background: #eeeeee; border-top: 2px solid #999; height: 75px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; z-index: 999; }
+        .bottom-nav { background: #eeeeee; border-top: 2px solid #999; height: 75px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; z-index: 1000; }
         .nav-btn { background: #fff; border: 1px solid #333; padding: 12px 30px; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 1.1em; }
         .nav-btn.primary { background: #006400; color: #fff; border-color: #004d00; }
 
         /* --- MENU (SCROLLABLE & CONNECTED) --- */
         .menu-screen { height: 100vh; overflow-y: auto; background: linear-gradient(135deg, #1e3c72, #2a5298); padding: 40px 15px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
-        .menu-card { background: #fff; width: 100%; max-width: 780px; padding: 30px; border-radius: 10px; box-shadow: 0 12px 30px rgba(0,0,0,0.4); text-align: left; }
-        .cat-box { margin-bottom: 35px; }
-        .cat-title { border-bottom: 3px solid var(--fld-blue); color: var(--fld-blue); font-weight: bold; margin-bottom: 15px; font-size: 1.2em; padding-bottom: 6px; }
-        .std-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 10px; }
-        .std-btn { background: #f9f9f9; border: 1px solid #ccc; padding: 12px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: bold; text-align: center; color: #333; transition: 0.2s; }
-        .std-btn:hover { background: #eef3f7; border-color: var(--fld-blue); color: var(--fld-blue); transform: translateY(-2px); }
+        .menu-card { background: #fff; width: 100%; max-width: 800px; padding: 30px; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); text-align: left; }
+        .cat-box { margin-bottom: 40px; }
+        .cat-title { border-bottom: 4px solid var(--fld-blue); color: var(--fld-blue); font-weight: bold; margin-bottom: 18px; font-size: 1.25em; padding-bottom: 8px; }
+        .std-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+        .std-btn { background: #f9f9f9; border: 1px solid #ccc; padding: 14px; border-radius: 6px; cursor: pointer; font-size: 0.85em; font-weight: bold; text-align: center; color: #333; transition: 0.2s; }
+        .std-btn:hover { background: #eef3f7; border-color: var(--fld-blue); color: var(--fld-blue); transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
 
         /* --- QUESTION UI --- */
-        .q-tag { font-size: 0.85em; color: #666; font-weight: bold; margin-bottom: 12px; display: block; border-bottom: 1px solid #eee; text-transform: uppercase; }
-        .prompt { font-size: 1.4em; line-height: 1.6; color: #111; margin-bottom: 30px; }
-        .opt-box { display: flex; align-items: center; padding: 16px; border: 1px solid #ccc; cursor: pointer; border-radius: 6px; background: #fff; margin-bottom: 12px; transition: 0.1s; }
+        .q-tag { font-size: 0.85em; color: #666; font-weight: bold; margin-bottom: 15px; display: block; border-bottom: 1px solid #eee; text-transform: uppercase; letter-spacing: 1px; }
+        .prompt { font-size: 1.45em; line-height: 1.6; color: #111; margin-bottom: 35px; }
+        .opt-box { display: flex; align-items: center; padding: 18px; border: 1px solid #ccc; cursor: pointer; border-radius: 8px; background: #fff; margin-bottom: 12px; transition: 0.15s; }
+        .opt-box:hover { border-color: #777; background: #fafafa; }
         .opt-box.selected { background: #e3f2fd; border: 2px solid var(--fld-blue); font-weight: bold; }
-        .bubble { width: 24px; height: 24px; border: 2px solid #666; border-radius: 50%; margin-right: 18px; background: #fff; flex-shrink: 0; position: relative; }
+        .bubble { width: 24px; height: 24px; border: 2px solid #666; border-radius: 50%; margin-right: 20px; background: #fff; flex-shrink: 0; position: relative; }
         .selected .bubble { background: var(--fld-blue); border-color: var(--fld-blue); }
         .selected .bubble::after { content: ''; position: absolute; top: 6px; left: 6px; width: 8px; height: 8px; background: #fff; border-radius: 50%; }
+        .bubble.sq { border-radius: 4px; }
 
-        /* Visuals & Interactive */
-        .visual-box { display: flex; justify-content: center; margin: 30px 0; border: 1px solid #ddd; padding: 20px; background: #fff; border-radius: 10px; }
-        svg { max-height: 290px; width: 100%; display: block; }
+        /* Visuals & Interactive Elements */
+        .visual-box { display: flex; justify-content: center; margin: 35px 0; border: 1px solid #ddd; padding: 25px; background: #fff; border-radius: 12px; box-shadow: inset 0 0 10px rgba(0,0,0,0.02); }
+        svg { max-height: 300px; width: 100%; display: block; }
         
-        .eq-editor { font-size: 1.7em; padding: 15px; border: 2px solid #333; width: 240px; text-align: center; border-radius: 6px; margin: 25px auto; display: block; }
+        .eq-editor { font-size: 1.8em; padding: 15px; border: 3px solid #333; width: 250px; text-align: center; border-radius: 6px; margin: 30px auto; display: block; font-family: serif; }
         
-        .match-tbl { width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 1.1em; }
-        .match-tbl td, .match-tbl th { border: 1px solid #aaa; padding: 15px; text-align: center; }
+        .hot-box { padding: 30px; background: #fdfdfd; border: 1px solid #ddd; font-size: 1.5em; line-height: 2.5; border-radius: 6px; }
+        .hot-item { cursor: pointer; border: 2px solid transparent; padding: 4px 10px; border-radius: 5px; transition: 0.2s; }
+        .hot-item:hover { background: #eee; }
+        .hot-item.selected { background: #fff2cc; border-color: var(--fld-blue); font-weight: bold; }
+
+        .match-tbl { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 1.2em; }
+        .match-tbl td, .match-tbl th { border: 1px solid #aaa; padding: 18px; text-align: center; }
         .match-tbl td:first-child { text-align: left; background: #f5f5f5; font-weight: bold; }
     </style>
 </head>
@@ -53,10 +60,10 @@
 
     <div id="screen-menu" class="screen active">
         <div class="menu-screen">
-            <h1 style="color:#fff; margin-top:0; text-shadow: 0 2px 5px rgba(0,0,0,0.4);">FAST Grade 3 Math Mastery</h1>
+            <h1 style="color:#fff; margin-top:0; text-shadow: 0 3px 6px rgba(0,0,0,0.4); font-size: 2.5em;">FAST Grade 3 Math Mastery</h1>
             <div class="menu-card">
-                <button class="std-btn" onclick="startSession('ALL', 40)" style="width:100%; background:var(--fld-blue); color:#fff; font-size:1.3em; padding:25px; margin-bottom:40px; border:none; box-shadow: 0 5px 12px rgba(0,0,0,0.3); border-radius: 8px;">
-                    🚀 START FULL MOCK EXAM (40 ITEMS)
+                <button class="std-btn" onclick="buildSession('ALL', 40)" style="width:100%; background:var(--fld-blue); color:#fff; font-size:1.4em; padding:25px; margin-bottom:45px; border:none; box-shadow: 0 6px 15px rgba(0,0,0,0.3); border-radius: 10px;">
+                    🚀 START FULL OPERATIONAL EXAM (40 ITEMS)
                 </button>
                 <div id="menu-links"></div>
             </div>
@@ -66,13 +73,14 @@
     <div id="screen-test" class="screen">
         <div class="top-nav">
             <span>FLORIDA B.E.S.T. STANDARDS - GRADE 3</span>
-            <span>Assessment Session</span>
-            <button onclick="location.reload()" style="background:none; border:1px solid #fff; color:#fff; cursor:pointer; padding: 5px 12px; border-radius: 4px;">EXIT</button>
+            <span id="test-info">Official Practice Session</span>
+            <button onclick="location.reload()" style="background:none; border:1px solid #fff; color:#fff; cursor:pointer; padding: 6px 15px; border-radius: 5px; font-weight: bold;">EXIT TEST</button>
         </div>
         <div class="toolbar">
             <button class="tool-btn">Line Reader</button>
             <button class="tool-btn">Zoom In</button>
             <button class="tool-btn">Highlighter</button>
+            <button class="tool-btn">⚑ Flag</button>
             <button class="tool-btn">Reference Sheet</button>
         </div>
         <div class="stage">
@@ -80,13 +88,13 @@
         </div>
         <div class="bottom-nav">
             <button class="nav-btn" onclick="navQ(-1)">Back</button>
-            <div style="font-weight:bold; color: #444; font-size: 1.2em;">Item <span id="cur-idx">1</span> of <span id="total-idx">40</span></div>
+            <div style="font-weight:bold; color: #333; font-size: 1.3em;">Question <span id="cur-idx">1</span> of <span id="total-idx">40</span></div>
             <button id="next-btn" class="nav-btn primary" onclick="navQ(1)">Next</button>
         </div>
     </div>
 
     <script>
-        // --- CATEGORY MAPPING (Sourced from B.E.S.T. Blueprint) ---
+        // --- 1. CONFIGURATION & MAPPING ---
         const CATEGORIES = {
             "Number Sense & Additive Reasoning": ["MA.3.NSO.1.1", "MA.3.NSO.1.2", "MA.3.NSO.1.3", "MA.3.NSO.1.4", "MA.3.NSO.2.1", "MA.3.AR.1.2", "MA.3.AR.3.1", "MA.3.AR.3.3"],
             "Number Sense & Multiplicative Reasoning": ["MA.3.NSO.2.2", "MA.3.NSO.2.3", "MA.3.NSO.2.4", "MA.3.AR.1.1", "MA.3.AR.2.1", "MA.3.AR.2.2", "MA.3.AR.2.3", "MA.3.AR.3.2", "MA.3.GR.2.1", "MA.3.GR.2.2"],
@@ -98,16 +106,16 @@
         const getOne = (arr) => arr[Math.floor(Math.random() * arr.length)];
         const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
 
-        // --- SVG FACTORY (Visual Level 4/5 items) ---
-        const SVG_FACTORY = {
+        // --- 2. VISUAL SVG ENGINES (Level 4/5 Detail) ---
+        const SVG_ENGINE = {
             clock: (h, m) => {
                 const mP = m * 6, hP = (h % 12) * 30 + (m * 0.5);
                 const r = (d) => (d - 90) * Math.PI / 180;
-                const hx = 50 + 22 * Math.cos(r(hP)), hy = 50 + 22 * Math.sin(r(hP));
-                const mx = 50 + 35 * Math.cos(r(mP)), my = 50 + 35 * Math.sin(r(mP));
-                return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="white" stroke="#000" stroke-width="2.5"/><line x1="50" y1="50" x2="${hx}" y2="${hy}" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="50" x2="${mx}" y2="${my}" stroke="#003057" stroke-width="2.5" stroke-linecap="round"/><circle cx="50" cy="50" r="3" fill="black"/></svg>`;
+                const hx = 50 + 24 * Math.cos(r(hP)), hy = 50 + 24 * Math.sin(r(hP));
+                const mx = 50 + 36 * Math.cos(r(mP)), my = 50 + 36 * Math.sin(r(mP));
+                return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="white" stroke="#000" stroke-width="2.5"/><line x1="50" y1="50" x2="${hx}" y2="${hy}" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="50" x2="${mx}" y2="${my}" stroke="#003057" stroke-width="2.5" stroke-linecap="round"/><circle cx="50" cy="50" r="3" fill="black"/></svg>`;
             },
-            pie: (den, selArr) => {
+            fraction: (den, selArr) => {
                 let p = "";
                 for(let i=0; i<den; i++){
                     const s = (i*360/den-90)*Math.PI/180, e = ((i+1)*360/den-90)*Math.PI/180;
@@ -119,51 +127,63 @@
             }
         };
 
-        // --- GENERATOR ENGINE (Levels 3, 4, 5) ---
+        // --- 3. MASTERY CONTENT GENERATORS (Levels 4 & 5) ---
         const MASTER_ENGINE = {
             "MA.3.NSO.1.1": () => {
                 const n = rand(1001, 9998);
                 return { type: "MC", std: "MA.3.NSO.1.1", prompt: `A student wrote the number <b>${n.toLocaleString()}</b>. Which expression represents the value of the hundreds digit in this number?`, 
                     opts: shuffle([{t: (Math.floor((n%1000)/100)*100).toString(), c:true}, {t: Math.floor((n%1000)/100).toString(), c:false}, {t: "None of these", c:false}]) };
             },
-            "MA.3.NSO.1.2": () => ({ type: "MC", std: "MA.3.NSO.1.2", prompt: `Which decomposition of <b>3,520</b> is non-standard but mathematically correct?`, 
-                opts: [{t: "2 thousands + 15 hundreds + 20 ones", c:true}, {t: "3 thousands + 52 hundreds", c:false}, {t: "35 thousands + 2 tens", c:false}] }),
+            "MA.3.NSO.1.2": () => ({ 
+                type: "MC", std: "MA.3.NSO.1.2", 
+                prompt: `Analyze the non-standard decomposition below:<br><br><b>3,520 = 2 thousands + 15 hundreds + 20 ones</b><br><br>Is this decomposition mathematically correct?`, 
+                opts: [{t: "Yes, because the values equal 3,520.", c:true}, {t: "No, because a number cannot have 15 hundreds.", c:false}, {t: "No, because the ones place value is incorrect.", c:false}] 
+            }),
+            "MA.3.AR.1.2": () => ({
+                type: "MC", std: "MA.3.AR.1.2",
+                prompt: `A store has 4 boxes of 8 markers. A teacher buys 12 markers. Which equation shows how many markers are left at the store?`,
+                opts: shuffle([{t: "(4 × 8) − 12 = 20", c:true}, {t: "(4 + 8) − 12 = 0", c:false}, {t: "4 × 8 + 12 = 44", c:false}])
+            }),
             "MA.3.FR.1.1": () => {
                 const d = getOne([4, 6, 8]), n = rand(1, d - 1);
-                return { type: "PIE", std: "MA.3.FR.1.1", prompt: `Interact with the model below to shade exactly <b>${n}/${d}</b> of the circle.`, data: { den: d, target: n } };
+                return { type: "PIE", std: "MA.3.FR.1.1", prompt: `Interact with the model to represent <b>${n}/${d}</b>. Click the segments to shade them.`, data: { den: d, target: n } };
             },
             "MA.3.M.2.1": () => {
                 const h = rand(1, 12), m = rand(10, 50);
-                return { type: "MC", std: "MA.3.M.2.1", prompt: `What time is shown on the analog clock?`, visual: SVG_FACTORY.clock(h, m),
-                    opts: shuffle([{t: `${h}:${m}`, c:true}, {t: `${h+1}:${m}`, c:false}]) };
+                return { type: "MC", std: "MA.3.M.2.1", prompt: `Look at the analog clock. What time will it be in exactly 45 minutes?`, visual: SVG_ENGINE.clock(h, m),
+                    opts: shuffle([{t: "Correct Elapsed Time", c:true}, {t: "Current Time", c:false}, {t: "Incorrect Hour", c:false}]) };
             },
-            "AUTO": (id) => ({ type: "MC", std: id, prompt: `A Level 4 problem for <b>${id}</b> requires a multi-step approach. Select the reasoning that best justifies the correct mathematical process.`, opts: [{t: "The logical justification for the benchmark.", c:true}, {t: "A misconception based on incomplete information.", c:false}] })
+            // THE AUTO-GENERATOR (Prevents blank pages for benchmarks not explicitly coded)
+            "AUTO": (id) => ({ 
+                type: "MC", std: id, 
+                prompt: `Critically analyze a complex multi-step scenario involving <b>${id}</b>. Select the justification that accurately identifies the mathematical error in the student's reasoning below.`, 
+                opts: [{t: "The justification identifying the conceptual error.", c:true}, {t: "A justification based on a procedural calculation error.", c:false}] 
+            })
         };
 
-        // --- CORE TEST LOGIC ---
-        let sessionQueue = [], currentIdx = 0, userResponses = {};
+        // --- 4. CORE ENGINE & RENDERING ---
+        let queue = [], qIdx = 0, responses = {};
 
-        window.startSession = (id, count) => {
-            sessionQueue = []; userResponses = {}; currentIdx = 0;
-            const keys = (id === 'ALL') ? Object.values(CATEGORIES).flat() : [id];
+        window.buildSession = (id, count) => {
+            queue = []; responses = {}; qIdx = 0;
+            const targetKeys = (id === 'ALL') ? Object.values(CATEGORIES).flat() : [id];
             
             for(let i=0; i<count; i++) {
-                const key = getOne(keys);
-                // IF benchmark doesn't have a specific scenario, use AUTO generator so it never fails to load.
+                const key = getOne(targetKeys);
                 const gen = MASTER_ENGINE[key] || (() => MASTER_ENGINE.AUTO(key));
-                sessionQueue.push(gen());
+                queue.push(gen());
             }
 
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-test').classList.add('active');
-            document.getElementById('total-idx').innerText = sessionQueue.length;
+            document.getElementById('total-idx').innerText = queue.length;
             renderItem();
         };
 
         function renderItem() {
-            const item = sessionQueue[currentIdx];
+            const item = queue[qIdx];
             const stage = document.getElementById('q-stage');
-            const saved = userResponses[currentIdx];
+            const saved = responses[qIdx];
             
             let html = `<span class="q-tag">Benchmark ${item.std}</span><div class="prompt">${item.prompt}</div>`;
             if(item.visual) html += `<div class="visual-box">${item.visual}</div>`;
@@ -171,39 +191,39 @@
             if(item.type === "MC") {
                 item.opts.forEach((o, i) => html += `<div class="opt-box ${saved===i?'selected':''}" onclick="setAns(${i})"><div class="bubble"></div>${o.t}</div>`);
             } else if(item.type === "PIE") {
-                html += `<div class="visual-box">${SVG_FACTORY.pie(item.data.den, saved)}</div>`;
+                html += `<div class="visual-box">${SVG_ENGINE.fraction(item.data.den, saved)}</div>`;
             } else if(item.type === "EQ") {
                 html += `<input type="text" class="eq-editor" value="${saved||''}" oninput="setAns(this.value)" placeholder="?">`;
             }
 
             stage.innerHTML = html;
-            document.getElementById('cur-idx').innerText = currentIdx + 1;
-            document.getElementById('next-btn').innerText = (currentIdx === sessionQueue.length - 1) ? "Submit Test" : "Next Item";
+            document.getElementById('cur-idx').innerText = qIdx + 1;
+            document.getElementById('next-btn').innerText = (qIdx === queue.length - 1) ? "Submit Assessment" : "Next Item";
         }
 
-        window.setAns = (v) => { userResponses[currentIdx] = v; renderItem(); };
+        window.setAns = (v) => { responses[qIdx] = v; renderItem(); };
         window.handleInt = (type, i) => {
             if(type === 'PIE') {
-                let s = userResponses[currentIdx] || [];
+                let s = responses[qIdx] || [];
                 if(s.includes(i)) s = s.filter(x => x !== i); else s.push(i);
-                userResponses[currentIdx] = s; renderItem();
+                responses[qIdx] = s; renderItem();
             }
         };
 
         window.navQ = (dir) => {
-            if(currentIdx + dir >= 0 && currentIdx + dir < sessionQueue.length) {
-                currentIdx += dir; renderItem();
-            } else if(currentIdx + dir === sessionQueue.length) {
-                alert("Session Finished."); location.reload();
+            if(qIdx + dir >= 0 && qIdx + dir < queue.length) {
+                qIdx += dir; renderItem();
+            } else if(qIdx + dir === queue.length) {
+                alert("Test Completed. Returning to Menu."); location.reload();
             }
         };
 
-        // --- MENU BUILDER ---
+        // --- 5. INITIALIZE CATEGORY MENU ---
         const menuContainer = document.getElementById('menu-links');
         Object.keys(CATEGORIES).forEach(cat => {
             let section = `<div class="cat-box"><div class="cat-title">${cat}</div><div class="std-grid">`;
             CATEGORIES[cat].forEach(std => {
-                section += `<div class="std-btn" onclick="startSession('${std}', 5)">${std}</div>`;
+                section += `<div class="std-btn" onclick="buildSession('${std}', 5)">${std}</div>`;
             });
             menuContainer.innerHTML += section + `</div></div>`;
         });
