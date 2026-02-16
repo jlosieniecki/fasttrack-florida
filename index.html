@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FAST Grade 3 Math - Full Stack</title>
+    <title>FAST Grade 3 Math - Error Free</title>
     <style>
         :root { --header: #2C3E50; --bg: #F5F7FA; --active: #00609C; --text: #333; --panel-border: #b5b5b5; }
         
@@ -17,18 +17,21 @@
         .screen { display: none; height: 100%; width: 100%; flex-direction: column; }
         .screen.active { display: flex; }
 
-        /* MENU */
+        /* MENU - ACCORDION STYLE */
         .menu-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 20px; }
         .menu-card { background: white; padding: 20px; border-radius: 4px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); text-align: center; color: #333; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; }
         
         details { width: 100%; margin: 5px 0; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; }
         summary { background: #f0f0f0; padding: 12px; cursor: pointer; font-weight: bold; text-align: left; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+        summary:after { content: '+'; font-weight: bold; }
+        details[open] summary:after { content: '-'; }
         details[open] summary { background: var(--active); color: white; }
         
-        .sub-btn { display: block; width: 100%; padding: 12px 15px; border: none; border-bottom: 1px solid #eee; background: #fff; text-align: left; cursor: pointer; font-size: 0.95em; padding-left: 20px; }
+        .sub-btn { display: block; width: 100%; padding: 10px 15px; border: none; border-bottom: 1px solid #eee; background: #fff; text-align: left; cursor: pointer; font-size: 0.9em; padding-left: 20px; transition: 0.2s; }
         .sub-btn:hover { background: #eef6fc; padding-left: 25px; color: var(--active); font-weight: bold; }
         
         .main-btn { display: block; width: 100%; padding: 15px; margin-bottom: 20px; background: #eef6fc; border: 2px solid #003057; color: #003057; font-weight: bold; cursor: pointer; border-radius: 4px; text-align: left; }
+        .main-btn:hover { background: #003057; color: white; }
 
         /* TEST INTERFACE */
         .top-bar { background: #fff; border-bottom: 2px solid #000; padding: 0 20px; height: 55px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
@@ -48,7 +51,13 @@
         .shaded-box { background: #E8E8E8; padding: 20px; border: 1px solid #999; display: inline-block; min-width: 300px; }
         .input-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .input-box { font-size: 1.2em; padding: 8px; width: 120px; text-align: center; border: 1px solid #555; background: white; border-radius: 2px; }
-        
+        .input-box::placeholder { color: #ccc; font-style: italic; }
+
+        .match-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .match-table th { background: #f0f0f0; border: 1px solid #999; padding: 10px; }
+        .match-table td { border: 1px solid #999; padding: 10px; text-align: center; }
+        .radio-big { width: 22px; height: 22px; cursor: pointer; accent-color: #000; }
+
         .opt-row { display: flex; padding: 12px; margin-bottom: 10px; cursor: pointer; align-items: center; border: 1px solid transparent; }
         .opt-row:hover { background: #f5f5f5; }
         .opt-row.selected { background: #e6f3ff; border: 1px solid var(--active); font-weight: bold; }
@@ -56,6 +65,9 @@
         .opt-row.selected .bubble { background: #000; border-color: #000; }
         .bubble.square { border-radius: 2px; }
 
+        .part-header { font-weight: bold; margin-top: 20px; margin-bottom: 10px; color: #000; border-top: 1px dashed #ccc; padding-top: 10px; }
+
+        /* NAV & REPORT */
         .nav-bar { background: #f0f0f0; border-top: 1px solid #999; height: 65px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; flex-shrink: 0; }
         .nav-btn { background: #fff; color: #333; border: 1px solid #999; padding: 10px 25px; font-weight: bold; font-size: 1em; cursor: pointer; min-width: 100px; border-radius: 2px; }
         .nav-btn.primary { background: var(--active); color: white; border-color: var(--active); }
@@ -63,7 +75,7 @@
         .l3 { background: #FBC02D; color: #000; } .l4 { background: #4CAF50; }
         .rep-box { padding: 15px; background: #f9f9f9; border-left: 6px solid #ccc; font-size: 0.9em; margin-top: 10px; }
 
-        svg { max-height: 250px; width: 100%; display: block; margin: auto; }
+        svg { max-height: 250px; display: block; margin: auto; }
     </style>
 </head>
 <body>
@@ -95,42 +107,28 @@
                     <summary>🍕 Fractions (FR)</summary>
                     <button class="sub-btn" onclick="startTest('MA.3.FR.1.1', 5)">FR.1.1: Represent Fractions</button>
                     <button class="sub-btn" onclick="startTest('MA.3.FR.1.2', 5)">FR.1.2: Number Lines</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.FR.1.3', 5)">FR.1.3: Whole Numbers</button>
                     <button class="sub-btn" onclick="startTest('MA.3.FR.2.1', 5)">FR.2.1: Comparing Fractions</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.FR.2.2', 5)">FR.2.2: Equivalent Fractions</button>
                 </details>
 
                 <details>
                     <summary>🧠 Algebraic Reasoning (AR)</summary>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.1.1', 5)">AR.1.1: Distributive Prop</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.1.2', 5)">AR.1.2: Multi-Step Problems</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.2.1', 5)">AR.2.1: Division Logic</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.2.2', 5)">AR.2.2: Mult Equations</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.1.2', 5)">AR.1.2: Two-Step Problems</button>
                     <button class="sub-btn" onclick="startTest('MA.3.AR.2.3', 5)">AR.2.3: Missing Factors</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.3.1', 5)">AR.3.1: Patterns (Identify)</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.3.2', 5)">AR.3.2: Patterns (Explain)</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.3.3', 5)">AR.3.3: Input/Output</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.3.1', 5)">AR.3.1: Patterns</button>
                 </details>
 
                 <details>
                     <summary>📐 Geometry (GR)</summary>
-                    <button class="sub-btn" onclick="startTest('MA.3.GR.1.1', 5)">GR.1.1: Lines & Points</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.GR.1.2', 5)">GR.1.2: Attributes</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.GR.1.3', 5)">GR.1.3: Symmetry</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.1', 5)">GR.2.1: Area (Tiles)</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.2', 5)">GR.2.2: Area (Formula)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.1.2', 5)">GR.1.2: Shape Attributes</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.1', 5)">GR.2.1: Area (Tiling)</button>
                     <button class="sub-btn" onclick="startTest('MA.3.GR.2.3', 5)">GR.2.3: Perimeter</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.4', 5)">GR.2.4: Area vs Perim</button>
                 </details>
 
                 <details>
                     <summary>📊 Data (DP) & Measurement (M)</summary>
-                    <button class="sub-btn" onclick="startTest('MA.3.M.1.1', 5)">M.1.1: Conversions</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.M.1.2', 5)">M.1.2: Mass/Vol</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.M.1.1', 5)">M.1.1: Measurement Conversion</button>
                     <button class="sub-btn" onclick="startTest('MA.3.M.2.1', 5)">M.2.1: Telling Time</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.M.2.2', 5)">M.2.2: Elapsed Time</button>
                     <button class="sub-btn" onclick="startTest('MA.3.DP.1.1', 5)">DP.1.1: Scaled Graphs</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.DP.1.2', 5)">DP.1.2: Interpret Data</button>
                 </details>
             </div>
         </div>
@@ -167,50 +165,8 @@
 
     <script>
         // --- VISUAL DRAWING FUNCTIONS ---
-        function drawRect(l, w, missingSide=false) {
-            let max = Math.max(l, w);
-            let scale = 200 / max;
-            let svgW = l * scale;
-            let svgH = w * scale;
-            let x = (300 - svgW) / 2;
-            let y = (150 - svgH) / 2;
-            let labelL = missingSide === 'L' ? "?" : l;
-            let labelW = missingSide === 'W' ? "?" : w;
-
-            return `<svg viewBox="0 0 300 150">
-                <rect x="${x}" y="${y}" width="${svgW}" height="${svgH}" fill="#EAEAEA" stroke="#333" stroke-width="2"/>
-                <text x="${150}" y="${y - 10}" text-anchor="middle" font-weight="bold">${labelL}</text>
-                <text x="${150}" y="${y + svgH + 20}" text-anchor="middle" font-weight="bold">${labelL}</text>
-                <text x="${x - 15}" y="${75}" text-anchor="middle" font-weight="bold">${labelW}</text>
-                <text x="${x + svgW + 15}" y="${75}" text-anchor="middle" font-weight="bold">${labelW}</text>
-            </svg>`;
-        }
-
-        function drawClock(h, m, title="") {
-            let hAng = ((h % 12) * 30 + (m / 2)) * (Math.PI / 180) - (Math.PI / 2);
-            let mAng = (m * 6) * (Math.PI / 180) - (Math.PI / 2);
-            return `<svg viewBox="0 0 100 120">
-                <text x="50" y="15" text-anchor="middle" font-weight="bold" font-size="12">${title}</text>
-                <circle cx="50" cy="70" r="40" fill="white" stroke="#333" stroke-width="3"/>
-                <line x1="50" y1="35" x2="50" y2="40" stroke="#333" stroke-width="2"/>
-                <line x1="85" y1="70" x2="80" y2="70" stroke="#333" stroke-width="2"/>
-                <line x1="50" y1="105" x2="50" y2="100" stroke="#333" stroke-width="2"/>
-                <line x1="15" y1="70" x2="20" y2="70" stroke="#333" stroke-width="2"/>
-                <line x1="50" y1="70" x2="${50 + 20 * Math.cos(hAng)}" y2="${70 + 20 * Math.sin(hAng)}" stroke="black" stroke-width="4" stroke-linecap="round"/>
-                <line x1="50" y1="70" x2="${50 + 32 * Math.cos(mAng)}" y2="${70 + 32 * Math.sin(mAng)}" stroke="#00609C" stroke-width="2" stroke-linecap="round"/>
-                <circle cx="50" cy="70" r="3" fill="#333"/>
-            </svg>`;
-        }
-
-        function drawDualClock(h1, m1, h2, m2) {
-            return `<div style="display:flex; justify-content:space-around;">
-                <div style="width:45%">${drawClock(h1, m1, "Start")}</div>
-                <div style="width:45%">${drawClock(h2, m2, "End")}</div>
-            </div>`;
-        }
-
         function drawPie(d, n) {
-             let path = "";
+            let path = "";
             for(let i=0; i<n; i++) {
                 let start = (i * 360 / d) * Math.PI/180;
                 let end = ((i+1) * 360 / d) * Math.PI/180;
@@ -226,79 +182,175 @@
             return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="white" stroke="#333" stroke-width="2"/><path d="${path}" fill="#00609C" stroke="#333"/>${lines}</svg>`;
         }
 
-        // --- COMPLETE GENERATOR DICTIONARY ---
+        function drawRect(l, w, missingSide=false) {
+            let labelL = missingSide === 'L' ? "?" : l;
+            let labelW = missingSide === 'W' ? "?" : w;
+            return `<svg viewBox="0 0 300 150">
+                <rect x="50" y="25" width="200" height="100" fill="#EAEAEA" stroke="#333" stroke-width="2"/>
+                <text x="150" y="20" text-anchor="middle" font-weight="bold">${labelL}</text>
+                <text x="150" y="145" text-anchor="middle" font-weight="bold">${labelL}</text>
+                <text x="40" y="80" text-anchor="middle" font-weight="bold" transform="rotate(-90,40,80)">${labelW}</text>
+                <text x="260" y="80" text-anchor="middle" font-weight="bold" transform="rotate(90,260,80)">${labelW}</text>
+            </svg>`;
+        }
+
+        function drawClock(h, m) {
+            let hAng = (h%12)*30 + (m/2);
+            let mAng = m*6;
+            return `<svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="white" stroke="#333" stroke-width="2"/>
+                <line x1="50" y1="50" x2="${50+25*Math.sin(hAng*Math.PI/180)}" y2="${50-25*Math.cos(hAng*Math.PI/180)}" stroke="black" stroke-width="3"/>
+                <line x1="50" y1="50" x2="${50+35*Math.sin(mAng*Math.PI/180)}" y2="${50-35*Math.cos(mAng*Math.PI/180)}" stroke="black" stroke-width="2"/>
+                <text x="50" y="15" text-anchor="middle" font-size="10">12</text><text x="85" y="53" text-anchor="middle" font-size="10">3</text>
+                <text x="50" y="92" text-anchor="middle" font-size="10">6</text><text x="15" y="53" text-anchor="middle" font-size="10">9</text>
+            </svg>`;
+        }
+
+        // --- MULTI-VARIANT GENERATORS WITH ERROR CHECKING ---
         const STANDARDS = {
-            // NSO
-            "MA.3.NSO.1.1": [ () => { let n=1000+Math.floor(Math.random()*8999); return {id:`NSO11-${n}`, cat:"NSO.1.1", type:"choice", layout:"full", text:`Select expanded form of <b>${n}</b>`, opts:[`${Math.floor(n/1000)*1000} + ${Math.floor((n%1000)/100)*100} + ${Math.floor((n%100)/10)*10} + ${n%10}`, `${n}+0`], ans:`${Math.floor(n/1000)*1000} + ${Math.floor((n%1000)/100)*100} + ${Math.floor((n%100)/10)*10} + ${n%10}`} } ],
-            "MA.3.NSO.1.2": [ () => { let n=1500; return {id:`NSO12-${Math.random()}`, cat:"NSO.1.2", type:"multi-select", layout:"full", text:`Select all for <b>1,500</b>`, opts:["15 hundreds", "15 tens", "1 thousand 5 hundreds"], ans:[0,2]} } ],
-            "MA.3.NSO.1.3": [ () => { let a=Math.floor(Math.random()*9000), b=Math.floor(Math.random()*9000); return {id:`NSO13-${a}-${b}`, cat:"NSO.1.3", type:"inline", layout:"full", text:"Compare.", sentence:[{text:`${a}`},{type:"select",opts:[">","<","="],ans:a>b?">":"<"},{text:`${b}`}]} } ],
-            "MA.3.NSO.1.4": [ () => { let n=Math.floor(Math.random()*800)+100; return {id:`NSO14-${n}`, cat:"NSO.1.4", type:"input", layout:"full", text:`Round <b>${n}</b> to nearest 10.`, ans:(Math.round(n/10)*10).toString()} } ],
-            "MA.3.NSO.2.1": [ () => { let a=Math.floor(Math.random()*5000), b=Math.floor(Math.random()*2000); return {id:`NSO21-${a}-${b}`, cat:"NSO.2.1", type:"input", layout:"full", text:`${a} + ${b} = ?`, ans:(a+b).toString()} } ],
-            "MA.3.NSO.2.2": [ () => { let a=Math.floor(Math.random()*9)+2, b=Math.floor(Math.random()*9)+2; return {id:`NSO22-${a}-${b}`, cat:"NSO.2.2", type:"input", layout:"full", text:`${a} x ${b} = ?`, ans:(a*b).toString()} } ],
-            "MA.3.NSO.2.3": [ () => { return {id:`NSO23-${Math.random()}`, cat:"NSO.2.3", type:"choice", layout:"full", text:"Strategy for 7x6?", opts:["(7x3)+(7x3)", "7+6"], ans:"(7x3)+(7x3)"} } ],
-            "MA.3.NSO.2.4": [ () => { let a=Math.floor(Math.random()*9)+2, b=Math.floor(Math.random()*9)+2; return {id:`NSO24-${a}-${b}`, cat:"NSO.2.4", type:"input", layout:"full", text:`${a*b} ÷ ${a} = ?`, ans:b.toString()} } ],
             
-            // FR
-            "MA.3.FR.1.1": [ () => { let d=[3,4,6,8][Math.floor(Math.random()*4)]; return {id:`FR11-${d}-${Math.random()}`, cat:"FR.1.1", type:"choice", layout:"split", visual:drawPie(d,1), text:"Fraction?", opts:[`1/${d}`,`1/${d+1}`], ans:`1/${d}`} } ],
-            "MA.3.FR.1.2": [ () => { return {id:`FR12-${Math.random()}`, cat:"FR.1.2", type:"choice", layout:"split", visual:`<svg viewBox="0 0 300 50"><line x1="10" y1="25" x2="290" y2="25" stroke="black"/><circle cx="150" cy="25" r="8" fill="#00609C"/><text x="10" y="45">0</text><text x="290" y="45">1</text></svg>`, text:"Identify point.", opts:["1/2","1/4"], ans:"1/2"} } ],
-            "MA.3.FR.1.3": [ () => { return {id:`FR13-${Math.random()}`, cat:"FR.1.3", type:"input", layout:"full", text:"Fraction for 3 wholes?", ans:"3/1"} } ],
-            "MA.3.FR.2.1": [ () => { return {id:`FR21-${Math.random()}`, cat:"FR.2.1", type:"inline", layout:"full", text:"Compare.", sentence:[{text:"1/3"},{type:"select",opts:[">","<"],ans:">"},{text:"1/5"}]} } ],
-            "MA.3.FR.2.2": [ () => { return {id:`FR22-${Math.random()}`, cat:"FR.2.2", type:"choice", layout:"full", text:"Equivalent to 1/2?", opts:["2/4", "1/3"], ans:"2/4"} } ],
+            // --- NSO.1.1: READ/WRITE NUMBERS ---
+            "MA.3.NSO.1.1": [
+                () => { // Var 1: Expanded Form
+                    let n = 1000 + Math.floor(Math.random()*8999);
+                    let th = Math.floor(n/1000)*1000, h = Math.floor((n%1000)/100)*100, t = Math.floor((n%100)/10)*10, o = n%10;
+                    return { id: `NSO11-V1-${n}`, cat:"NSO.1.1", type:"choice", layout:"full", text:`Select the expanded form of <b>${n.toLocaleString()}</b>.`, opts:[`${th} + ${h} + ${t} + ${o}`, `${n} + 100`, `${Math.floor(n/1000)} + ${Math.floor((n%1000)/100)}`], ans:`${th} + ${h} + ${t} + ${o}` };
+                },
+                () => { // Var 2: Word Form to Standard
+                    let n = Math.floor(Math.random()*9000)+1000;
+                    return { id: `NSO11-V2-${n}`, cat:"NSO.1.1", type:"input", layout:"full", text:`Write <b>${n.toLocaleString()}</b> in standard form numbers.`, ans:n.toString() };
+                },
+                () => { // Var 3: Value of Digit
+                    let n = Math.floor(Math.random()*8999)+1000;
+                    let val = Math.floor((n%100)/10)*10;
+                    return { id: `NSO11-V3-${n}`, cat:"NSO.1.1", type:"input", layout:"full", text:`What is the value of the digit in the tens place in <b>${n.toLocaleString()}</b>?`, ans:val.toString() };
+                }
+            ],
+
+            // --- NSO.2.1: ADD/SUBTRACT ---
+            "MA.3.NSO.2.1": [
+                () => { // Var 1: Standard Addition
+                    let a = Math.floor(Math.random()*4000)+1000, b = Math.floor(Math.random()*4000)+1000;
+                    return { id: `NSO21-V1-${a}-${b}`, cat:"NSO.2.1", type:"input", layout:"full", text:`Add: ${a} + ${b} = ?`, ans:(a+b).toString() };
+                },
+                () => { // Var 2: Subtraction (Safe - no negative)
+                    let a = Math.floor(Math.random()*5000)+2000;
+                    let b = Math.floor(Math.random()*(a-1000))+1000; // b is always smaller than a
+                    return { id: `NSO21-V2-${a}-${b}`, cat:"NSO.2.1", type:"input", layout:"full", text:`Subtract: ${a} - ${b} = ?`, ans:(a-b).toString() };
+                },
+                () => { // Var 3: Missing Part Addition
+                    let total = 5000 + Math.floor(Math.random()*2000);
+                    let part = 2000 + Math.floor(Math.random()*2000);
+                    return { id: `NSO21-V3-${total}-${part}`, cat:"NSO.2.1", type:"input", layout:"full", text:`Find the missing number: ${part} + ? = ${total}`, ans:(total-part).toString() };
+                }
+            ],
+
+             // --- NSO.2.4: DIVISION ---
+             "MA.3.NSO.2.4": [
+                () => { // Var 1: Fact Family (Clean Division)
+                    let a = Math.floor(Math.random()*8)+2; // 2-9
+                    let b = Math.floor(Math.random()*9)+2; // 2-10
+                    let total = a * b;
+                    return { id: `NSO24-V1-${total}-${a}`, cat:"NSO.2.4", type:"input", layout:"full", text:`Divide: ${total} ÷ ${a} = ?`, ans:b.toString() };
+                },
+                () => { // Var 2: Missing Divisor
+                    let a = Math.floor(Math.random()*8)+2;
+                    let b = Math.floor(Math.random()*9)+2;
+                    let total = a * b;
+                    return { id: `NSO24-V2-${total}-${b}`, cat:"NSO.2.4", type:"input", layout:"full", text:`${total} ÷ ? = ${b}`, ans:a.toString() };
+                }
+            ],
+
+            // --- FR.1.1: REPRESENT FRACTIONS ---
+            "MA.3.FR.1.1": [
+                () => { // Var 1: Pie Chart
+                    let d = [3,4,6,8][Math.floor(Math.random()*4)];
+                    let n = 1; 
+                    return { id: `FR11-V1-${d}`, cat:"FR.1.1", type:"choice", layout:"split", visual:drawPie(d,n), text:"What fraction is shaded?", opts:[`1/${d}`, `1/${d-1}`], ans:`1/${d}` };
+                },
+                () => { // Var 2: Text Model
+                    let total = Math.floor(Math.random()*5)+4; // 4-8
+                    let target = Math.floor(Math.random()*(total-1))+1;
+                    return { id: `FR11-V2-${total}-${target}`, cat:"FR.1.1", type:"input", layout:"full", text:`There are ${total} marbles. ${target} are blue. Write the fraction of blue marbles (a/b).`, ans:`${target}/${total}` };
+                }
+            ],
+
+            // --- GR.2.3: PERIMETER ---
+            "MA.3.GR.2.3": [
+                () => { // Var 1: Calculate Total
+                    let l=Math.floor(Math.random()*8)+3, w=Math.floor(Math.random()*5)+2;
+                    return { id: `GR23-V1-${l}-${w}`, cat:"GR.2.3", type:"input", layout:"split", visual:drawRect(l,w), text:"Find Perimeter.", ans:(2*l+2*w).toString() };
+                },
+                () => { // Var 2: Find Missing Side
+                    let l=Math.floor(Math.random()*8)+3, w=Math.floor(Math.random()*5)+2;
+                    let perim = 2*l + 2*w;
+                    return { id: `GR23-V2-${l}-${perim}`, cat:"GR.2.3", type:"input", layout:"split", visual:drawRect(l,w,'W'), text:`Perimeter = ${perim}. Length = ${l}. Find Width.`, ans:w.toString() };
+                }
+            ],
+
+             // --- M.2.1: TIME ---
+            "MA.3.M.2.1": [
+                 () => { // Var 1: Clock Read
+                    let h = Math.floor(Math.random()*11)+1;
+                    let m = [0,15,30,45][Math.floor(Math.random()*4)];
+                    let mStr = m === 0 ? "00" : m;
+                    return { id: `M21-V1-${h}-${m}`, cat:"M.2.1", type:"choice", layout:"split", visual:drawClock(h,m), text:"What time is it?", opts:[`${h}:${mStr}`, `${h+1}:${mStr}`], ans:`${h}:${mStr}` };
+                 }
+            ],
             
-            // AR
-            "MA.3.AR.1.1": [ () => { return {id:`AR11-${Math.random()}`, cat:"AR.1.1", type:"choice", layout:"full", text:"Distributive: 8x7", opts:["(8x5)+(8x2)", "8+7"], ans:"(8x5)+(8x2)"} } ],
-            "MA.3.AR.1.2": [ () => { return {id:`AR12-${Math.random()}`, cat:"AR.1.2", type:"input", layout:"full", text:"Start 50, sub 10, add 5.", ans:"45"} } ],
-            "MA.3.AR.2.1": [ () => { return {id:`AR21-${Math.random()}`, cat:"AR.2.1", type:"input", layout:"full", text:"24 ÷ 3 = ?", ans:"8"} } ],
-            "MA.3.AR.2.2": [ () => { return {id:`AR22-${Math.random()}`, cat:"AR.2.2", type:"choice", layout:"full", text:"5 groups of 3 matches:", opts:["5x3=15", "5+3=8"], ans:"5x3=15"} } ],
-            "MA.3.AR.2.3": [ () => { return {id:`AR23-${Math.random()}`, cat:"AR.2.3", type:"input", layout:"full", text:"4 x ? = 20", ans:"5"} } ],
-            "MA.3.AR.3.1": [ () => { return {id:`AR31-${Math.random()}`, cat:"AR.3.1", type:"choice", layout:"full", text:"2,4,6... Rule?", opts:["+2", "x2"], ans:"+2"} } ],
-            "MA.3.AR.3.2": [ () => { return {id:`AR32-${Math.random()}`, cat:"AR.3.2", type:"inline", layout:"full", text:"10, 20, 30.", sentence:[{text:"The rule is"},{type:"select",opts:["Add 10","Add 5"],ans:"Add 10"}]} } ],
-            "MA.3.AR.3.3": [ () => { return {id:`AR33-${Math.random()}`, cat:"AR.3.3", type:"table", layout:"full", text:"Rule: x2", rows:["In: 3", "In: 5"], cols:["Out: 6", "Out: 10"], ans:["Out: 6", "Out: 10"]} } ],
-
-            // GR
-            "MA.3.GR.1.1": [ () => { return {id:`GR11-${Math.random()}`, cat:"GR.1.1", type:"choice", layout:"full", text:"Which is a Ray?", opts:["Line with 1 endpoint", "Line with 2 endpoints"], ans:"Line with 1 endpoint"} } ],
-            "MA.3.GR.1.2": [ () => { return {id:`GR12-${Math.random()}`, cat:"GR.1.2", type:"choice", layout:"full", text:"Quad with 4 right angles?", opts:["Rectangle", "Trapezoid"], ans:"Rectangle"} } ],
-            "MA.3.GR.1.3": [ () => { return {id:`GR13-${Math.random()}`, cat:"GR.1.3", type:"choice", layout:"full", text:"Has symmetry?", opts:["Heart", "Cloud"], ans:"Heart"} } ],
-            "MA.3.GR.2.1": [ () => { let l=3,w=2; return {id:`GR21-${Math.random()}`, cat:"GR.2.1", type:"input", layout:"split", visual:drawRect(l,w), text:"Area?", ans:"6"} } ],
-            "MA.3.GR.2.2": [ () => { let l=4,w=4; return {id:`GR22-${Math.random()}`, cat:"GR.2.2", type:"input", layout:"split", visual:drawRect(l,w), text:"Area?", ans:"16"} } ],
-            "MA.3.GR.2.3": [ () => { let l=5,w=2; return {id:`GR23-${Math.random()}`, cat:"GR.2.3", type:"input", layout:"split", visual:drawRect(l,w), text:"Perimeter?", ans:"14"} } ],
-            "MA.3.GR.2.4": [ () => { return {id:`GR24-${Math.random()}`, cat:"GR.2.4", type:"two-part", layout:"split", visual:drawRect(4,2), text:"Solve.", parts:[{label:"Area",opts:["8","12"],ans:"8"},{label:"Perim",opts:["12","8"],ans:"12"}]} } ],
-
-            // M & DP
-            "MA.3.M.1.1": [ () => { return {id:`M11-${Math.random()}`, cat:"M.1.1", type:"input", layout:"full", text:"2 ft = ? in", ans:"24"} } ],
-            "MA.3.M.1.2": [ () => { return {id:`M12-${Math.random()}`, cat:"M.1.2", type:"input", layout:"full", text:"2 kg = ? g", ans:"2000"} } ],
-            "MA.3.M.2.1": [ () => { let h=4,m=15; return {id:`M21-${Math.random()}`, cat:"M.2.1", type:"choice", layout:"split", visual:drawClock(h,m), text:"Time?", opts:["4:15","3:45"], ans:"4:15"} } ],
-            "MA.3.M.2.2": [ () => { let h1=1,m1=0,h2=1,m2=30; return {id:`M22-${Math.random()}`, cat:"M.2.2", type:"input", layout:"split", visual:drawDualClock(h1,m1,h2,m2), text:"Minutes passed?", ans:"30"} } ],
-            "MA.3.DP.1.1": [ () => { return {id:`DP11-${Math.random()}`, cat:"DP.1.1", type:"input", layout:"split", visual:`<div class="shaded-box">Key: *=2<br>A: **</div>`, text:"Total?", ans:"4"} } ],
-            "MA.3.DP.1.2": [ () => { return {id:`DP12-${Math.random()}`, cat:"DP.1.2", type:"choice", layout:"full", text:"Data shows:", opts:["Most liked A", "Most liked B"], ans:"Most liked A"} } ]
+            // --- DP.1.1: DATA ---
+            "MA.3.DP.1.1": [
+                 () => { // Var 1: Read Total
+                    let k = [2,5,10][Math.floor(Math.random()*3)];
+                    let count = Math.floor(Math.random()*4)+2;
+                    return { id: `DP11-V1-${k}-${count}`, cat:"DP.1.1", type:"input", layout:"split", visual:`<div class="shaded-box">Key: ⭐=${k}<br>A: ${"⭐".repeat(count)}</div>`, text:"Total?", ans:(k*count).toString() };
+                 }
+            ],
+            
+            // --- FILLERS FOR DEMO ---
+             "MA.3.NSO.1.2": [ () => { return { id:"NSO12", cat:"NSO.1.2", type:"multi-select", layout:"full", text:`Select <b>ALL</b> for 1,200.`, opts:["12 hundreds", "1 thousand + 2 hundreds", "12 tens"], ans:[0,1] } } ],
+             "MA.3.NSO.1.3": [ () => { let a=500,b=400; return { id:"NSO13", cat:"NSO.1.3", type:"inline", layout:"full", text:"Compare.", sentence:[{text:"500 "},{type:"select",opts:[">","<"],ans:">"},{text:" 400"}] } } ],
+             "MA.3.NSO.1.4": [ () => { return { id:"NSO14", cat:"NSO.1.4", type:"input", layout:"full", text:"Round 43 to ten.", ans:"40" } } ],
+             "MA.3.NSO.2.2": [ () => { return { id:"NSO22", cat:"NSO.2.2", type:"input", layout:"full", text:"7 x 8 = ?", ans:"56" } } ],
+             "MA.3.NSO.2.3": [ () => { return { id:"NSO23", cat:"NSO.2.3", type:"choice", layout:"full", text:"Strategy for 6x12?", opts:["(6x10)+(6x2)", "6x1+2"], ans:"(6x10)+(6x2)" } } ],
+             "MA.3.FR.1.2": [ () => { return { id:"FR12", cat:"FR.1.2", type:"choice", layout:"split", visual:`<svg viewBox="0 0 300 50"><line x1="0" y1="25" x2="300" y2="25" stroke="black"/><circle cx="150" cy="25" r="5"/><text x="10" y="45">0</text><text x="290" y="45">1</text></svg>`, text:"Identify point.", opts:["1/2","1/4"], ans:"1/2" } } ],
+             "MA.3.FR.2.1": [ () => { return { id:"FR21", cat:"FR.2.1", type:"inline", layout:"full", text:"Compare.", sentence:[{text:"1/3 "},{type:"select",opts:[">","<"],ans:">"},{text:" 1/5"}] } } ],
+             "MA.3.AR.1.2": [ () => { return { id:"AR12", cat:"AR.1.2", type:"input", layout:"full", text:"50 - 10 + 5 = ?", ans:"45" } } ],
+             "MA.3.AR.2.3": [ () => { return { id:"AR23", cat:"AR.2.3", type:"input", layout:"full", text:"3 x ? = 12", ans:"4" } } ],
+             "MA.3.AR.3.1": [ () => { return { id:"AR31", cat:"AR.3.1", type:"choice", layout:"full", text:"2, 4, 6... Rule?", opts:["+2", "+4"], ans:"+2" } } ],
+             "MA.3.GR.1.2": [ () => { return { id:"GR12", cat:"GR.1.2", type:"table", layout:"full", text:"Classify Square.", rows:["Square"], cols:["4 Sides"], ans:["4 Sides"] } } ],
+             "MA.3.GR.2.1": [ () => { return { id:"GR21", cat:"GR.2.1", type:"input", layout:"split", visual:drawRect(3,2), text:"Area?", ans:"6" } } ],
+             "MA.3.M.1.1": [ () => { return { id:"M11", cat:"M.1.1", type:"input", layout:"full", text:"1 ft = ? in", ans:"12" } } ]
         };
 
-        // --- SESSION LOGIC ---
+        // --- SESSION LOGIC WITH DUPLICATE PROTECTION ---
         let queue = [], curIdx = 0, answers = [];
-        let sessionHistory = new Set(); 
+        let sessionHistory = new Set(); // Stores question IDs
 
         function startTest(mode, count) {
             queue = []; answers = [];
             sessionHistory.clear();
             
             let attempts = 0;
-            while(queue.length < count && attempts < 300) {
+            while(queue.length < count && attempts < 200) {
                 attempts++;
+                let q = null;
+                
+                // PICK GEN
                 let keys = Object.keys(STANDARDS);
                 if(mode !== 'ALL') keys = keys.filter(k => k.includes(mode));
-                if(keys.length === 0) break; 
                 
+                if(keys.length === 0) break; 
                 let k = keys[Math.floor(Math.random()*keys.length)];
                 let gens = STANDARDS[k];
-                // PICK RANDOM VARIATION
-                let q = gens[Math.floor(Math.random()*gens.length)]();
+                q = gens[Math.floor(Math.random()*gens.length)]();
 
+                // DUPLICATE CHECK
                 if(!sessionHistory.has(q.id)) {
                     queue.push(q);
                     sessionHistory.add(q.id);
                 }
             }
-            if(queue.length === 0) { alert("No questions found for this standard yet!"); return; }
 
             curIdx = 0;
             document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -361,27 +413,18 @@
                 });
                 html += `</tbody></table>`;
             }
-             else if(q.type === 'two-part') {
-                q.parts.forEach((p, pIdx) => {
-                    html += `<div class="part-header">${p.label}</div>`;
-                    p.opts.forEach(o => {
-                        let sel = (ans[pIdx] === o) ? 'selected' : '';
-                        html += `<div class="opt-row ${sel}" onclick="saveTwoPart(${pIdx}, '${o}')"><div class="bubble"></div>${o}</div>`;
-                    });
-                });
-            }
 
             stage.innerHTML = `${left}<div class="pane right-pane" style="${rStyle}"><div class="q-header">${q.cat}</div><div class="q-text">${q.text}</div>${html}</div>`;
             document.getElementById('q-idx').innerText = curIdx + 1;
             document.getElementById('btn-next').innerText = (curIdx === queue.length-1) ? "Submit" : "Next";
         }
 
+        // --- SAVING ---
         window.save = v => { answers[curIdx] = v; renderQ(); };
         window.saveMulti = i => { let a=answers[curIdx]||[]; if(a.includes(i)) a=a.filter(x=>x!==i); else a.push(i); answers[curIdx]=a; renderQ(); };
         window.saveMultiInput = (i,v) => { let a=answers[curIdx]||[]; a[i]=v; answers[curIdx]=a; };
         window.saveInline = (i,v) => { let a=answers[curIdx]||{}; a[i]=v; answers[curIdx]=a; };
         window.saveTable = (i,v) => { let a=answers[curIdx]||{}; a[i]=v; answers[curIdx]=a; };
-        window.saveTwoPart = (i,v) => { let a=answers[curIdx]||{}; a[i]=v; answers[curIdx]=a; renderQ(); };
 
         window.nextQ = () => { if(curIdx < queue.length-1) { curIdx++; renderQ(); } else finish(); };
         window.prevQ = () => { if(curIdx>0) { curIdx--; renderQ(); } };
@@ -406,9 +449,10 @@
             document.getElementById('final-badge').className = "level-badge " + cls;
             document.getElementById('final-badge').innerText = lvl;
             document.getElementById('report-grid').innerHTML = `<div class="rep-box ${pct>=60?'good':'bad'}"><strong>Overall Score</strong><br>${score}/${total} (${pct}%)</div>`;
+            
             document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
             document.getElementById('screen-report').classList.add('active');
         }
     </script>
 </body>
-</html>           
+</html>               
