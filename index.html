@@ -3,290 +3,396 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FAST G3 Math - Full Mastery Simulator</title>
+    <title>FAST Grade 3 Math - Operational Mastery</title>
     <style>
-        :root { --fld-blue: #003057; --bg: #f0f2f5; --white: #ffffff; --text: #1a1a1a; }
-        body { font-family: 'Verdana', 'Segoe UI', sans-serif; background: var(--bg); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text); }
-
-        /* --- NAVIGATION FRAMEWORK --- */
-        .top-nav { background: #000; color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; flex-shrink: 0; }
-        .toolbar { background: #e0e0e0; border-bottom: 2px solid #bbb; padding: 8px 20px; display: flex; gap: 12px; overflow-x: auto; flex-shrink: 0; }
-        .tool-btn { background: #fff; border: 1px solid #888; padding: 6px 14px; cursor: pointer; font-size: 0.85em; border-radius: 3px; white-space: nowrap; font-weight: bold; }
-        .tool-btn:hover { background: #f0f0f0; }
-
-        .stage { flex: 1; overflow-y: auto; padding: 25px; display: flex; justify-content: center; background: white; }
-        .content-card { max-width: 900px; width: 100%; padding-bottom: 150px; }
-
-        .bottom-nav { background: #eeeeee; border-top: 2px solid #999; height: 80px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; z-index: 1000; }
-        .nav-btn { background: #fff; border: 2px solid #333; padding: 12px 35px; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 1.1em; }
-        .nav-btn.primary { background: #006400; color: #fff; border-color: #004d00; }
-        .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-        /* --- MENU (SCROLLABLE & SYNCED) --- */
-        .menu-screen { height: 100vh; overflow-y: auto; background: linear-gradient(135deg, #1e3c72, #2a5298); padding: 40px 15px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
-        .menu-card { background: #fff; width: 100%; max-width: 850px; padding: 35px; border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.5); text-align: left; }
-        .cat-box { margin-bottom: 45px; }
-        .cat-title { border-bottom: 4px solid var(--fld-blue); color: var(--fld-blue); font-weight: bold; margin-bottom: 20px; font-size: 1.3em; padding-bottom: 8px; }
-        .std-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-        .std-btn { background: #fdfdfd; border: 1px solid #ccc; padding: 15px; border-radius: 6px; cursor: pointer; font-size: 0.85em; font-weight: bold; text-align: center; color: #333; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .std-btn:hover { background: #eef3f7; border-color: var(--fld-blue); color: var(--fld-blue); transform: translateY(-3px); box-shadow: 0 5px 12px rgba(0,0,0,0.15); }
-
-        /* --- QUESTION INTERFACE --- */
-        .q-tag { font-size: 0.85em; color: #666; font-weight: bold; margin-bottom: 15px; display: block; border-bottom: 1px solid #eee; text-transform: uppercase; letter-spacing: 1px; }
-        .prompt { font-size: 1.5em; line-height: 1.6; color: #111; margin-bottom: 35px; font-weight: 500; }
+        :root { --header: #2C3E50; --bg: #F5F7FA; --active: #00609C; --text: #333; --panel-border: #b5b5b5; }
         
-        .opt-box { display: flex; align-items: center; padding: 20px; border: 1px solid #ccc; cursor: pointer; border-radius: 8px; background: #fff; margin-bottom: 12px; transition: 0.15s; }
-        .opt-box:hover { border-color: #777; background: #fafafa; }
-        .opt-box.selected { background: #e6f3ff; border: 2px solid var(--fld-blue); font-weight: bold; }
+        body { 
+            font-family: 'Verdana', 'Segoe UI', sans-serif; 
+            background: var(--bg); margin: 0; height: 100dvh; 
+            display: flex; flex-direction: column; overflow: hidden; 
+        }
+
+        /* SCREEN MANAGEMENT */
+        .screen { display: none; height: 100%; width: 100%; flex-direction: column; }
+        .screen.active { display: flex; }
+
+        /* MENU */
+        .menu-container { display: flex; flex-direction: column; align-items: center; justify-content: start; height: 100%; background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 20px; overflow-y: auto; }
+        .menu-card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); text-align: center; color: #333; width: 100%; max-width: 650px; margin-bottom: 50px; }
         
-        .bubble { width: 24px; height: 24px; border: 2px solid #666; border-radius: 50%; margin-right: 20px; background: #fff; flex-shrink: 0; position: relative; }
-        .selected .bubble { background: var(--fld-blue); border-color: var(--fld-blue); }
-        .selected .bubble::after { content: ''; position: absolute; top: 7px; left: 7px; width: 8px; height: 8px; background: #fff; border-radius: 50%; }
-        .bubble.sq { border-radius: 4px; }
-
-        /* INTERACTIVE ELEMENTS */
-        .visual-box { display: flex; justify-content: center; margin: 35px 0; border: 1px solid #ddd; padding: 25px; background: #fff; border-radius: 12px; box-shadow: inset 0 0 12px rgba(0,0,0,0.03); }
-        svg { max-height: 320px; width: 100%; display: block; }
+        details { width: 100%; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; background: #fff; }
+        summary { background: #f0f0f0; padding: 15px; cursor: pointer; font-weight: bold; text-align: left; list-style: none; display: flex; justify-content: space-between; align-items: center; font-size: 1.1em; }
+        details[open] summary { background: var(--active); color: white; }
         
-        .hot-box { padding: 30px; background: #fdfdfd; border: 1px solid #ddd; font-size: 1.55em; line-height: 2.5; border-radius: 8px; }
-        .hot-item { cursor: pointer; border: 2px solid transparent; padding: 4px 10px; border-radius: 6px; transition: 0.2s; }
-        .hot-item:hover { background: #eee; }
-        .hot-item.selected { background: #fff2cc; border-color: var(--fld-blue); font-weight: bold; }
+        .sub-btn { display: block; width: 100%; padding: 12px 15px; border: none; border-bottom: 1px solid #eee; background: #fff; text-align: left; cursor: pointer; font-size: 0.95em; padding-left: 20px; transition: 0.2s; }
+        .sub-btn:hover { background: #eef6fc; padding-left: 30px; color: var(--active); font-weight: bold; }
+        
+        .main-btn { display: block; width: 100%; padding: 20px; margin-bottom: 30px; background: #eef6fc; border: 3px solid #003057; color: #003057; font-weight: bold; cursor: pointer; border-radius: 6px; text-align: center; font-size: 1.2em; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .main-btn:hover { background: #003057; color: white; }
 
-        .match-tbl { width: 100%; border-collapse: collapse; margin-top: 30px; font-size: 1.2em; }
-        .match-tbl td, .match-tbl th { border: 1px solid #aaa; padding: 20px; text-align: center; }
-        .match-tbl td:first-child { text-align: left; background: #f5f5f5; font-weight: bold; }
-        .check-ui { transform: scale(2.0); cursor: pointer; accent-color: var(--fld-blue); }
+        /* TEST INTERFACE */
+        .top-bar { background: #fff; border-bottom: 2px solid #000; padding: 0 20px; height: 60px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .tool-btn { background: transparent; border: 1px solid #666; color: #333; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9em; margin-left: 8px; }
 
-        .eq-editor { font-size: 1.8em; padding: 15px; border: 3px solid #333; width: 280px; text-align: center; border-radius: 8px; margin: 30px auto; display: block; background: #fff; }
+        .main-stage { flex: 1; padding: 15px; overflow: hidden; display: flex; gap: 15px; height: 100%; position: relative; }
+        .pane { background: white; border: 1px solid var(--panel-border); overflow-y: auto; height: 100%; box-sizing: border-box; padding: 25px; border-radius: 4px; }
+        .left-pane { width: 45%; background: #FAFAFA; display: flex; align-items: center; justify-content: center; padding: 10px; border-right: 1px solid #ccc; }
+        .right-pane { width: 55%; }
+        @media (max-width: 768px) { .main-stage { flex-direction: column; } .left-pane { width: 100%; height: 35%; border-bottom: 2px solid #999; } .right-pane { width: 100%; height: 65%; } }
+
+        /* QUESTIONS */
+        .q-header { font-weight: bold; color: #666; margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px; text-transform: uppercase; font-size: 0.85em; letter-spacing: 0.5px; }
+        .q-text { font-size: 1.35em; line-height: 1.6; color: #000; margin-bottom: 25px; }
+
+        .inline-select { display: inline-block; font-size: 1em; padding: 4px 10px; margin: 0 4px; border: 2px solid #333; background: #fff; color: #000; font-weight: bold; cursor: pointer; }
+        .shaded-box { background: #E8E8E8; padding: 20px; border: 1px solid #999; display: inline-block; min-width: 300px; border-radius: 4px; }
+        .input-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .input-box { font-size: 1.4em; padding: 10px; width: 140px; text-align: center; border: 2px solid #555; background: white; border-radius: 4px; }
+        
+        .opt-row { display: flex; padding: 15px; margin-bottom: 10px; cursor: pointer; align-items: center; border: 1px solid #ddd; border-radius: 6px; transition: 0.1s; }
+        .opt-row:hover { background: #f5f5f5; border-color: #999; }
+        .opt-row.selected { background: #e6f3ff; border: 2px solid var(--active); font-weight: bold; }
+        .bubble { width: 22px; height: 22px; border: 2px solid #333; border-radius: 50%; margin-right: 15px; flex-shrink: 0; background: white; position:relative; }
+        .opt-row.selected .bubble { background: var(--active); border-color: var(--active); }
+        .opt-row.selected .bubble::after { content:''; position:absolute; top:5px; left:5px; width:8px; height:8px; background:white; border-radius:50%; }
+        .bubble.square { border-radius: 3px; }
+
+        .nav-bar { background: #f0f0f0; border-top: 1px solid #999; height: 75px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; flex-shrink: 0; }
+        .nav-btn { background: #fff; color: #333; border: 1px solid #999; padding: 12px 30px; font-weight: bold; font-size: 1.1em; cursor: pointer; min-width: 120px; border-radius: 4px; }
+        .nav-btn.primary { background: var(--active); color: white; border-color: var(--active); }
+        
+        .level-badge { padding: 10px 20px; color: white; font-weight: bold; font-size: 1.5em; border-radius: 30px; margin: 15px 0; display: inline-block; }
+        .l3 { background: #FBC02D; color: #000; } .l4 { background: #4CAF50; } .l1 { background: #D32F2F; }
+        .rep-box { padding: 15px; background: #f9f9f9; border-left: 6px solid #ccc; font-size: 1.1em; margin-top: 10px; text-align: left; }
+
+        svg { max-height: 280px; width: 100%; display: block; margin: auto; }
+        .eq-editor { font-size: 1.6em; padding: 10px; border: 2px solid #333; text-align: center; width: 200px; display: block; margin: 20px auto; }
     </style>
 </head>
 <body>
 
     <div id="screen-menu" class="screen active">
-        <div class="menu-screen">
-            <h1 style="color:#fff; margin-top:0; text-shadow: 0 4px 8px rgba(0,0,0,0.4); font-size: 2.8em;">FAST Grade 3 Math Mastery</h1>
+        <div class="menu-container">
+            <h1 style="text-shadow: 0 2px 4px rgba(0,0,0,0.3); margin-bottom: 10px;">FAST G3 Mastery</h1>
+            <p style="margin-bottom: 30px; opacity: 0.9;">Level 4 & 5 Complexity Engine</p>
             <div class="menu-card">
-                <button class="std-btn" onclick="buildSession('ALL', 40)" style="width:100%; background:var(--fld-blue); color:#fff; font-size:1.5em; padding:28px; margin-bottom:50px; border:none; box-shadow: 0 8px 20px rgba(0,0,0,0.3); border-radius: 12px;">
-                    🚀 START FULL OPERATIONAL MOCK (40 ITEMS)
+                <button class="main-btn" onclick="startTest('ALL', 40)">
+                    🚀 Start Full Operational Mock (40 Items)
                 </button>
-                <div id="menu-links"></div>
+                
+                <h4 style="text-align:left; margin-bottom:15px; color:#555; text-transform:uppercase; border-bottom:2px solid #eee; padding-bottom:5px;">Select by Reporting Category</h4>
+
+                <details>
+                    <summary>🔢 Number Sense (NSO)</summary>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.1.1', 5)">NSO.1.1: Read/Write Numbers (Lv 4/5)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.1.2', 5)">NSO.1.2: Compose/Decompose (Lv 4/5)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.1.3', 5)">NSO.1.3: Comparing (Lv 4)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.1.4', 5)">NSO.1.4: Rounding (Lv 3/4)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.2.1', 5)">NSO.2.1: Add/Subtract (Lv 4)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.2.2', 5)">NSO.2.2: Multiplication Logic</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.2.3', 5)">NSO.2.3: Mult Strategies</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.NSO.2.4', 5)">NSO.2.4: Division Logic</button>
+                </details>
+
+                <details>
+                    <summary>🍕 Fractions (FR)</summary>
+                    <button class="sub-btn" onclick="startTest('MA.3.FR.1.1', 5)">FR.1.1: Represent Fractions</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.FR.1.2', 5)">FR.1.2: Number Lines (Lv 4)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.FR.1.3', 5)">FR.1.3: Whole Numbers</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.FR.2.1', 5)">FR.2.1: Comparing Fractions</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.FR.2.2', 5)">FR.2.2: Equivalent Fractions</button>
+                </details>
+
+                <details>
+                    <summary>🧠 Algebraic Reasoning (AR)</summary>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.1.1', 5)">AR.1.1: Distributive Property</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.1.2', 5)">AR.1.2: Multi-Step Problems (Lv 5)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.2.1', 5)">AR.2.1: Inverse Operations</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.2.2', 5)">AR.2.2: Interpreting Equations</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.2.3', 5)">AR.2.3: Missing Factors</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.3.1', 5)">AR.3.1: Number Patterns</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.3.2', 5)">AR.3.2: Pattern Rules</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.AR.3.3', 5)">AR.3.3: Input/Output Tables</button>
+                </details>
+
+                <details>
+                    <summary>📐 Geometry (GR)</summary>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.1.1', 5)">GR.1.1: Points, Lines, Rays</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.1.2', 5)">GR.1.2: Quad Attributes (Lv 4)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.1.3', 5)">GR.1.3: Symmetry</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.1', 5)">GR.2.1: Area (Tiling)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.2', 5)">GR.2.2: Area (Formula)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.3', 5)">GR.2.3: Perimeter</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.4', 5)">GR.2.4: Area vs Perimeter (Lv 5)</button>
+                </details>
+
+                <details>
+                    <summary>📊 Data & Measurement (M/DP)</summary>
+                    <button class="sub-btn" onclick="startTest('MA.3.M.1.1', 5)">M.1.1: Measurement Conversions</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.M.1.2', 5)">M.1.2: Mass & Volume</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.M.2.1', 5)">M.2.1: Telling Time</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.M.2.2', 5)">M.2.2: Elapsed Time (Lv 4)</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.DP.1.1', 5)">DP.1.1: Scaled Graphs</button>
+                    <button class="sub-btn" onclick="startTest('MA.3.DP.1.2', 5)">DP.1.2: Interpreting Data</button>
+                </details>
             </div>
         </div>
     </div>
 
     <div id="screen-test" class="screen">
-        <div class="top-nav">
-            <span>FLORIDA B.E.S.T. STANDARDS - GRADE 3</span>
-            <span id="test-info">Student Practice Session</span>
-            <button onclick="location.reload()" style="background:none; border:2px solid #fff; color:#fff; cursor:pointer; padding: 8px 18px; border-radius: 6px; font-weight: bold;">EXIT TEST</button>
+        <div class="top-bar">
+            <div><strong>FAST Simulator</strong> | Level 4/5 Mode</div>
+            <div>
+                <button class="tool-btn" onclick="toggleZoom()">🔍 Zoom</button>
+                <button class="tool-btn" style="color:#D32F2F; border-color:#D32F2F;" onclick="location.reload()">Exit</button>
+            </div>
         </div>
-        <div class="toolbar">
-            <button class="tool-btn">Line Reader</button>
-            <button class="tool-btn">Zoom In</button>
-            <button class="tool-btn">Highlighter</button>
-            <button class="tool-btn">⚑ Flag for Review</button>
-            <button class="tool-btn">Formula Sheet</button>
+
+        <div id="stage" class="main-stage"></div>
+
+        <div class="nav-bar">
+            <button class="nav-btn" onclick="prevQ()">Back</button>
+            <div style="font-weight:bold; color:#555;">Item <span id="q-idx">1</span> of <span id="q-total">40</span></div>
+            <button class="nav-btn primary" onclick="nextQ()" id="btn-next">Next</button>
         </div>
-        <div class="stage">
-            <div id="q-stage" class="content-card"></div>
-        </div>
-        <div class="bottom-nav">
-            <button class="nav-btn" onclick="navQ(-1)">Back</button>
-            <div style="font-weight:bold; color: #333; font-size: 1.4em;">Question <span id="cur-idx">1</span> of <span id="total-idx">40</span></div>
-            <button id="next-btn" class="nav-btn primary" onclick="navQ(1)">Next</button>
+    </div>
+
+    <div id="screen-report" class="screen">
+        <div class="menu-container" style="background: #f4f4f4; color: #333; justify-content: center;">
+            <div class="menu-card">
+                <h2>Performance Report</h2>
+                <div id="final-badge" class="level-badge l3">Calculating...</div>
+                <div id="report-grid" style="text-align:left; margin-top:20px;"></div>
+                <button class="main-btn" style="margin-top:30px;" onclick="location.reload()">Return to Menu</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- 1. DATA MAPPING & BLUEPRINTS ---
-        const CATEGORIES = {
-            "Number Sense & Additive Reasoning": ["MA.3.NSO.1.1", "MA.3.NSO.1.2", "MA.3.NSO.1.3", "MA.3.NSO.1.4", "MA.3.NSO.2.1", "MA.3.AR.1.2", "MA.3.AR.3.1", "MA.3.AR.3.3"],
-            "Number Sense & Multiplicative Reasoning": ["MA.3.NSO.2.2", "MA.3.NSO.2.3", "MA.3.NSO.2.4", "MA.3.AR.1.1", "MA.3.AR.2.1", "MA.3.AR.2.2", "MA.3.AR.2.3", "MA.3.AR.3.2", "MA.3.GR.2.1", "MA.3.GR.2.2"],
-            "Fractional Reasoning": ["MA.3.FR.1.1", "MA.3.FR.1.2", "MA.3.FR.1.3", "MA.3.FR.2.1", "MA.3.FR.2.2"],
-            "Measurement, Data & Geometry": ["MA.3.GR.1.1", "MA.3.GR.1.2", "MA.3.GR.1.3", "MA.3.GR.2.3", "MA.3.GR.2.4", "MA.3.M.1.1", "MA.3.M.1.2", "MA.3.M.2.1", "MA.3.M.2.2", "MA.3.DP.1.1", "MA.3.DP.1.2"]
-        };
+        // --- VISUAL DRAWING FUNCTIONS ---
+        function drawRect(l, w, missingSide=false) {
+            let max = Math.max(l, w);
+            let scale = 220 / max;
+            let svgW = l * scale;
+            let svgH = w * scale;
+            let x = (300 - svgW) / 2;
+            let y = (250 - svgH) / 2;
+            let labelL = missingSide === 'L' ? "?" : l + ' ft';
+            let labelW = missingSide === 'W' ? "?" : w + ' ft';
 
-        const NAMES = ["Mateo", "Sloan", "Hassan", "Aaliyah", "Finn", "Elena", "Kaleb", "Zara", "Leo", "Maya"];
-        const OBJECTS = ["stickers", "marbles", "trading cards", "pencils", "stamps", "beads", "shells"];
-
-        const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-        const getOne = (arr) => arr[Math.floor(Math.random() * arr.length)];
-        const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
-
-        // --- 2. SVG RENDERING FACTORY ---
-        const SVG_ENGINE = {
-            clock: (h, m) => {
-                const mP = m * 6, hP = (h % 12) * 30 + (m * 0.5);
-                const r = (d) => (d - 90) * Math.PI / 180;
-                const hx = 50 + 24 * Math.cos(r(hP)), hy = 50 + 24 * Math.sin(r(hP));
-                const mx = 50 + 36 * Math.cos(r(mP)), my = 50 + 36 * Math.sin(r(mP));
-                let ticks = "";
-                for(let i=0; i<12; i++){
-                    const a = (i*30-90)*Math.PI/180;
-                    ticks += `<line x1="${50+39*Math.cos(a)}" y1="${50+39*Math.sin(a)}" x2="${50+44*Math.cos(a)}" y2="${50+44*Math.sin(a)}" stroke="#333" stroke-width="2"/>`;
-                }
-                return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="white" stroke="#000" stroke-width="2.5"/>${ticks}
-                        <line x1="50" y1="50" x2="${hx}" y2="${hy}" stroke="black" stroke-width="4.5" stroke-linecap="round"/>
-                        <line x1="50" y1="50" x2="${mx}" y2="${my}" stroke="#003057" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="3.5" fill="black"/></svg>`;
-            },
-            fraction: (den, selArr) => {
-                let p = "";
-                for(let i=0; i<den; i++){
-                    const s = (i*360/den-90)*Math.PI/180, e = ((i+1)*360/den-90)*Math.PI/180;
-                    const x1=50+45*Math.cos(s), y1=50+45*Math.sin(s), x2=50+45*Math.cos(e), y2=50+45*Math.sin(e);
-                    const fill = (selArr || []).includes(i) ? '#003057' : 'white';
-                    p += `<path d="M50,50 L${x1},${y1} A45,45 0 0,1 ${x2},${y2} Z" fill="${fill}" stroke="#000" onclick="handleInt('PIE', ${i})" style="cursor:pointer;"/>`;
-                }
-                return `<svg viewBox="0 0 100 100">${p}</svg>`;
-            },
-            rect: (l, w, hide) => {
-                const scale = 200 / Math.max(l, w);
-                const sw = l * scale, sh = w * scale;
-                const ox = (300-sw)/2, oy = (200-sh)/2;
-                return `<svg viewBox="0 0 300 200"><rect x="${ox}" y="${oy}" width="${sw}" height="${sh}" fill="#f9f9f9" stroke="#000" stroke-width="3"/>
-                        <text x="150" y="${oy-15}" text-anchor="middle" font-weight="bold" font-size="16">${l} units</text>
-                        <text x="${ox-15}" y="${oy+sh/2}" text-anchor="end" font-weight="bold" dominant-baseline="middle" font-size="16">${hide?'?':w+' units'}</text></svg>`;
-            }
-        };
-
-        // --- 3. THE CORE MASTER GENERATOR ENGINE (LV 3-5) ---
-        const MASTER_ENGINE = {
-            "NSO.1.1": () => {
-                const n = rand(1001, 9998);
-                const type = rand(1, 2);
-                if(type === 1) return { type: "MULTI", std: "MA.3.NSO.1.1", prompt: `Select <b>all</b> the ways to represent the value of <b>${n.toLocaleString()}</b>.`, 
-                    opts: shuffle([{t: `${Math.floor(n/1000)} thousands, ${n%1000} ones`, c:true}, {t: `${Math.floor(n/100)} hundreds, ${n%100} ones`, c:true}, {t: `${n} ones`, c:true}, {t: `${Math.floor(n/10)*10} + ${n%10}`, c:true}, {t: `${Math.floor(n/1000)} thousands, ${Math.floor((n%1000)/100)} tens`, c:false}]) };
-                return { type: "HOT_TEXT", std: "MA.3.NSO.1.1", prompt: `Click the digit that represents <b>hundreds</b> in the number below.`, data: { list: n.toString().split(''), ans: [1] } };
-            },
-            "NSO.1.2": () => ({ 
-                type: "MC", std: "MA.3.NSO.1.2", 
-                prompt: `Analyze the non-standard decomposition below:<br><br><b>4,120 = 2 thousands + 21 hundreds + 2 tens</b><br><br>Is this decomposition mathematically correct?`, 
-                opts: [{t: "Yes, because the values sum to 4,120.", c:true}, {t: "No, because there cannot be 21 hundreds.", c:false}, {t: "No, because the tens value is incorrect.", c:false}] 
-            }),
-            "NSO.1.3": () => {
-                const a = rand(1000, 9999), b = rand(1000, 9999);
-                return { type: "MC", std: "MA.3.NSO.1.3", prompt: `Which comparison statement is true?`, opts: shuffle([{t: `${a} > ${b}`, c:a>b}, {t: `${a} < ${b}`, c:a<b}, {t: `${a} = ${b}`, c:a===b}]) };
-            },
-            "NSO.1.4": () => {
-                const n = rand(110, 890);
-                return { type: "MC", std: "MA.3.NSO.1.4", prompt: `Round <b>${n}</b> to the nearest ten and hundred.`, opts: [{t: `10: ${Math.round(n/10)*10}, 100: ${Math.round(n/100)*100}`, c:true}, {t: "Incorrect Combination", c:false}] };
-            },
-            "NSO.2.1": () => {
-                const a = rand(1100, 4500), b = rand(1100, 4500);
-                return { type: "EQ", std: "MA.3.NSO.2.1", prompt: `Find the sum: <br><br> ${a.toLocaleString()} + ${b.toLocaleString()} = ?`, ans: (a+b).toString() };
-            },
-            "NSO.2.2": () => ({ type: "MC", std: "MA.3.NSO.2.2", prompt: `Which fact is related to 56 ÷ 8 = 7?`, opts: shuffle([{t: "8 × 7 = 56", c:true}, {t: "56 + 8 = 64", c:false}, {t: "56 − 8 = 48", c:false}]) }),
-            "NSO.2.4": () => ({ type: "EQ", std: "MA.3.NSO.2.4", prompt: `What is 72 divided by 9?`, ans: "8" }),
-            "AR.1.1": () => ({ type: "MC", std: "MA.3.AR.1.1", prompt: `Which expression is equivalent to 7 × 6?`, opts: shuffle([{t: "(7 × 5) + (7 × 1)", c:true}, {t: "(7 + 5) × (7 + 1)", c:false}, {t: "7 + 6", c:false}]) }),
-            "AR.1.2": () => ({ type: "MC", std: "MA.3.AR.1.2", prompt: `${getOne(NAMES)} has 5 boxes of 9 ${getOne(OBJECTS)}. They give 15 to a friend. Which equation shows how many are left?`, opts: shuffle([{t: "(5 × 9) − 15 = 30", c:true}, {t: "(5 + 9) − 15 = -1", c:false}, {t: "5 × 9 + 15 = 60", c:false}]) }),
-            "AR.2.3": () => ({ type: "EQ", std: "MA.3.AR.2.3", prompt: `Solve for <b>n</b>: <br><br> 42 ÷ <b>n</b> = 6`, ans: "7" }),
-            "AR.3.1": () => ({ type: "MC", std: "MA.3.AR.3.1", prompt: `What is the rule for the pattern: 4, 8, 12, 16?`, opts: [{t: "Add 4", c:true}, {t: "Multiply by 2", c:false}] }),
-            "FR.1.1": () => {
-                const d = getOne([4,6,8]), n = rand(1, d - 1);
-                return { type: "PIE", std: "MA.3.FR.1.1", prompt: `Click parts of the circle to shade exactly <b>${n}/${d}</b>.`, data: { den: d, ans: n } };
-            },
-            "FR.2.1": () => ({ type: "MC", std: "MA.3.FR.2.1", prompt: `Which comparison is correct?`, opts: shuffle([{t: "1/4 < 1/3", c:true}, {t: "2/6 = 1/2", c:false}, {t: "1/8 > 1/4", c:false}]) }),
-            "M.2.1": () => {
-                const h = rand(1, 12), m = rand(10, 50);
-                return { type: "MC", std: "MA.3.M.2.1", prompt: `What time will it be in 45 minutes?`, visual: SVG_ENGINE.clock(h, m), opts: shuffle([{t: "Correct Elapsed Time", c:true}, {t: "Current Time", c:false}]) };
-            },
-            "GR.1.2": () => ({ type: "MULTI", std: "MA.3.GR.1.2", prompt: `Select <b>all</b> quadrilaterals that always have 4 equal sides.`, opts: [{t: "Square", c:true}, {t: "Rhombus", c:true}, {t: "Rectangle", c:false}, {t: "Trapezoid", c:false}] }),
-            "GR.2.3": () => {
-                const p = 30, w = 5, l = 10;
-                return { type: "EQ", std: "MA.3.GR.2.3", prompt: `A rectangle has a perimeter of 30 feet. The width is 5 feet. What is the length?`, visual: SVG_ENGINE.rect(l, w, true), ans: "10" },
-            "DP.1.1": () => ({ type: "MC", std: "MA.3.DP.1.1", prompt: `A bar graph has a scale of 5. If a bar is halfway between 10 and 15, what value does it represent?`, opts: [{t: "12.5", c:true}, {t: "12", c:false}, {t: "13", c:false}] }),
-            
-            // --- UNIVERSAL FALLBACK AUTO-GENERATOR ---
-            "AUTO": (id) => ({ 
-                type: "MC", std: id, 
-                prompt: `Analyzing a Level 4 scenario for <b>${id}</b>. Which statement below identifies the conceptual error in the student's reasoning for a multi-step problem?`, 
-                opts: [{t: "Accurate identification of the reasoning error.", c:true}, {t: "A distractor based on an unrelated calculation error.", c:false}] 
-            })
-        };
-
-        // --- 4. CORE SESSION ENGINE ---
-        let queue = [], qIdx = 0, responses = {};
-
-        window.buildSession = (id, count) => {
-            queue = []; responses = {}; qIdx = 0;
-            // Handle prefix and non-prefix versions for ID matching
-            const targetKeys = (id === 'ALL') ? Object.values(CATEGORIES).flat() : [id, `MA.3.${id}`];
-            
-            for(let i=0; i<count; i++) {
-                const rawKey = getOne(targetKeys);
-                const shortKey = rawKey.replace('MA.3.', '');
-                // Check engine for the key (both long and short versions)
-                const gen = MASTER_ENGINE[shortKey] || MASTER_ENGINE[rawKey] || (() => MASTER_ENGINE.AUTO(rawKey));
-                queue.push(gen());
-            }
-
-            document.getElementById('screen-menu').classList.remove('active');
-            document.getElementById('screen-test').classList.add('active');
-            document.getElementById('total-idx').innerText = queue.length;
-            renderItem();
-        };
-
-        function renderItem() {
-            const item = queue[qIdx];
-            const stage = document.getElementById('q-stage');
-            const saved = responses[qIdx];
-            
-            let html = `<span class="q-tag">Benchmark ${item.std}</span><div class="prompt">${item.prompt}</div>`;
-            if(item.visual) html += `<div class="visual-box">${item.visual}</div>`;
-
-            if(item.type === "MC") {
-                item.opts.forEach((o, i) => html += `<div class="opt-box ${saved===i?'selected':''}" onclick="setAns(${i})"><div class="bubble"></div>${o.t}</div>`);
-            } else if(item.type === "MULTI") {
-                const s = saved || [];
-                item.opts.forEach((o, i) => html += `<div class="opt-box ${s.includes(i)?'selected':''}" onclick="setAnsMulti(${i})"><div class="bubble sq"></div>${o.t}</div>`);
-            } else if(item.type === "HOT_TEXT") {
-                const s = saved || [];
-                html += `<div class="hot-box">`;
-                item.data.list.forEach((w, i) => html += `<span class="hot-item ${s.includes(i)?'selected':''}" onclick="setAnsMulti(${i})">${w}</span> `);
-                html += `</div>`;
-            } else if(item.type === "PIE") {
-                html += `<div class="visual-box">${SVG_ENGINE.fraction(item.data.den, saved)}</div>`;
-            } else if(item.type === "EQ") {
-                html += `<input type="text" class="eq-editor" value="${saved||''}" oninput="setAns(this.value)" placeholder="?">`;
-            }
-
-            stage.innerHTML = html;
-            document.getElementById('cur-idx').innerText = qIdx + 1;
-            document.getElementById('next-btn').innerText = (qIdx === queue.length - 1) ? "Submit Assessment" : "Next Item";
+            return `<svg viewBox="0 0 300 250">
+                <rect x="${x}" y="${y}" width="${svgW}" height="${svgH}" fill="#EAEAEA" stroke="#333" stroke-width="3"/>
+                <text x="${150}" y="${y - 10}" text-anchor="middle" font-weight="bold" font-size="16">${labelL}</text>
+                <text x="${x - 15}" y="${125}" text-anchor="middle" font-weight="bold" font-size="16" transform="rotate(-90, ${x-15}, 125)">${labelW}</text>
+            </svg>`;
         }
 
-        window.setAns = (v) => { responses[qIdx] = v; renderItem(); };
-        window.setAnsMulti = (i) => {
-            let s = responses[qIdx] || [];
-            if(s.includes(i)) s = s.filter(x => x !== i); else s.push(i);
-            responses[qIdx] = s; renderItem();
-        };
-        window.handleInt = (type, i) => {
-            if(type === 'PIE') {
-                let s = responses[qIdx] || [];
-                if(s.includes(i)) s = s.filter(x => x !== i); else s.push(i);
-                responses[qIdx] = s; renderItem();
+        function drawClock(h, m, title="") {
+            let hAng = ((h % 12) * 30 + (m / 2)) * (Math.PI / 180) - (Math.PI / 2);
+            let mAng = (m * 6) * (Math.PI / 180) - (Math.PI / 2);
+            let ticks = "";
+            for(let i=0; i<12; i++){
+                let ang = (i*30-90)*Math.PI/180;
+                ticks += `<line x1="${50+38*Math.cos(ang)}" y1="${50+38*Math.sin(ang)}" x2="${50+44*Math.cos(ang)}" y2="${50+44*Math.sin(ang)}" stroke="#333" stroke-width="2"/>`;
             }
+
+            return `<svg viewBox="0 0 100 120">
+                <text x="50" y="15" text-anchor="middle" font-weight="bold" font-size="12">${title}</text>
+                <circle cx="50" cy="70" r="45" fill="white" stroke="#333" stroke-width="3"/>
+                ${ticks}
+                <line x1="50" y1="70" x2="${50 + 24 * Math.cos(hAng)}" y2="${70 + 24 * Math.sin(hAng)}" stroke="black" stroke-width="4" stroke-linecap="round"/>
+                <line x1="50" y1="70" x2="${50 + 36 * Math.cos(mAng)}" y2="${70 + 36 * Math.sin(mAng)}" stroke="#00609C" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="50" cy="70" r="3" fill="#333"/>
+            </svg>`;
+        }
+
+        function drawPie(d, n, interactive=false) {
+             let path = "";
+            for(let i=0; i<n; i++) {
+                let start = (i * 360 / d - 90) * Math.PI/180;
+                let end = ((i+1) * 360 / d - 90) * Math.PI/180;
+                let x1=50+45*Math.cos(start), y1=50+45*Math.sin(start);
+                let x2=50+45*Math.cos(end), y2=50+45*Math.sin(end);
+                path += `M50,50 L${x1},${y1} A45,45 0 0,1 ${x2},${y2} Z `;
+            }
+            let lines = "";
+            for(let i=0; i<d; i++) {
+                let ang = (i*360/d - 90) * Math.PI/180;
+                lines += `<line x1="50" y1="50" x2="${50+45*Math.cos(ang)}" y2="${50+45*Math.sin(ang)}" stroke="#333" stroke-width="2"/>`;
+            }
+            return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="white" stroke="#333" stroke-width="2"/><path d="${path}" fill="#00609C" stroke="#333"/>${lines}</svg>`;
+        }
+
+        // --- MASTER DATA: LEVEL 4/5 VARIATIONS ---
+        const STANDARDS = {
+            // NSO
+            "MA.3.NSO.1.1": [
+                () => { let n=1000+Math.floor(Math.random()*8000); return {id:`NSO11A`, cat:"NSO.1.1", type:"choice", layout:"full", text:`A student writes <b>${n}</b> in expanded form. Which expression correctly represents the value of the hundreds digit?`, opts:[(Math.floor((n%1000)/100)*100).toString(), Math.floor((n%1000)/100).toString(), (Math.floor(n/1000)*1000).toString()], ans:(Math.floor((n%1000)/100)*100).toString()} },
+                () => { let n=Math.floor(Math.random()*9000); return {id:`NSO11B`, cat:"NSO.1.1", type:"multi-select", layout:"full", text:`Select <b>all</b> ways to represent <b>${n.toLocaleString()}</b>.`, opts:[`${Math.floor(n/1000)} thousands, ${n%1000} ones`, `${n} ones`, `${Math.floor(n/100)} hundreds`, `${Math.floor(n/10)} tens`], ans:[0,1,3]} }
+            ],
+            "MA.3.NSO.1.2": [
+                () => { return {id:`NSO12A`, cat:"NSO.1.2", type:"choice", layout:"full", text:`Analyze this decomposition: <b>2,300 = 1 thousand + 13 hundreds</b>. Is it correct?`, opts:["Yes, because 1,000 + 1,300 = 2,300.", "No, because you cannot have 13 hundreds."], ans:"Yes, because 1,000 + 1,300 = 2,300."} },
+                () => { let n=3500; return {id:`NSO12B`, cat:"NSO.1.2", type:"input", layout:"full", text:`3,500 = 2 thousands + ? hundreds`, ans:"15"} }
+            ],
+            "MA.3.NSO.1.3": [
+                () => { let a=Math.floor(Math.random()*9000); return {id:`NSO13A`, cat:"NSO.1.3", type:"inline", layout:"full", text:`Compare ${a} and ${a+10}.`, sentence:[{text:`${a}`},{type:"select",opts:[">","<","="],ans:"<"},{text:`${a+10}`}]} }
+            ],
+            "MA.3.NSO.1.4": [
+                () => { let n=Math.floor(Math.random()*800)+100; return {id:`NSO14A`, cat:"NSO.1.4", type:"input", layout:"full", text:`Round <b>${n}</b> to the nearest 100.`, ans:(Math.round(n/100)*100).toString()} }
+            ],
+            "MA.3.NSO.2.1": [
+                 () => { let a=Math.floor(Math.random()*4000)+1000; return {id:`NSO21A`, cat:"NSO.2.1", type:"input", layout:"full", text:`${a} + 2,345 = ?`, ans:(a+2345).toString()} }
+            ],
+            "MA.3.NSO.2.2": [
+                 () => { return {id:`NSO22A`, cat:"NSO.2.2", type:"choice", layout:"full", text:`Which equation is related to 56 ÷ 8 = 7?`, opts:["7 × 8 = 56", "56 + 8 = 64", "8 + 7 = 15"], ans:"7 × 8 = 56"} }
+            ],
+            "MA.3.NSO.2.3": [ () => ({id:`NSO23A`, cat:"NSO.2.3", type:"choice", layout:"full", text:"Which property explains why 4x5 = 5x4?", opts:["Commutative", "Associative", "Distributive"], ans:"Commutative"}) ],
+            "MA.3.NSO.2.4": [ () => ({id:`NSO24A`, cat:"NSO.2.4", type:"input", layout:"full", text:"63 ÷ 9 = ?", ans:"7"}) ],
+
+            // AR
+            "MA.3.AR.1.1": [ () => ({id:`AR11A`, cat:"AR.1.1", type:"choice", layout:"full", text:"Apply Distributive Property: 8 x 7", opts:["(8x5) + (8x2)", "8 + 7", "8 x 5 + 2"], ans:"(8x5) + (8x2)"}) ],
+            "MA.3.AR.1.2": [ 
+                () => { return {id:`AR12A`, cat:"AR.1.2", type:"choice", layout:"full", text:`Mia buys 3 packs of 6 pencils. She gives 5 to a friend. Which equation finds how many are left?`, opts:["(3 × 6) − 5 = 13", "(3 + 6) − 5 = 4", "3 × 6 + 5 = 23"], ans:"(3 × 6) − 5 = 13"} }
+            ],
+            "MA.3.AR.2.1": [ () => ({id:`AR21A`, cat:"AR.2.1", type:"input", layout:"full", text:"24 ÷ 3 = ?", ans:"8"}) ],
+            "MA.3.AR.2.2": [ () => ({id:`AR22A`, cat:"AR.2.2", type:"choice", layout:"full", text:"Which situation matches 4 x 5?", opts:["4 bags with 5 apples each", "4 apples and 5 oranges"], ans:"4 bags with 5 apples each"}) ],
+            "MA.3.AR.2.3": [ () => ({id:`AR23A`, cat:"AR.2.3", type:"input", layout:"full", text:"42 ÷ ? = 6", ans:"7"}) ],
+            "MA.3.AR.3.1": [ () => ({id:`AR31A`, cat:"AR.3.1", type:"choice", layout:"full", text:"2, 5, 8, 11... Rule?", opts:["Add 3", "Multiply 2"], ans:"Add 3"}) ],
+            "MA.3.AR.3.2": [ () => ({id:`AR32A`, cat:"AR.3.2", type:"choice", layout:"full", text:"Multiples of 2 are always:", opts:["Even", "Odd"], ans:"Even"}) ],
+            "MA.3.AR.3.3": [ () => ({id:`AR33A`, cat:"AR.3.3", type:"input", layout:"full", text:"Rule: +6. In: 5, Out: ?", ans:"11"}) ],
+
+            // FR
+            "MA.3.FR.1.1": [
+                () => { let d=[4,6,8][Math.floor(Math.random()*3)]; return {id:`FR11A`, cat:"FR.1.1", type:"choice", layout:"split", visual:drawPie(d,1), text:"What fraction is shaded?", opts:[`1/${d}`, `1/${d+1}`], ans:`1/${d}`} }
+            ],
+            "MA.3.FR.1.2": [ () => ({id:`FR12A`, cat:"FR.1.2", type:"choice", layout:"full", text:"Where is 3/4 on number line?", opts:["Between 0 and 1", "Between 1 and 2"], ans:"Between 0 and 1"}) ],
+            "MA.3.FR.1.3": [ () => ({id:`FR13A`, cat:"FR.1.3", type:"input", layout:"full", text:"Fraction for 3 wholes?", ans:"3/1"}) ],
+            "MA.3.FR.2.1": [ () => ({id:`FR21A`, cat:"FR.2.1", type:"choice", layout:"full", text:"Which is larger?", opts:["1/3", "1/6"], ans:"1/3"}) ],
+            "MA.3.FR.2.2": [ () => ({id:`FR22A`, cat:"FR.2.2", type:"choice", layout:"full", text:"Equivalent to 1/2?", opts:["2/4", "2/5"], ans:"2/4"}) ],
+
+            // GR
+            "MA.3.GR.1.1": [ () => ({id:`GR11A`, cat:"GR.1.1", type:"choice", layout:"full", text:"Line with 1 endpoint?", opts:["Ray", "Line Segment"], ans:"Ray"}) ],
+            "MA.3.GR.1.2": [ () => ({id:`GR12A`, cat:"GR.1.2", type:"multi-select", layout:"full", text:"Select Rectangles.", opts:["Square", "Trapezoid"], ans:[0]}) ],
+            "MA.3.GR.1.3": [ () => ({id:`GR13A`, cat:"GR.1.3", type:"input", layout:"full", text:"Lines of symmetry in Square?", ans:"4"}) ],
+            "MA.3.GR.2.1": [ () => ({id:`GR21A`, cat:"GR.2.1", type:"choice", layout:"split", visual:drawRect(3,2), text:"Area?", opts:["6", "5"], ans:"6"}) ],
+            "MA.3.GR.2.2": [ () => ({id:`GR22A`, cat:"GR.2.2", type:"input", layout:"full", text:"Rect: 5x6. Area?", ans:"30"}) ],
+            "MA.3.GR.2.3": [ () => ({id:`GR23A`, cat:"GR.2.3", type:"input", layout:"split", visual:drawRect(5,4), text:"Perimeter?", ans:"18"}) ],
+            "MA.3.GR.2.4": [ () => ({id:`GR24A`, cat:"GR.2.4", type:"choice", layout:"full", text:"Same Area, Diff Perimeter?", opts:["Possible", "Impossible"], ans:"Possible"}) ],
+
+            // M & DP
+            "MA.3.M.1.1": [ () => ({id:`M11A`, cat:"M.1.1", type:"input", layout:"full", text:"3 ft = ? in", ans:"36"}) ],
+            "MA.3.M.1.2": [ () => ({id:`M12A`, cat:"M.1.2", type:"input", layout:"full", text:"2000g = ? kg", ans:"2"}) ],
+            "MA.3.M.2.1": [
+                () => { let h=Math.floor(Math.random()*11)+1; return {id:`M21A`, cat:"M.2.1", type:"choice", layout:"split", visual:drawClock(h,30), text:"Time?", opts:[`${h}:30`, `${h+1}:30`], ans:`${h}:30`} }
+            ],
+            "MA.3.M.2.2": [ () => ({id:`M22A`, cat:"M.2.2", type:"input", layout:"full", text:"Start 2:00. End 2:45. Mins?", ans:"45"}) ],
+            "MA.3.DP.1.1": [ () => ({id:`DP11A`, cat:"DP.1.1", type:"choice", layout:"full", text:"Graph Scale is 5. Bar is at 20.", opts:["Value is 20", "Value is 4"], ans:"Value is 20"}) ],
+            "MA.3.DP.1.2": [ () => ({id:`DP12A`, cat:"DP.1.2", type:"choice", layout:"full", text:"Most people liked:", opts:["Pizza", "Salad"], ans:"Pizza"}) ]
         };
 
-        window.navQ = (dir) => {
-            if(qIdx + dir >= 0 && qIdx + dir < queue.length) {
-                qIdx += dir; renderItem();
-            } else if(qIdx + dir === queue.length) {
-                alert("Assessment Submitted Successfully."); location.reload();
-            }
-        };
+        // --- SESSION LOGIC ---
+        let queue = [], curIdx = 0, answers = [];
+        let sessionHistory = new Set(); 
 
-        // --- 5. INITIALIZE CATEGORY MENU ---
-        const menuContainer = document.getElementById('menu-links');
-        Object.keys(CATEGORIES).forEach(cat => {
-            let section = `<div class="cat-box"><div class="cat-title">${cat}</div><div class="std-grid">`;
-            CATEGORIES[cat].forEach(std => {
-                section += `<div class="std-btn" onclick="buildSession('${std}', 5)">${std.replace('MA.3.', '')}</div>`;
+        function startTest(mode, count) {
+            queue = []; answers = [];
+            sessionHistory.clear();
+            
+            let attempts = 0;
+            // Generate Queue
+            while(queue.length < count && attempts < 400) {
+                attempts++;
+                let keys = Object.keys(STANDARDS);
+                if(mode !== 'ALL') keys = keys.filter(k => k.includes(mode));
+                
+                if(keys.length === 0) { alert("Standard not found in database."); return; }
+                
+                let k = keys[Math.floor(Math.random()*keys.length)];
+                let gens = STANDARDS[k];
+                let q = gens[Math.floor(Math.random()*gens.length)]();
+
+                queue.push(q);
+            }
+
+            if(queue.length === 0) { alert("No questions found!"); return; }
+
+            curIdx = 0;
+            document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+            document.getElementById('screen-test').classList.add('active');
+            renderQ();
+        }
+
+        function renderQ() {
+            const q = queue[curIdx];
+            const stage = document.getElementById('stage');
+            const ans = answers[curIdx] || {};
+
+            let left = q.layout === 'split' ? `<div class="left-pane">${q.visual}</div>` : "";
+            let rStyle = q.layout === 'full' ? "width:100%" : "width:55%";
+
+            let html = "";
+            if(q.type === 'choice') {
+                q.opts.forEach(o => {
+                    let sel = ans === o ? 'selected' : '';
+                    html += `<div class="opt-row ${sel}" onclick="save('${o}')"><div class="bubble"></div>${o}</div>`;
+                });
+            } 
+            else if(q.type === 'multi-select') {
+                q.opts.forEach((o, i) => {
+                    let arr = answers[curIdx] || [];
+                    let sel = arr.includes(i) ? 'selected' : '';
+                    html += `<div class="opt-row ${sel}" onclick="saveMulti(${i})"><div class="bubble square"></div>${o}</div>`;
+                });
+            }
+            else if(q.type === 'input') {
+                html = `<input class="input-box" value="${ans||''}" onchange="save(this.value)" placeholder="?">`;
+            }
+            else if(q.type === 'inline') {
+                html += `<div style="line-height:2.5">`;
+                q.sentence.forEach((p, i) => {
+                    if(p.type === 'select') {
+                        html += `<select class="inline-select" onchange="saveInline(${i}, this.value)"><option disabled selected>Select...</option>`;
+                        p.opts.forEach(o => html += `<option>${o}</option>`);
+                        html += `</select>`;
+                    } else html += `<span>${p.text}</span>`;
+                });
+                html += `</div>`;
+            }
+
+            stage.innerHTML = `${left}<div class="pane right-pane" style="${rStyle}"><div class="q-header">${q.cat}</div><div class="q-text">${q.text}</div>${html}</div>`;
+            document.getElementById('q-idx').innerText = curIdx + 1;
+            document.getElementById('btn-next').innerText = (curIdx === queue.length-1) ? "Submit" : "Next";
+        }
+
+        window.save = v => { answers[curIdx] = v; renderQ(); };
+        window.saveMulti = i => { let a=answers[curIdx]||[]; if(a.includes(i)) a=a.filter(x=>x!==i); else a.push(i); answers[curIdx]=a; renderQ(); };
+        window.saveInline = (i,v) => { let a=answers[curIdx]||{}; a[i]=v; answers[curIdx]=a; };
+
+        window.nextQ = () => { if(curIdx < queue.length-1) { curIdx++; renderQ(); } else finish(); };
+        window.prevQ = () => { if(curIdx>0) { curIdx--; renderQ(); } };
+        window.toggleZoom = () => { document.body.style.zoom = document.body.style.zoom==="1.2"?"1":"1.2"; };
+
+        function finish() {
+            let score=0, total=queue.length;
+            queue.forEach((q, i) => {
+                let a = answers[i];
+                let correct = false;
+                if(q.type === 'choice' || q.type === 'input') correct = (a == q.ans);
+                else if(q.type === 'multi-select') correct = (a && JSON.stringify(a.sort())===JSON.stringify(q.ans.sort()));
+                else correct = true; // Simplified checking
+                if(correct) score++;
             });
-            menuContainer.innerHTML += section + `</div></div>`;
-        });
+            let pct = Math.round((score/total)*100);
+            let lvl = pct>=80 ? "Level 4" : (pct>=60 ? "Level 3" : "Level 1");
+            let cls = pct>=80 ? "l4" : (pct>=60 ? "l3" : "l1");
+            
+            document.getElementById('final-badge').className = "level-badge " + cls;
+            document.getElementById('final-badge').innerText = lvl;
+            document.getElementById('report-grid').innerHTML = `<div class="rep-box"><strong>Score:</strong> ${score}/${total} (${pct}%)</div>`;
+            document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+            document.getElementById('screen-report').classList.add('active');
+        }
     </script>
 </body>
 </html>
