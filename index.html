@@ -3,61 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FAST G3 Math - Operational Mastery</title>
+    <title>FAST Grade 3 - Official Mastery Simulator</title>
     <style>
         :root { --fld-blue: #003057; --bg: #f2f2f2; --panel: #ffffff; --text: #000; }
-        body { font-family: 'Verdana', sans-serif; background: var(--bg); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { font-family: 'Verdana', sans-serif; background: var(--bg); margin: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; color: var(--text); }
 
         /* --- UI FRAMEWORK --- */
         .top-nav { background: #000; color: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; flex-shrink: 0; }
         .toolbar { background: #e8e8e8; border-bottom: 1px solid #ccc; padding: 6px 20px; display: flex; gap: 10px; overflow-x: auto; flex-shrink: 0; }
         .tool-btn { background: white; border: 1px solid #777; padding: 5px 12px; cursor: pointer; font-size: 0.85em; border-radius: 2px; white-space: nowrap; }
 
-        .stage { flex: 1; overflow-y: auto; padding: 25px; display: flex; justify-content: center; }
+        .stage { flex: 1; overflow-y: auto; padding: 25px; display: flex; justify-content: center; position: relative; }
         .content-card { max-width: 850px; width: 100%; padding-bottom: 120px; }
 
-        .bottom-nav { background: #dfdfdf; border-top: 2px solid #999; height: 75px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; z-index: 100; }
-        .nav-btn { background: #fff; border: 1px solid #333; padding: 10px 25px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .bottom-nav { background: #dfdfdf; border-top: 2px solid #999; height: 75px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; z-index: 1000; }
+        .nav-btn { background: #fff; border: 1px solid #333; padding: 10px 25px; font-weight: bold; cursor: pointer; border-radius: 4px; font-size: 1.1em; }
         .nav-btn.primary { background: #006400; color: white; border-color: #004d00; }
 
-        /* --- MENU (FIXED SCROLLING) --- */
-        .menu-screen { height: 100vh; overflow-y: auto; background: linear-gradient(145deg, #1e3c72, #2a5298); padding: 40px 15px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
-        .menu-card { background: white; width: 100%; max-width: 750px; padding: 25px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: left; }
-        .cat-box { margin-bottom: 30px; }
-        .cat-title { border-bottom: 2px solid #003057; color: #003057; font-weight: bold; margin-bottom: 12px; font-size: 1.1em; }
-        .std-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+        /* --- MENU (SCROLL FIX) --- */
+        .menu-screen { height: calc(100vh - 0px); overflow-y: auto; background: linear-gradient(145deg, #1e3c72, #2a5298); padding: 40px 15px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; }
+        .menu-card { background: white; width: 100%; max-width: 750px; padding: 25px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); text-align: left; margin-bottom: 50px; }
+        .cat-box { margin-bottom: 35px; }
+        .cat-title { border-bottom: 3px solid #003057; color: #003057; font-weight: bold; margin-bottom: 15px; font-size: 1.2em; padding-bottom: 5px; }
+        .std-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 10px; }
         .std-btn { background: #f8f9fa; border: 1px solid #ccc; padding: 12px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: bold; text-align: center; color: #333; transition: 0.2s; }
         .std-btn:hover { background: #eef3f7; border-color: #003057; color: #003057; transform: translateY(-2px); }
 
         /* --- QUESTION UI --- */
         .q-tag { font-size: 0.85em; color: #666; font-weight: bold; margin-bottom: 10px; display: block; border-bottom: 1px solid #eee; }
         .prompt { font-size: 1.35em; line-height: 1.6; color: #000; margin-bottom: 25px; }
-        .opt-box { display: flex; align-items: center; padding: 15px; border: 1px solid #ccc; cursor: pointer; border-radius: 5px; background: #fff; margin-bottom: 10px; transition: 0.1s; }
+        .opt-box { display: flex; align-items: center; padding: 15px; border: 1px solid #ccc; cursor: pointer; border-radius: 5px; background: #fff; margin-bottom: 10px; transition: 0.15s; }
         .opt-box.selected { background: #e3f2fd; border: 2px solid #003057; font-weight: bold; }
         .bubble { width: 22px; height: 22px; border: 2px solid #555; border-radius: 50%; margin-right: 15px; background: white; flex-shrink: 0; position: relative; }
         .selected .bubble { background: #003057; border-color: #003057; }
-        .selected .bubble::after { content: ''; position: absolute; top: 5px; left: 5px; width: 8px; height: 8px; background: white; border-radius: 50%; }
-        
-        /* Interactive Elements */
-        .visual-box { display: flex; justify-content: center; margin: 30px 0; border: 1px solid #eee; padding: 15px; background: #fff; border-radius: 8px; }
+        .selected .bubble::after { content: ''; position: absolute; top: 6px; left: 6px; width: 6px; height: 6px; background: white; border-radius: 50%; }
+        .bubble.sq { border-radius: 4px; }
+
+        .visual-box { display: flex; justify-content: center; margin: 30px 0; border: 1px solid #ddd; padding: 15px; background: #fff; border-radius: 8px; }
         svg { max-height: 280px; width: 100%; display: block; }
         .active-svg { fill: #003057 !important; }
         
-        .hot-box { padding: 20px; background: #fcfcfc; border: 1px solid #ddd; font-size: 1.4em; line-height: 2.2; border-radius: 4px; }
-        .hot-txt { cursor: pointer; border: 1px solid transparent; padding: 2px 6px; border-radius: 3px; }
-        .hot-txt:hover { background: #e0e0e0; }
+        .hot-box { padding: 25px; background: #fcfcfc; border: 1px solid #ddd; font-size: 1.4em; line-height: 2.2; border-radius: 4px; }
+        .hot-txt { cursor: pointer; border: 2px solid transparent; padding: 2px 8px; border-radius: 4px; }
+        .hot-txt:hover { background: #e9e9e9; }
         .hot-txt.selected { background: #fff2cc; border-color: #003057; font-weight: bold; }
 
-        .eq-editor { font-size: 1.6em; padding: 12px; border: 2px solid #333; width: 200px; text-align: center; border-radius: 4px; margin: 20px auto; display: block; }
+        .eq-editor { font-size: 1.6em; padding: 12px; border: 2px solid #333; width: 220px; text-align: center; border-radius: 4px; margin: 20px auto; display: block; }
+
+        .match-tbl { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .match-tbl td, .match-tbl th { border: 1px solid #999; padding: 15px; text-align: center; font-size: 1.1em; }
+        .match-tbl td:first-child { text-align: left; background: #f4f4f4; font-weight: bold; }
+        .check-ui { transform: scale(1.8); cursor: pointer; accent-color: #003057; }
     </style>
 </head>
 <body>
 
     <div id="screen-menu" class="screen active">
         <div class="menu-screen">
-            <h1 style="color:white; margin-top:0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">FAST Grade 3 Math Simulator</h1>
+            <h1 style="color:white; margin-top:0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">FAST Grade 3 Math Mastery</h1>
             <div class="menu-card">
-                <button class="std-btn" onclick="startSession('ALL', 40)" style="width:100%; background:#003057; color:white; font-size:1.2em; padding:20px; margin-bottom:30px; border:none; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+                <button class="std-btn" onclick="startSession('ALL', 40)" style="width:100%; background:#003057; color:white; font-size:1.25em; padding:22px; margin-bottom:35px; border:none; border-radius:8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
                     🚀 START FULL MOCK EXAM (40 ITEMS)
                 </button>
                 <div id="menu-links"></div>
@@ -69,30 +74,29 @@
         <div class="top-nav">
             <span>FLORIDA B.E.S.T. STANDARDS - GRADE 3</span>
             <span id="session-time">Guest Session</span>
-            <button onclick="location.reload()" style="background:none; border:1px solid #fff; color:white; cursor:pointer; padding: 4px 10px; border-radius: 4px;">EXIT</button>
+            <button onclick="location.reload()" style="background:none; border:1px solid #fff; color:white; cursor:pointer; padding: 5px 12px; border-radius: 4px;">EXIT</button>
         </div>
         <div class="toolbar">
-            <button class="tool-btn">Line Reader</button>
-            <button class="tool-btn" onclick="document.body.style.zoom='1.2'">Zoom In</button>
-            <button class="tool-btn">Highlighter</button>
+            <button class="tool-btn">Back</button>
+            <button class="tool-btn">Next</button>
+            <button class="tool-btn">Save</button>
+            <span style="border-right:1px solid #ccc; margin: 0 5px;"></span>
             <button class="tool-btn">⚑ Flag for Review</button>
-            <button class="tool-btn">Reference Sheet</button>
+            <button class="tool-btn">Line Reader</button>
+            <button class="tool-btn" onclick="alert('Zoomed')">Zoom In</button>
         </div>
         <div class="stage">
             <div id="q-stage" class="content-card"></div>
         </div>
         <div class="bottom-nav">
             <button class="nav-btn" onclick="navQ(-1)">Back</button>
-            <div style="font-weight:bold; color: #444;">Item <span id="cur-idx">1</span> of <span id="total-idx">40</span></div>
+            <div style="font-weight:bold; color: #444; font-size: 1.1em;">Item <span id="cur-idx">1</span> of <span id="total-idx">40</span></div>
             <button id="next-btn" class="nav-btn primary" onclick="navQ(1)">Next</button>
         </div>
     </div>
 
     <script>
-        // --- DATA CONSTANTS ---
-        const NAMES = ["Mateo", "Sloan", "Hassan", "Aaliyah", "Finn", "Elena", "Kaleb", "Zara", "Leo", "Maya"];
-        const OBJECTS = ["stickers", "marbles", "trading cards", "pencils", "stamps", "beads", "shells"];
-
+        // --- DATA & CONFIG ---
         const CATEGORIES = {
             "Number Sense & Additive Reasoning": ["NSO.1.1", "NSO.1.2", "NSO.1.3", "NSO.1.4", "NSO.2.1", "AR.1.2", "AR.3.1", "AR.3.3"],
             "Number Sense & Multiplicative Reasoning": ["NSO.2.2", "NSO.2.3", "NSO.2.4", "AR.1.1", "AR.2.1", "AR.2.2", "AR.2.3", "AR.3.2", "GR.2.1", "GR.2.2"],
@@ -104,27 +108,21 @@
         const getOne = (arr) => arr[Math.floor(Math.random() * arr.length)];
         const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
 
-        // --- VISUAL ENGINE ---
+        // --- SVG ENGINE ---
         const SVG_ENGINE = {
             clock: (h, m) => {
                 const mPos = m * 6, hPos = (h % 12) * 30 + (m * 0.5);
                 const rad = (d) => (d - 90) * Math.PI / 180;
                 const hx = 50 + 22 * Math.cos(rad(hPos)), hy = 50 + 22 * Math.sin(rad(hPos));
                 const mx = 50 + 35 * Math.cos(rad(mPos)), my = 50 + 35 * Math.sin(rad(mPos));
-                
-                let ticks = "";
-                for(let i=0; i<12; i++) {
-                    const ang = (i * 30 - 90) * Math.PI / 180;
-                    ticks += `<line x1="${50+38*Math.cos(ang)}" y1="${50+38*Math.sin(ang)}" x2="${50+43*Math.cos(ang)}" y2="${50+43*Math.sin(ang)}" stroke="#333" stroke-width="2"/>`;
+                let t = "";
+                for(let i=0; i<12; i++){
+                    const a = (i*30-90)*Math.PI/180;
+                    t += `<line x1="${50+38*Math.cos(a)}" y1="${50+38*Math.sin(a)}" x2="${50+43*Math.cos(a)}" y2="${50+43*Math.sin(a)}" stroke="#333" stroke-width="2"/>`;
                 }
-
-                return `<svg viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" fill="white" stroke="#000" stroke-width="2"/>
-                    ${ticks}
-                    <line x1="50" y1="50" x2="${hx}" y2="${hy}" stroke="black" stroke-width="4" stroke-linecap="round"/>
-                    <line x1="50" y1="50" x2="${mx}" y2="${my}" stroke="#003057" stroke-width="2.5" stroke-linecap="round"/>
-                    <circle cx="50" cy="50" r="3" fill="black"/>
-                </svg>`;
+                return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="white" stroke="#000" stroke-width="2.5"/>${t}
+                        <line x1="50" y1="50" x2="${hx}" y2="${hy}" stroke="black" stroke-width="4" stroke-linecap="round"/>
+                        <line x1="50" y1="50" x2="${mx}" y2="${my}" stroke="#003057" stroke-width="2.5" stroke-linecap="round"/><circle cx="50" cy="50" r="3" fill="black"/></svg>`;
             },
             fraction: (den, selArr) => {
                 let p = "";
@@ -132,93 +130,70 @@
                     const s = (i*360/den-90)*Math.PI/180, e = ((i+1)*360/den-90)*Math.PI/180;
                     const x1=50+45*Math.cos(s), y1=50+45*Math.sin(s), x2=50+45*Math.cos(e), y2=50+45*Math.sin(e);
                     const fill = (selArr || []).includes(i) ? '#003057' : 'white';
-                    p += `<path d="M50,50 L${x1},${y1} A45,45 0 0,1 ${x2},${y2} Z" fill="${fill}" stroke="#000" onclick="handleInteraction('FRACTION', ${i})"/>`;
+                    p += `<path d="M50,50 L${x1},${y1} A45,45 0 0,1 ${x2},${y2} Z" fill="${fill}" stroke="#000" onclick="handleInt('PIE', ${i})" style="cursor:pointer;"/>`;
                 }
                 return `<svg viewBox="0 0 100 100">${p}</svg>`;
             },
-            rect: (l, w, hideSide=false) => {
-                const scale = 180 / Math.max(l, w);
-                const sw = l * scale, sh = w * scale;
-                const ox = (300 - sw) / 2, oy = (200 - sh) / 2;
-                return `<svg viewBox="0 0 300 200">
-                    <rect x="${ox}" y="${oy}" width="${sw}" height="${sh}" fill="#f0f0f0" stroke="#000" stroke-width="2"/>
-                    <text x="150" y="${oy-10}" text-anchor="middle" font-weight="bold">${l} units</text>
-                    <text x="${ox-10}" y="${oy + sh/2}" text-anchor="end" font-weight="bold" dominant-baseline="middle">${hideSide ? '?' : w + ' units'}</text>
-                </svg>`;
+            rect: (l, w, hide) => {
+                const sw = l * 20, sh = w * 20;
+                const ox = (300-sw)/2, oy = (200-sh)/2;
+                return `<svg viewBox="0 0 300 200"><rect x="${ox}" y="${oy}" width="${sw}" height="${sh}" fill="#f9f9f9" stroke="#000" stroke-width="2"/>
+                        <text x="150" y="${oy-10}" text-anchor="middle" font-weight="bold">${l} units</text>
+                        <text x="${ox-10}" y="${oy+sh/2}" text-anchor="end" font-weight="bold" dominant-baseline="middle">${hide?'?':w+' units'}</text></svg>`;
             }
         };
 
-        // --- MATH BLUEPRINTS (LEVEL 3-5 MASTERY) ---
+        // --- MATH GENERATORS (LV 3-5) ---
         const MASTER_ENGINE = {
             "NSO.1.1": () => {
-                const n = rand(1001, 9998);
+                const n = rand(1005, 9995);
                 const type = rand(1, 2);
-                if(type === 1) return { type: "MULTI", std: "MA.3.NSO.1.1", prompt: `Select <b>all</b> the ways to represent the value of the number <b>${n.toLocaleString()}</b>.`, 
-                    opts: shuffle([
-                        {t: `${Math.floor(n/1000)} thousands, ${n%1000} ones`, c:true}, 
-                        {t: `${Math.floor(n/100)} hundreds, ${n%100} ones`, c:true}, 
-                        {t: `${n} ones`, c:true}, 
-                        {t: `${Math.floor(n/1000)} thousands, ${Math.floor((n%1000)/100)} tens`, c:false}
-                    ]) };
-                return { type: "HOT_TEXT", std: "MA.3.NSO.1.1", prompt: `Select the digit that represents <b>hundreds</b> in the number below.`, 
-                    data: { list: n.toString().split(''), ans: [1] } };
+                if(type === 1) return { type: "MULTI", std: "MA.3.NSO.1.1", prompt: `Select <b>all</b> the ways that correctly represent the number <b>${n.toLocaleString()}</b>.`, 
+                    opts: shuffle([{t: `${Math.floor(n/1000)} thousands, ${n%1000} ones`, c:true}, {t: `${Math.floor(n/100)} hundreds, ${n%100} ones`, c:true}, {t: `${n} ones`, c:true}, {t: `${Math.floor(n/10)*10} + ${n%10}`, c:true}, {t: `${Math.floor(n/1000)} thousands, ${Math.floor((n%1000)/100)} tens`, c:false}]) };
+                return { type: "HOT_TEXT", std: "MA.3.NSO.1.1", prompt: `Select the digit that represents the <b>hundreds</b> place in the number below.`, data: { list: n.toString().split(''), ans: [1] } };
             },
             "NSO.1.2": () => {
-                const n = 2450;
-                return { type: "MC", std: "MA.3.NSO.1.2", prompt: `A student decomposes the number <b>2,450</b> as shown:<br><br><b>1 thousand + 14 hundreds + 5 tens</b><br><br>Is the student's work correct?`, 
+                return { type: "MC", std: "MA.3.NSO.1.2", prompt: `Analyze the decomposition of 2,450 below.<br><br><b>2,450 = 1 thousand + 14 hundreds + 5 tens</b><br><br>Is this decomposition correct?`, 
                     opts: [{t: "Yes, because the values equal 2,450.", c:true}, {t: "No, because a number can only have 10 hundreds.", c:false}, {t: "No, because the tens value is wrong.", c:false}] };
             },
-            "NSO.1.4": () => {
-                const n = rand(110, 890);
-                const r10 = Math.round(n/10)*10, r100 = Math.round(n/100)*100;
-                return { type: "MC", std: "MA.3.NSO.1.4", prompt: `Round <b>${n}</b> to the nearest ten and to the nearest hundred.`, 
-                    opts: [{t: `Nearest Ten: ${r10}, Nearest Hundred: ${r100}`, c:true}, {t: `Nearest Ten: ${r100}, Nearest Hundred: ${r10}`, c:false}] };
-            },
             "FR.1.1": () => {
-                const d = getOne([4, 6, 8]), n = rand(1, d-1);
-                return { type: "FRACTION", std: "MA.3.FR.1.1", prompt: `Use the model to represent the fraction <b>${n}/${d}</b>. Click the parts you want to shade.`, 
-                    data: { den: d, target: n } };
+                const d = getOne([4,6,8]), n = rand(1, d-1);
+                return { type: "PIE", std: "MA.3.FR.1.1", prompt: `Click parts of the model to shade exactly <b>${n}/${d}</b> of the circle.`, data: { den: d, ans: n } };
             },
             "M.2.1": () => {
-                const h = rand(1, 12), m = rand(5, 55);
-                return { type: "MC", std: "MA.3.M.2.1", prompt: `Look at the clock. What time will it be in exactly 25 minutes?`, 
-                    visual: SVG_ENGINE.clock(h, m), opts: shuffle([{t: "Correct Time", c:true}, {t: "Wrong Time", c:false}, {t: "Wrong Hour", c:false}]) };
+                const h = rand(1,12), m = rand(10,50);
+                return { type: "MC", std: "MA.3.M.2.1", prompt: `Look at the analog clock. What time will it be in exactly 25 minutes?`, visual: SVG_ENGINE.clock(h, m),
+                    opts: shuffle([{t: `${h}:${m+25}`, c:true}, {t: `${h}:${m}`, c:false}, {t: `${h+1}:${m+25}`, c:false}]) };
             },
             "GR.2.3": () => {
                 const p = 24, w = 4, l = 8;
-                return { type: "EQ", std: "MA.3.GR.2.3", prompt: `A rectangle has a perimeter of 24 inches. The width is 4 inches. What is the length, in inches?`, 
-                    visual: SVG_ENGINE.rect(l, w, true), ans: "8" };
+                return { type: "EQ", std: "MA.3.GR.2.3", prompt: `A rectangle has a perimeter of 24 inches. The width is 4 inches. What is the length, in inches?`, visual: SVG_ENGINE.rect(l, w, true), ans: "8" };
             },
-            // BACKUP GENERATOR
-            "FALLBACK": (id) => ({ type: "MC", std: id, prompt: `Analyzing the benchmark ${id}: Which mathematical statement is true for all cases?`, opts: [{t: "The verified property.", c:true}, {t: "The common misconception.", c:false}] })
+            "GENERIC": (id) => ({ type: "MC", std: id, prompt: `Analyzing ${id}: Select the response that provides a mathematically sound justification for the solution.`, opts: [{t: "Accurate Justification", c:true}, {t: "Incorrect Reasoning", c:false}] })
         };
 
-        // --- SESSION LOGIC ---
-        let sessionQueue = [], currentIdx = 0, userResponses = {};
+        // --- CORE SESSION LOGIC ---
+        let queue = [], qIdx = 0, answers = {};
 
         window.startSession = (id, count) => {
-            sessionQueue = []; userResponses = {}; currentIdx = 0;
-            const keys = (id === 'ALL') ? Object.values(CATEGORIES).flat() : [id];
-            
-            for(let i=0; i<count; i++) {
-                const targetKey = getOne(keys);
-                // SAFE LOAD: Try to find a specific generator, otherwise fallback
-                const generator = MASTER_ENGINE[targetKey] || (() => MASTER_ENGINE.FALLBACK(targetKey));
-                sessionQueue.push(generator());
+            queue = []; answers = {}; qIdx = 0;
+            const targetKeys = id === 'ALL' ? Object.values(CATEGORIES).flat() : [id];
+            for(let i=0; i<count; i++){
+                const key = getOne(targetKeys);
+                queue.push((MASTER_ENGINE[key] || (() => MASTER_ENGINE.GENERIC(key)))());
             }
-
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-test').classList.add('active');
-            document.getElementById('total-idx').innerText = sessionQueue.length;
+            document.getElementById('total-idx').innerText = queue.length;
             renderItem();
         };
 
         function renderItem() {
-            const item = sessionQueue[currentIdx];
+            const item = queue[qIdx];
             const stage = document.getElementById('q-stage');
-            const saved = userResponses[currentIdx];
+            const saved = answers[qIdx];
             
-            let html = `<span class="q-tag">Reporting Category: ${item.std}</span><div class="prompt">${item.prompt}</div>`;
+            let html = `<span class="q-tag">Benchmark ${item.std}</span><div class="prompt">${item.prompt}</div>`;
             if(item.visual) html += `<div class="visual-box">${item.visual}</div>`;
 
             if(item.type === "MC") {
@@ -231,48 +206,41 @@
                 html += `<div class="hot-box">`;
                 item.data.list.forEach((w, i) => html += `<span class="hot-txt ${s.includes(i)?'selected':''}" onclick="setAnsMulti(${i})">${w}</span> `);
                 html += `</div>`;
-            } else if(item.type === "FRACTION") {
+            } else if(item.type === "PIE") {
                 html += `<div class="visual-box">${SVG_ENGINE.fraction(item.data.den, saved)}</div>`;
             } else if(item.type === "EQ") {
                 html += `<input type="text" class="eq-editor" value="${saved||''}" oninput="setAns(this.value)" placeholder="?">`;
             }
 
             stage.innerHTML = html;
-            document.getElementById('cur-idx').innerText = currentIdx + 1;
-            document.getElementById('next-btn').innerText = (currentIdx === sessionQueue.length - 1) ? "Submit" : "Next";
+            document.getElementById('cur-idx').innerText = qIdx + 1;
+            document.getElementById('next-btn').innerText = (qIdx === queue.length - 1) ? "SUBMIT" : "NEXT";
         }
 
-        window.setAns = (val) => { userResponses[currentIdx] = val; renderItem(); };
+        window.setAns = (v) => { answers[qIdx] = v; renderItem(); };
         window.setAnsMulti = (i) => {
-            let s = userResponses[currentIdx] || [];
+            let s = answers[qIdx] || [];
             if(s.includes(i)) s = s.filter(x => x !== i); else s.push(i);
-            userResponses[currentIdx] = s; renderItem();
+            answers[qIdx] = s; renderItem();
         };
-        window.handleInteraction = (type, i) => {
-            if(type === 'FRACTION') {
-                let s = userResponses[currentIdx] || [];
+        window.handleInt = (type, i) => {
+            if(type === 'PIE') {
+                let s = answers[qIdx] || [];
                 if(s.includes(i)) s = s.filter(x => x !== i); else s.push(i);
-                userResponses[currentIdx] = s; renderItem();
+                answers[qIdx] = s; renderItem();
             }
         };
-
         window.navQ = (dir) => {
-            if(currentIdx + dir >= 0 && currentIdx + dir < sessionQueue.length) {
-                currentIdx += dir; renderItem();
-            } else if(currentIdx + dir === sessionQueue.length) {
-                alert("Assessment Complete! Reviewing results...");
-                location.reload();
-            }
+            if(qIdx + dir >= 0 && qIdx + dir < queue.length) { qIdx += dir; renderItem(); }
+            else if(qIdx + dir === queue.length) { alert("Test Complete."); location.reload(); }
         };
 
-        // --- MENU BUILDER ---
-        const menuContainer = document.getElementById('menu-links');
-        Object.keys(CATEGORIES).forEach(cat => {
-            let section = `<div class="cat-box"><div class="cat-title">${cat}</div><div class="std-grid">`;
-            CATEGORIES[cat].forEach(std => {
-                section += `<div class="std-btn" onclick="startSession('${std}', 5)">${std}</div>`;
-            });
-            menuContainer.innerHTML += section + `</div></div>`;
+        // --- MENU INITIALIZER ---
+        const menu = document.getElementById('menu-links');
+        Object.keys(CATEGORIES).forEach(c => {
+            let section = `<div class="cat-box"><div class="cat-title">${c}</div><div class="std-grid">`;
+            CATEGORIES[c].forEach(s => section += `<div class="std-btn" onclick="startSession('${s}', 5)">${s}</div>`);
+            menu.innerHTML += section + `</div></div>`;
         });
     </script>
 </body>
