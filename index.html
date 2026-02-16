@@ -3,53 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FAST Grade 3 - Mastery Simulator</title>
+    <title>FAST G3 - High Variance Simulator</title>
     <style>
-        :root { --header: #003057; --bg: #F5F7FA; --active: #003057; --text: #333; }
+        :root { --header: #003057; --bg: #F5F7FA; --active: #003057; --text: #333; --border: #ccc; }
         
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+        body { font-family: 'Segoe UI', 'Verdana', sans-serif; background: var(--bg); margin: 0; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* SCREENS */
+        /* --- UI COMPONENTS --- */
         .screen { display: none; height: 100%; width: 100%; flex-direction: column; }
         .screen.active { display: flex; }
 
+        .top-bar { background: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; font-weight: bold; }
+        
         /* MENU */
-        .menu-container { overflow-y: auto; padding: 20px; text-align: center; background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; min-height: 100%; }
-        .menu-btn { background: white; color: #333; border: none; padding: 15px; margin: 10px auto; width: 100%; max-width: 600px; text-align: left; font-weight: bold; cursor: pointer; border-radius: 4px; display:block; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .menu-btn:hover { background: #eef6fc; color: var(--active); transform: translateY(-2px); }
+        .menu-container { overflow-y: auto; padding: 30px; text-align: center; background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; height: 100%; }
+        .menu-card { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: left; }
+        .menu-card h3 { margin: 0 0 10px 0; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; }
         
-        details { background: rgba(255,255,255,0.1); margin: 10px auto; max-width: 600px; border-radius: 4px; text-align: left; }
-        summary { padding: 15px; cursor: pointer; font-weight: bold; list-style: none; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        summary:after { content: '+'; }
-        details[open] summary:after { content: '-'; }
-        details[open] summary { background: rgba(0,0,0,0.2); }
-        .sub-btn { background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.1); color: white; width: 100%; padding: 12px 20px; text-align: left; cursor: pointer; font-size: 0.9em; }
-        .sub-btn:hover { background: rgba(255,255,255,0.2); }
+        .std-btn { background: white; border: none; padding: 12px; margin: 5px 0; width: 100%; text-align: left; cursor: pointer; border-radius: 4px; font-size: 0.95em; transition: 0.2s; display: flex; justify-content: space-between; }
+        .std-btn:hover { background: #eef6fc; transform: translateX(5px); color: var(--active); font-weight: bold; }
+        .std-btn span { color: #666; font-size: 0.8em; }
 
-        /* TEST AREA */
-        .top-bar { background: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; }
+        /* TEST STAGE */
         .stage { flex: 1; padding: 20px; overflow-y: auto; display: flex; justify-content: center; background: white; }
-        .q-card { width: 100%; max-width: 800px; padding-bottom: 100px; }
+        .q-card { width: 100%; max-width: 850px; padding-bottom: 100px; }
         
-        /* ITEM TYPES */
-        h2 { border-bottom: 1px solid #ccc; padding-bottom: 10px; color: #444; font-size: 1.1em; text-transform: uppercase; }
-        .prompt { font-size: 1.3em; margin-bottom: 20px; line-height: 1.6; }
-        
-        .mc-opt { padding: 15px; border: 1px solid #ddd; margin: 8px 0; cursor: pointer; display: flex; align-items: center; border-radius: 4px; transition: 0.2s; }
-        .mc-opt:hover { background: #f5f5f5; }
-        .mc-opt.selected { background: #e3f2fd; border-color: var(--active); font-weight: bold; }
-        .bubble { width: 20px; height: 20px; border: 2px solid #555; border-radius: 50%; margin-right: 15px; background: white; flex-shrink: 0; }
-        .mc-opt.selected .bubble { background: #003057; border-color: #003057; }
-        .bubble.square { border-radius: 3px; }
+        h2 { border-bottom: 1px solid #ccc; padding-bottom: 10px; color: #444; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; }
+        .prompt { font-size: 1.3em; margin-bottom: 20px; line-height: 1.6; color: #111; }
 
-        .edit-select { font-size: 1.1em; font-weight: bold; padding: 5px; border: 2px solid #333; background: #eef; cursor: pointer; margin: 0 5px; }
+        /* INTERACTION TYPES */
+        .mc-opt { padding: 15px; border: 1px solid #ddd; margin: 10px 0; cursor: pointer; display: flex; align-items: center; border-radius: 5px; transition: 0.2s; background: #fff; }
+        .mc-opt:hover { background: #f0f8ff; border-color: #bbb; }
+        .mc-opt.selected { background: #e3f2fd; border: 2px solid var(--active); font-weight: bold; }
+        .bubble { width: 22px; height: 22px; border: 2px solid #555; border-radius: 50%; margin-right: 15px; background: white; flex-shrink: 0; }
+        .mc-opt.selected .bubble { background: #003057; border-color: #003057; }
+        .bubble.square { border-radius: 4px; }
+
+        .edit-select { font-size: 1.1em; font-weight: bold; padding: 6px 12px; border: 2px solid #333; background: #eef; cursor: pointer; margin: 0 5px; border-radius: 4px; }
+        .eq-input { font-size: 1.5em; padding: 10px; width: 200px; text-align: center; border: 2px solid #333; border-radius: 4px; display: block; margin: 20px auto; }
+
+        .hot-box { font-size: 1.4em; line-height: 2.2; padding: 25px; background: #fafafa; border: 1px solid #ccc; border-radius: 5px; }
+        .hot-span { padding: 4px 6px; margin: 0 2px; cursor: pointer; border-radius: 3px; border: 2px solid transparent; transition: 0.2s; }
+        .hot-span:hover { background: #e0e0e0; }
+        .hot-span.selected { background: #cce5ff; border-color: var(--active); color: #000; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
         /* VISUALS */
-        .visual-container { display: flex; justify-content: center; margin: 20px 0; background: #f9f9f9; padding: 20px; border-radius: 8px; }
-        svg { max-width: 100%; max-height: 300px; }
-        
+        .visual-container { display: flex; justify-content: center; margin: 25px 0; background: #fff; }
+        svg { max-width: 100%; max-height: 350px; }
+        .fraction-slice { fill: white; stroke: #333; stroke-width: 2; cursor: pointer; transition: 0.2s; }
+        .fraction-slice:hover { fill: #eee; }
+        .fraction-slice.active { fill: var(--active); }
+        .bar-col { fill: var(--active); opacity: 0.7; stroke: #333; cursor: pointer; transition: height 0.3s; }
+        .bar-col:hover { opacity: 1; }
+
         /* NAV */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 70px; background: #eee; border-top: 1px solid #999; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; box-sizing: border-box; }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 70px; background: #f4f4f4; border-top: 1px solid #bbb; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; box-sizing: border-box; }
         .nav-btn { padding: 12px 30px; font-weight: bold; cursor: pointer; border: 1px solid #999; background: white; border-radius: 4px; font-size: 1em; }
         .nav-btn.primary { background: var(--active); color: white; border-color: var(--active); }
 
@@ -59,65 +67,87 @@
 
     <div id="screen-menu" class="screen active">
         <div class="menu-container">
-            <h1>FAST Math Mastery</h1>
-            <p>Level 3, 4, & 5 Items Only</p>
+            <h1 style="margin-bottom:10px;">FAST Grade 3 Simulator</h1>
+            <p style="margin-bottom:30px; opacity:0.8;">High-Variance Engine (Levels 3, 4, & 5)</p>
             
-            <button class="menu-btn" onclick="startTest('ALL', 40)">🚀 Start Full Mock Exam (40 Items)</button>
+            <button class="std-btn" onclick="startTest('ALL', 40)" style="text-align:center; display:block; padding:15px; margin-bottom:30px; font-size:1.1em; background:#fff; color:#003057;">
+                <strong>🚀 Start Full Operational Mock (40 Items)</strong>
+            </button>
 
-            <details>
-                <summary>🔢 Number Sense (NSO)</summary>
-                <button class="sub-btn" onclick="startTest('MA.3.NSO.1.1', 5)">NSO.1.1: Place Value</button>
-                <button class="sub-btn" onclick="startTest('MA.3.NSO.1.2', 5)">NSO.1.2: Compose/Decompose</button>
-                <button class="sub-btn" onclick="startTest('MA.3.NSO.1.3', 5)">NSO.1.3: Comparing Numbers</button>
-                <button class="sub-btn" onclick="startTest('MA.3.NSO.1.4', 5)">NSO.1.4: Rounding</button>
-                <button class="sub-btn" onclick="startTest('MA.3.NSO.2.1', 5)">NSO.2.1: Add/Sub (Multi-Step)</button>
-            </details>
+            <div class="menu-card">
+                <h3>🔢 Number Sense (NSO)</h3>
+                <button class="std-btn" onclick="startTest('MA.3.NSO.1.1', 5)">NSO.1.1: Forms of Numbers <span>Lv 3-5</span></button>
+                <button class="std-btn" onclick="startTest('MA.3.NSO.1.2', 5)">NSO.1.2: Compose/Decompose <span>Lv 3-5</span></button>
+                <button class="std-btn" onclick="startTest('MA.3.NSO.1.3', 5)">NSO.1.3: Comparing <span>Lv 3-5</span></button>
+                <button class="std-btn" onclick="startTest('MA.3.NSO.1.4', 5)">NSO.1.4: Rounding <span>Lv 3</span></button>
+                <button class="std-btn" onclick="startTest('MA.3.NSO.2.1', 5)">NSO.2.1: Add/Sub <span>Lv 3-4</span></button>
+            </div>
 
-            <details>
-                <summary>🍕 Fractions (FR)</summary>
-                <button class="sub-btn" onclick="startTest('MA.3.FR.1.1', 5)">FR.1.1: Represent Fractions</button>
-                <button class="sub-btn" onclick="startTest('MA.3.FR.1.2', 5)">FR.1.2: Number Lines</button>
-                <button class="sub-btn" onclick="startTest('MA.3.FR.2.1', 5)">FR.2.1: Comparing Fractions</button>
-            </details>
+            <div class="menu-card">
+                <h3>🍕 Fractions (FR)</h3>
+                <button class="std-btn" onclick="startTest('MA.3.FR.1.1', 5)">FR.1.1: Represent Fractions <span>Lv 2-4</span></button>
+                <button class="std-btn" onclick="startTest('MA.3.FR.1.2', 5)">FR.1.2: Number Lines <span>Lv 3-5</span></button>
+                <button class="std-btn" onclick="startTest('MA.3.FR.2.1', 5)">FR.2.1: Comparing Fractions <span>Lv 3-5</span></button>
+            </div>
 
-            <details>
-                <summary>🧠 Algebraic Reasoning (AR)</summary>
-                <button class="sub-btn" onclick="startTest('MA.3.AR.1.2', 5)">AR.1.2: Two-Step Problems</button>
-                <button class="sub-btn" onclick="startTest('MA.3.AR.2.3', 5)">AR.2.3: Missing Factors</button>
-                <button class="sub-btn" onclick="startTest('MA.3.AR.3.1', 5)">AR.3.1: Patterns</button>
-            </details>
+            <div class="menu-card">
+                <h3>🧠 Algebraic Reasoning (AR)</h3>
+                <button class="std-btn" onclick="startTest('MA.3.AR.1.2', 5)">AR.1.2: Multi-Step Problems <span>Lv 4</span></button>
+                <button class="std-btn" onclick="startTest('MA.3.AR.2.3', 5)">AR.2.3: Missing Factors <span>Lv 4</span></button>
+                <button class="std-btn" onclick="startTest('MA.3.AR.3.1', 5)">AR.3.1: Patterns <span>Lv 3</span></button>
+            </div>
 
-            <details>
-                <summary>📐 Geometry & Data (GR/M/DP)</summary>
-                <button class="sub-btn" onclick="startTest('MA.3.GR.1.2', 5)">GR.1.2: Attributes of Shapes</button>
-                <button class="sub-btn" onclick="startTest('MA.3.M.2.1', 5)">M.2.1: Telling Time</button>
-                <button class="sub-btn" onclick="startTest('MA.3.DP.1.1', 5)">DP.1.1: Graphing</button>
-            </details>
+            <div class="menu-card">
+                <h3>📐 Geom & Data (GR/M/DP)</h3>
+                <button class="std-btn" onclick="startTest('MA.3.GR.1.2', 5)">GR.1.2: Attributes <span>Lv 2-4</span></button>
+                <button class="std-btn" onclick="startTest('MA.3.M.2.1', 5)">M.2.1: Telling Time <span>Lv 3</span></button>
+                <button class="std-btn" onclick="startTest('MA.3.DP.1.1', 5)">DP.1.1: Graphing <span>Lv 3</span></button>
+            </div>
         </div>
     </div>
 
     <div id="screen-test" class="screen">
         <div class="top-bar">
-            <div><strong>Student: Guest</strong> | FAST G3</div>
-            <button onclick="location.reload()" style="background:none; border:1px solid #333; padding:5px 10px; cursor:pointer;">Exit</button>
+            <div>FAST Mathematics G3</div>
+            <button onclick="location.reload()" style="background:none; border:1px solid #333; padding:5px 15px; cursor:pointer; font-weight:bold;">Exit</button>
         </div>
+        
         <div class="stage">
             <div id="q-container" class="q-card"></div>
         </div>
+
         <div class="nav-bar">
             <button class="nav-btn" onclick="prevQ()">Back</button>
-            <div style="font-weight:bold;">Item <span id="q-idx">1</span> of <span id="q-total">0</span></div>
+            <div style="font-weight:bold; color:#555;">Item <span id="q-idx">1</span> of <span id="q-total">0</span></div>
             <button class="nav-btn primary" onclick="nextQ()">Next</button>
         </div>
     </div>
 
     <script>
-        // --- VISUAL DRAWING FUNCTIONS ---
+        // --- UTILITIES ---
+        const uuid = () => Math.random().toString(36).substr(2, 9);
+        const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const randArr = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
 
+        // --- CONTEXT GENERATOR (Names/Objects) ---
+        const CONTEXT = {
+            names: ["Maya", "James", "Sofia", "Liam", "Zara", "Noah", "Elena"],
+            items: ["stickers", "marbles", "books", "trading cards", "shells"],
+            actions: ["collected", "bought", "found", "won"]
+        };
+        function getCtx() {
+            return {
+                name: randArr(CONTEXT.names),
+                item: randArr(CONTEXT.items),
+                action: randArr(CONTEXT.actions)
+            };
+        }
+
+        // --- VISUAL DRAWING FUNCTIONS ---
         function drawClock(h, m) {
             let mAng = m * 6;
-            let hAng = (h % 12) * 30 + (m * 0.5);
-            
+            let hAng = (h % 12) * 30 + (m * 0.5); // Logic for Level 4/5 (Hour hand moves)
             let mRad = (mAng - 90) * Math.PI / 180;
             let hRad = (hAng - 90) * Math.PI / 180;
             
@@ -159,118 +189,135 @@
             </svg>`;
         }
 
-        function drawGraph(vals, max) {
+        function drawGraph(vals, labels, max) {
             let bars = "";
             vals.forEach((v, i) => {
                 let h = (v / max) * 250;
                 let y = 300 - h - 30; 
-                bars += `<rect x="${50 + i*60}" y="${y}" width="40" height="${h}" 
+                bars += `<rect x="${50 + i*70}" y="${y}" width="40" height="${h}" 
                          fill="#003057" stroke="#333" opacity="0.8" onclick="clickGraph(event, ${i}, ${max})" style="cursor:pointer; transition: height 0.3s;"/>`;
             });
+            let lbls = labels.map((l, i) => `<text x="${70 + i*70}" y="290" text-anchor="middle" font-size="12">${l}</text>`).join('');
             return `<svg viewBox="0 0 300 300" style="height:300px; width:100%;">
                 <line x1="30" y1="30" x2="30" y2="270" stroke="#333" stroke-width="2"/>
                 <line x1="30" y1="270" x2="280" y2="270" stroke="#333" stroke-width="2"/>
-                ${bars}
-                <text x="70" y="290" text-anchor="middle">A</text>
-                <text x="130" y="290" text-anchor="middle">B</text>
-                <text x="190" y="290" text-anchor="middle">C</text>
+                ${bars} ${lbls}
             </svg>`;
         }
 
-        // --- GENERATORS ---
-        const uuid = () => Math.random().toString(36).substr(2,9);
-        const randInt = (min,max) => Math.floor(Math.random()*(max-min+1))+min;
-
-        const STANDARDS = {
+        // --- THE GENERATOR ENGINE (BLUEPRINTS) ---
+        // Each standard has multiple independent "Blueprint Functions"
+        
+        const BLUEPRINTS = {
+            
+            // === NSO.1.1 (Read/Write Numbers) ===
             "MA.3.NSO.1.1": [
-                () => { 
-                    let n = randInt(1000,9000);
-                    return { id:uuid(), type:'multi', std:'NSO.1.1 (Lv4)', text:`Select <b>ALL</b> ways to represent <b>${n.toLocaleString()}</b>.`, 
+                // Blueprint 1: Hot Text (Place Value)
+                () => {
+                    let n = randInt(1000, 9999);
+                    let digits = n.toString().split('');
+                    let places = ["thousands", "hundreds", "tens", "ones"];
+                    let target = randInt(0,3);
+                    return { id:uuid(), type:'hot-text', std:'NSO.1.1', text:`Select the digit in the <b>${places[target]}</b> place.`, 
+                        sentence: digits, correctIndices:[target] };
+                },
+                // Blueprint 2: Multi-Select (Expanded/Word Forms - Lv 4)
+                () => {
+                    let n = randInt(2000, 8000);
+                    return { id:uuid(), type:'multi', std:'NSO.1.1', text:`Select <b>all</b> ways to express the number <b>${n.toLocaleString()}</b>.`, 
                         opts: [
                             {txt:`${Math.floor(n/1000)} thousands, ${n%1000} ones`, corr:true},
                             {txt:`${n} ones`, corr:true},
                             {txt:`${Math.floor(n/100)} hundreds`, corr:false},
-                            {txt:`${Math.floor(n/10)} tens, ${n%10} ones`, corr:true}
+                            {txt:`${Math.floor(n/1000)*1000} + ${n%1000}`, corr:true}
+                        ] };
+                },
+                // Blueprint 3: Error Analysis (Lv 5)
+                () => {
+                    let n = 3405;
+                    return { id:uuid(), type:'mc', std:'NSO.1.1', text:`Student A writes ${n} as "3 thousands, 40 hundreds, and 5 ones". <br>Student B writes ${n} as "34 hundreds and 5 ones".<br><br>Which statement is true?`, 
+                        opts: [
+                            {txt:`Only Student B is correct.`, corr:true},
+                            {txt:`Only Student A is correct.`, corr:false},
+                            {txt:`Both students are correct.`, corr:false},
+                            {txt:`Neither student is correct.`, corr:false}
                         ] };
                 }
             ],
+
+            // === NSO.1.2 (Compose/Decompose) ===
             "MA.3.NSO.1.2": [
+                // Blueprint 1: Multi-Select (Flexible Place Value - Lv 4)
                 () => {
-                    return { id:uuid(), type:'mc', std:'NSO.1.2 (Lv4)', text:`Which number is equal to 14 hundreds and 12 tens?`, 
-                        opts:[{txt:"1,520", corr:true}, {txt:"1,412", corr:false}, {txt:"2,600", corr:false}] };
+                    return { id:uuid(), type:'multi', std:'NSO.1.2', text:`Select <b>all</b> values equal to <b>1,500</b>.`,
+                        opts: [ {txt:"15 hundreds",corr:true}, {txt:"1 thousand 5 hundreds",corr:true}, {txt:"150 tens",corr:true}, {txt:"15 tens",corr:false} ] };
+                },
+                // Blueprint 2: Missing Part Equation
+                () => {
+                    let n = randInt(2000, 5000);
+                    return { id:uuid(), type:'eq', std:'NSO.1.2', text:`${n} = 2 thousands + ? hundreds + ${n%100} ones.<br>Find the missing number.`, ans:((n-2000-(n%100))/100).toString() };
                 }
             ],
-            "MA.3.NSO.1.3": [
-                () => {
-                    let a=randInt(1000,9000), b=randInt(1000,9000);
-                    return { id:uuid(), type:'mc', std:'NSO.1.3', text:`Compare ${a} and ${b}.`, 
-                        opts:[{txt:`${a} > ${b}`, corr:a>b}, {txt:`${a} < ${b}`, corr:a<b}, {txt:`${a} = ${b}`, corr:a===b}] };
-                }
-            ],
-            "MA.3.NSO.1.4": [
-                () => {
-                    let n=randInt(100,900);
-                    return { id:uuid(), type:'edit', std:'NSO.1.4', text:`Round <b>${n}</b>.`, template:`Nearest 10: [D1] <br> Nearest 100: [D2]`, 
-                        drops:{ D1:{opts:[Math.round(n/10)*10,(Math.round(n/10)*10)+10],ans:Math.round(n/10)*10}, D2:{opts:[Math.round(n/100)*100, (Math.round(n/100)*100)+100],ans:Math.round(n/100)*100}} };
-                }
-            ],
-            "MA.3.NSO.2.1": [
-                () => {
-                    let a=randInt(1000,5000), b=randInt(1000,4000);
-                    return { id:uuid(), type:'eq', std:'NSO.2.1', text:`${a} + ${b} = ?`, ans:(a+b).toString() };
-                }
-            ],
+
+            // === FR.1.1 (Represent Fractions) ===
             "MA.3.FR.1.1": [
-                () => { 
-                    let d = 8, n = randInt(1,7);
-                    return { id:uuid(), type:'fraction', std:'FR.1.1', text:`Click to shade <b>${n}/${d}</b>.`, total:d, ans:n };
-                }
-            ],
-            "MA.3.FR.1.2": [
+                // Blueprint 1: Interactive Model
                 () => {
-                    return { id:uuid(), type:'mc', std:'FR.1.2', text:'Which fraction is at point P on the number line?', opts:[{txt:'1/4',corr:true}, {txt:'3/4',corr:false}, {txt:'1/2',corr:false}] };
+                    let d = [3,4,6,8][randInt(0,3)];
+                    let n = randInt(1, d-1);
+                    return { id:uuid(), type:'fraction', std:'FR.1.1', text:`Click to shade <b>${n}/${d}</b> of the circle.`, total:d, ans:n };
+                },
+                // Blueprint 2: Word Problem (Set Model)
+                () => {
+                    let c = getCtx();
+                    let total = 8, target = 3;
+                    return { id:uuid(), type:'mc', std:'FR.1.1', text:`${c.name} has ${total} ${c.item}. ${target} of them are blue. What fraction are blue?`, 
+                        opts:[{txt:`${target}/${total}`,corr:true}, {txt:`${total}/${target}`,corr:false}, {txt:`1/${total}`,corr:false}] };
                 }
             ],
-            "MA.3.FR.2.1": [
+
+            // === M.2.1 (Time) ===
+            "MA.3.M.2.1": [
+                 // Blueprint 1: Read Clock (Analog)
                  () => {
-                     return { id:uuid(), type:'edit', std:'FR.2.1', text:'Compare 1/4 and 1/3.', template:'1/4 [D1] 1/3', drops:{D1:{opts:['<','>','='],ans:'<'}} };
+                     let h = randInt(1,12), m = randInt(0,11)*5;
+                     let mStr = m<10?`0${m}`:m;
+                     return { id:uuid(), type:'clock', std:'M.2.1', text:`Select the time shown.`, h:h, m:m, 
+                         opts:[{txt:`${h}:${mStr}`, corr:true}, {txt:`${h+1}:${mStr}`, corr:false}, {txt:`${h>1?h-1:12}:${mStr}`, corr:false}] };
+                 },
+                 // Blueprint 2: Word Problem (AM/PM)
+                 () => {
+                     return { id:uuid(), type:'mc', std:'M.2.1', text:`It is 15 minutes before 4:00 p.m. What time is it?`, 
+                         opts:[{txt:`3:45 p.m.`, corr:true}, {txt:`3:45 a.m.`, corr:false}, {txt:`4:15 p.m.`, corr:false}] };
                  }
             ],
-            "MA.3.AR.1.2": [
-                () => {
-                    let start=50, sub=12, add=5;
-                    return { id:uuid(), type:'eq', std:'AR.1.2', text:`Start with ${start}. Subtract ${sub}. Then add ${add}.`, ans: (start-sub+add).toString() };
-                }
-            ],
-            "MA.3.AR.2.3": [
-                () => {
-                    return { id:uuid(), type:'eq', std:'AR.2.3', text:`Find k: 56 ÷ k = 7`, ans:"8" };
-                }
-            ],
-            "MA.3.AR.3.1": [
-                () => {
-                    return { id:uuid(), type:'mc', std:'AR.3.1', text:'2, 4, 8, 16... Rule?', opts:[{txt:'Multiply by 2',corr:true}, {txt:'Add 2',corr:false}] };
-                }
-            ],
+
+            // === GR.1.2 (Attributes) ===
             "MA.3.GR.1.2": [
+                // Blueprint 1: Select All (Classification)
                 () => {
-                    return { id:uuid(), type:'multi', std:'GR.1.2', text:'Select ALL Quadrilaterals.', opts:[{txt:'Square',corr:true}, {txt:'Triangle',corr:false}, {txt:'Trapezoid',corr:true}] };
-                }
-            ],
-            "MA.3.M.2.1": [
+                    return { id:uuid(), type:'multi', std:'GR.1.2', text:`Select <b>all</b> quadrilaterals that always have 4 right angles.`,
+                        opts:[{txt:"Square",corr:true}, {txt:"Rectangle",corr:true}, {txt:"Rhombus",corr:false}, {txt:"Trapezoid",corr:false}] };
+                },
+                // Blueprint 2: Error Analysis (Lv 5)
                 () => {
-                    let h = randInt(1,12), m = randInt(0,11)*5;
-                    let mStr = m<10?`0${m}`:m;
-                    return { id:uuid(), type:'clock', std:'M.2.1', text:`What time is on the clock?`, h:h, m:m, 
-                        opts:[{txt:`${h}:${mStr}`, corr:true}, {txt:`${h+1}:${mStr}`, corr:false}, {txt:`${h>1?h-1:12}:${mStr}`, corr:false}] };
-                }
-            ],
-            "MA.3.DP.1.1": [
-                () => {
-                    let v = [5, 8, 3];
-                    return { id:uuid(), type:'graph', std:'DP.1.1', text:`Graph: A=5, B=8, C=3.`, max:10, ans:v };
+                    return { id:uuid(), type:'mc', std:'GR.1.2', text:`Student A says: "A square is always a rectangle."<br>Student B says: "A rectangle is always a square."<br>Who is correct?`,
+                        opts:[{txt:"Student A",corr:true}, {txt:"Student B",corr:false}, {txt:"Both",corr:false}] };
                 }
             ]
+        };
+        
+        // Add Generic Generators for others to prevent empty tests
+        const FALLBACK = {
+            "MA.3.NSO.1.3": [ () => ({ id:uuid(), type:'edit', std:'NSO.1.3', text:'Compare 4,502 and 4,520.', template:'4,502 [D1] 4,520', drops:{D1:{opts:['<','>','='],ans:'<'}} }) ],
+            "MA.3.NSO.1.4": [ () => ({ id:uuid(), type:'edit', std:'NSO.1.4', text:'Round 345.', template:'Nearest 10: [D1]', drops:{D1:{opts:['340','350'],ans:'350'}} }) ],
+            "MA.3.NSO.2.1": [ () => ({ id:uuid(), type:'eq', std:'NSO.2.1', text:'3,400 - 1,250 = ?', ans:'2150' }) ],
+            "MA.3.FR.1.2": [ () => ({ id:uuid(), type:'mc', std:'FR.1.2', text:'Where is 3/4 on the number line?', opts:[{txt:'Between 0 and 1',corr:true}, {txt:'Between 1 and 2',corr:false}] }) ],
+            "MA.3.FR.2.1": [ () => ({ id:uuid(), type:'edit', std:'FR.2.1', text:'Compare.', template:'1/3 [D1] 1/8', drops:{D1:{opts:['>','<'],ans:'>'}} }) ],
+            "MA.3.AR.1.2": [ () => ({ id:uuid(), type:'eq', std:'AR.1.2', text:'(4 x 5) + 10 = ?', ans:'30' }) ],
+            "MA.3.AR.2.3": [ () => ({ id:uuid(), type:'eq', std:'AR.2.3', text:'4 x ? = 24', ans:'6' }) ],
+            "MA.3.AR.3.1": [ () => ({ id:uuid(), type:'mc', std:'AR.3.1', text:'2, 5, 8, 11... Rule?', opts:[{txt:'Add 3',corr:true}, {txt:'Add 2',corr:false}] }) ],
+            "MA.3.DP.1.1": [ () => ({ id:uuid(), type:'graph', std:'DP.1.1', text:'Graph: A=2, B=4.', labels:['A','B'], max:5, ans:[2,4] }) ]
         };
 
         // --- ENGINE ---
@@ -278,20 +325,21 @@
 
         function startTest(mode, count) {
             queue=[]; answers={}; curr=0;
-            let keys = Object.keys(STANDARDS);
-            if(mode !== 'ALL') keys = keys.filter(k => k === mode);
+            let targetKeys = Object.keys(BLUEPRINTS).concat(Object.keys(FALLBACK));
             
+            if(mode !== 'ALL') targetKeys = targetKeys.filter(k => k === mode);
+            targetKeys = [...new Set(targetKeys)]; // Remove dupes
+
+            if(targetKeys.length === 0) return alert("Standard not found.");
+
             for(let i=0; i<count; i++) {
-                let k = keys[Math.floor(Math.random()*keys.length)];
-                let gens = STANDARDS[k];
-                if(gens) queue.push(gens[Math.floor(Math.random()*gens.length)]());
+                let k = targetKeys[Math.floor(Math.random()*targetKeys.length)];
+                let gens = BLUEPRINTS[k] || FALLBACK[k];
+                // Randomly pick a blueprint for variety
+                let bp = gens[Math.floor(Math.random()*gens.length)];
+                queue.push(bp());
             }
 
-            if(queue.length===0) {
-                alert("No questions found for this selection yet.");
-                return;
-            }
-            
             document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-test').classList.add('active');
             document.getElementById('q-total').innerText = queue.length;
@@ -302,10 +350,16 @@
             let q = queue[curr];
             let ans = answers[q.id];
             let html = `<h2>${q.std}</h2><div class="prompt">${q.text}</div>`;
-            
-            if(q.type === 'mc' || q.type === 'clock') {
-                q.opts = q.opts || [];
-                if(q.type === 'clock') html += `<div class="visual-container">${drawClock(q.h, q.m)}</div>`;
+
+            // RENDER LOGIC SWITCH
+            if(q.type === 'clock') {
+                html += `<div class="visual-container">${drawClock(q.h, q.m)}</div>`;
+                q.opts.forEach((o, i) => {
+                    let sel = ans === i ? 'selected' : '';
+                    html += `<div class="mc-opt ${sel}" onclick="save(${i})"><div class="bubble"></div>${o.txt}</div>`;
+                });
+            }
+            else if(q.type === 'mc') {
                 q.opts.forEach((o, i) => {
                     let sel = ans === i ? 'selected' : '';
                     html += `<div class="mc-opt ${sel}" onclick="save(${i})"><div class="bubble"></div>${o.txt}</div>`;
@@ -318,8 +372,17 @@
                     html += `<div class="mc-opt ${sel}" onclick="saveMulti(${i})"><div class="bubble square"></div>${o.txt}</div>`;
                 });
             }
+            else if(q.type === 'hot-text') {
+                ans = ans || [];
+                html += `<div class="hot-box">`;
+                q.sentence.forEach((w,i) => {
+                    let sel = ans.includes(i) ? 'selected' : '';
+                    html += `<span class="hot-span ${sel}" onclick="toggleHot(${i})">${w}</span>`;
+                });
+                html += `</div>`;
+            }
             else if(q.type === 'eq') {
-                html += `<input class="edit-select" style="width:150px; font-size:1.5em;" oninput="save(this.value)" value="${ans||''}" placeholder="?">`;
+                html += `<input class="eq-input" oninput="save(this.value)" value="${ans||''}" placeholder="?">`;
             }
             else if(q.type === 'edit') {
                 let t = q.template;
@@ -337,38 +400,31 @@
                 html += `<div class="visual-container">${drawFraction(q.total, ans)}</div>`;
             }
             else if(q.type === 'graph') {
-                ans = ans || [0,0,0];
-                html += `<div class="visual-container">${drawGraph(ans, q.max)}</div><p style="text-align:center">Click bars to set height</p>`;
+                ans = ans || new Array(q.labels.length).fill(0);
+                html += `<div class="visual-container">${drawGraph(ans, q.labels, q.max)}</div><p style="text-align:center">Click bars to set height</p>`;
             }
 
             document.getElementById('q-container').innerHTML = html;
             document.getElementById('q-idx').innerText = curr+1;
         }
 
-        // --- SAVING ---
-        window.save = v => { answers[queue[curr].id] = v; if(queue[curr].type.includes('mc')) render(); };
+        // --- HANDLERS ---
+        window.save = v => { answers[queue[curr].id] = v; if(['mc','clock'].includes(queue[curr].type)) render(); };
         window.saveMulti = i => { 
             let a = answers[queue[curr].id] || [];
             if(a.includes(i)) a=a.filter(x=>x!==i); else a.push(i);
             answers[queue[curr].id]=a; render(); 
         };
-        window.saveDrop = (k,v) => {
-            let a = answers[queue[curr].id] || {};
-            a[k]=v; answers[queue[curr].id]=a;
+        window.toggleHot = i => {
+            let a = answers[queue[curr].id] || [];
+            if(a.includes(i)) a=a.filter(x=>x!==i); else a.push(i);
+            answers[queue[curr].id]=a; render();
         };
-        window.toggleSlice = i => {
-             let a = answers[queue[curr].id] || [];
-             if(a.includes(i)) a=a.filter(x=>x!==i); else a.push(i);
-             answers[queue[curr].id]=a; render();
-        };
-        window.clickGraph = (e, i, max) => {
-             // Simple increment for demo
-             let a = answers[queue[curr].id] || [0,0,0];
-             a[i] = (a[i]+1) % (max+1);
-             answers[queue[curr].id]=a; render();
-        };
+        window.saveDrop = (k,v) => { let a = answers[queue[curr].id] || {}; a[k]=v; answers[queue[curr].id]=a; };
+        window.toggleSlice = i => { let a = answers[queue[curr].id] || []; if(a.includes(i)) a=a.filter(x=>x!==i); else a.push(i); answers[queue[curr].id]=a; render(); };
+        window.clickGraph = (e,i,max) => { let a = answers[queue[curr].id] || new Array(queue[curr].labels.length).fill(0); a[i] = (a[i]+1)%(max+1); answers[queue[curr].id]=a; render(); };
 
-        window.nextQ = () => { if(curr<queue.length-1){curr++; render();} else alert("Done!"); };
+        window.nextQ = () => { if(curr<queue.length-1){curr++; render();} else alert("Complete!"); };
         window.prevQ = () => { if(curr>0){curr--; render();} };
 
     </script>
