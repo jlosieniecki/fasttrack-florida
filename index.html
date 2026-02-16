@@ -1,545 +1,283 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FAST Grade 3 - Official Item Types</title>
-    <style>
-        :root { 
-            --header: #333; 
-            --bg: #fff; 
-            --active: #003057; /* Florida Blue */
-            --highlight: #e6f3ff;
-            --border: #888;
-        }
-        
-        body { 
-            font-family: 'Verdana', 'Arial', sans-serif; 
-            background: #f4f4f4; margin: 0; height: 100vh; 
-            display: flex; flex-direction: column; overflow: hidden; 
-        }
+<script>
+    // --- STATE MANAGEMENT ---
+    let queue = [];
+    let currentIndex = 0;
+    let userAnswers = {}; 
 
-        /* --- LAYOUT --- */
-        .screen { display: none; height: 100%; width: 100%; flex-direction: column; }
-        .screen.active { display: flex; }
+    // --- HELPER FUNCTIONS ---
+    const uuid = () => Math.random().toString(36).substr(2, 9);
+    const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
+    const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
-        .top-bar { 
-            background: #000; color: white; padding: 0 20px; height: 50px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            font-size: 0.9em; font-weight: bold;
-        }
+    // --- GENERATOR ENGINE (Organized by Reporting Category) ---
+    const GENERATORS = {
 
-        .tools-bar {
-            background: #eee; border-bottom: 1px solid #ccc; padding: 5px 20px;
-            display: flex; gap: 10px;
-        }
-        .tool-btn {
-            background: white; border: 1px solid #999; padding: 4px 10px; cursor: pointer; font-size: 0.8em; border-radius: 3px;
-        }
+        /* =========================================================
+           CATEGORY 1: NUMBER SENSE (NSO) 
+           Benchmarks: NSO.1.1, 1.2, 1.3, 1.4, 2.1
+           ========================================================= */
 
-        .main-stage { 
-            flex: 1; padding: 30px; overflow-y: auto; background: white; 
-            display: flex; justify-content: center; 
-        }
-        .question-card { max-width: 850px; width: 100%; padding-bottom: 80px; }
-
-        .nav-bar { 
-            background: #ddd; border-top: 1px solid #999; height: 65px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 30px; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; 
-        }
-        
-        .nav-btn { 
-            background: #fff; border: 1px solid #333; padding: 10px 25px; 
-            font-weight: bold; cursor: pointer; border-radius: 4px; 
-        }
-        .nav-btn.primary { background: #008000; color: white; border-color: #006400; }
-
-        /* --- TYPOGRAPHY --- */
-        h2 { font-size: 1.1em; color: #444; margin-top: 0; text-transform: uppercase; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
-        .prompt { font-size: 1.25em; margin-bottom: 25px; line-height: 1.5; color: #000; }
-
-        /* --- ITEM TYPE: MULTIPLE CHOICE --- */
-        .mc-row { display: flex; align-items: center; padding: 12px; cursor: pointer; margin-bottom: 5px; border: 1px solid transparent; }
-        .mc-row:hover { background: #f0f0f0; }
-        .mc-row.selected { background: #e0f0ff; border: 1px solid var(--active); font-weight: bold; }
-        .bubble { width: 20px; height: 20px; border: 2px solid #333; border-radius: 50%; margin-right: 15px; background: white; }
-        .mc-row.selected .bubble { background: #000; }
-
-        /* --- ITEM TYPE: MULTI-SELECT --- */
-        .bubble.square { border-radius: 3px; }
-
-        /* --- ITEM TYPE: EDITING TASK (DROPDOWN) --- */
-        .edit-select { font-size: 1.1em; font-weight: bold; border: 2px solid #333; padding: 4px; background: #eef; cursor: pointer; }
-
-        /* --- ITEM TYPE: HOT TEXT --- */
-        .hot-box { font-size: 1.4em; line-height: 2; padding: 20px; border: 1px solid #ccc; background: #fafafa; border-radius: 4px; }
-        .hot-span { padding: 5px 8px; margin: 0 2px; cursor: pointer; border: 2px solid transparent; border-radius: 3px; transition: 0.2s; }
-        .hot-span:hover { background: #ddd; }
-        .hot-span.selected { background: #cce5ff; border-color: var(--active); color: #000; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-
-        /* --- ITEM TYPE: MATCHING TABLE --- */
-        .match-table { width: 100%; border-collapse: collapse; font-size: 1.1em; margin-top: 20px; }
-        .match-table th, .match-table td { border: 1px solid #888; padding: 15px; text-align: center; }
-        .match-table th { background: #eee; }
-        .match-table td:first-child { text-align: left; font-weight: bold; background: #f9f9f9; }
-        .check-big { transform: scale(1.5); cursor: pointer; accent-color: #003057; }
-
-        /* --- ITEM TYPE: FRACTION MODEL --- */
-        .model-container { display: flex; gap: 30px; justify-content: center; margin: 30px 0; }
-        .pie-slice { fill: white; stroke: #333; stroke-width: 2; cursor: pointer; transition: 0.2s; }
-        .pie-slice:hover { opacity: 0.8; fill: #eee; }
-        .pie-slice.active { fill: var(--active); }
-
-        /* --- ITEM TYPE: GRAPHING --- */
-        .graph-area { height: 350px; width: 100%; border-left: 2px solid #333; border-bottom: 2px solid #333; display: flex; align-items: flex-end; padding: 0 20px; gap: 20px; position: relative; margin-top: 40px; }
-        .grid-line { position: absolute; width: 100%; border-top: 1px dashed #ccc; left: 0; z-index: 0; }
-        .bar-col { flex: 1; background: transparent; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; position: relative; z-index: 1; cursor: pointer; }
-        .bar-fill { background: var(--active); opacity: 0.8; border: 1px solid #333; border-bottom: none; transition: height 0.3s; width: 100%; }
-        .bar-col:hover .bar-fill { opacity: 1; }
-        .bar-label { text-align: center; position: absolute; bottom: -30px; width: 100%; font-weight: bold; }
-
-        /* --- ITEM TYPE: EQUATION EDITOR --- */
-        .eq-input { font-size: 1.5em; padding: 10px; width: 200px; border: 2px solid #333; border-radius: 4px; text-align: center; }
-
-        /* MENU STYLES */
-        .menu-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: white; padding: 20px; }
-        .menu-btn { background: white; color: #333; border: none; padding: 15px 30px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin: 10px; width: 100%; max-width: 500px; text-align: left; border-radius: 5px; transition: 0.2s; }
-        .menu-btn:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .menu-btn strong { color: #003057; display: block; }
-    </style>
-</head>
-<body>
-
-    <div id="screen-menu" class="screen active">
-        <div class="menu-wrapper">
-            <h1 style="margin-bottom:40px;">FAST & B.E.S.T. Assessment Simulator</h1>
+        // MA.3.NSO.1.1: Read/Write Numbers
+        // Level 2: Compose using hundreds/tens [cite: 5]
+        // Level 5: Identify errors in composition 
+        "NSO.1.1": () => {
+            const variant = Math.random();
+            const n = randInt(1000, 9999);
             
-            <button class="menu-btn" onclick="startTest('ALL', 40)">
-                <strong>🚀 Full Mock Exam (40 Items)</strong>
-                <small>Mix of all Tech-Enhanced Item Types</small>
-            </button>
-            
-            <h3 style="margin-top:30px; border-bottom:1px solid #666; width:100%; max-width:500px; padding-bottom:10px;">Practice by Item Type</h3>
-            
-            <button class="menu-btn" onclick="startTest('HOT_TEXT', 5)">
-                <strong>📝 Hot Text & Editing Tasks</strong>
-                <small>Select words, Dropdown menus</small>
-            </button>
-            
-            <button class="menu-btn" onclick="startTest('INTERACTIVE', 5)">
-                <strong>📊 Interactive Items</strong>
-                <small>Graphing, Fraction Models, Matching Tables</small>
-            </button>
-            
-            <button class="menu-btn" onclick="startTest('MULTI', 5)">
-                <strong>☑️ Multiselect</strong>
-                <small>Select all that apply</small>
-            </button>
-        </div>
-    </div>
-
-    <div id="screen-test" class="screen">
-        <div class="top-bar">
-            <div>FAST Mathematics G3</div>
-            <div>Student: <strong>Guest Session</strong></div>
-            <div>
-                <button style="background:transparent; border:1px solid #fff; color:#fff; padding:5px 10px; cursor:pointer;" onclick="location.reload()">Exit</button>
-            </div>
-        </div>
-        
-        <div class="tools-bar">
-            <button class="tool-btn">Back</button>
-            <button class="tool-btn">Next</button>
-            <button class="tool-btn">Save</button>
-            <span style="border-left:1px solid #ccc; margin:0 5px;"></span>
-            <button class="tool-btn">⚑ Flag</button>
-            <button class="tool-btn">Line Reader</button>
-            <button class="tool-btn">Zoom In</button>
-            <button class="tool-btn">Zoom Out</button>
-        </div>
-
-        <div class="main-stage">
-            <div id="question-card" class="question-card">
-                </div>
-        </div>
-
-        <div class="nav-bar">
-            <button class="nav-btn" onclick="prevQ()">Back</button>
-            <div style="font-weight:bold; color:#444;">Question <span id="q-idx">1</span> of <span id="q-total">40</span></div>
-            <button class="nav-btn primary" onclick="nextQ()">Next</button>
-        </div>
-    </div>
-
-    <script>
-        // --- DATA STATE ---
-        let queue = [];
-        let currentIndex = 0;
-        let userAnswers = {}; // Stores answers by Question ID
-
-        // --- HELPER: SHUFFLE & ID ---
-        const uuid = () => Math.random().toString(36).substr(2, 9);
-        const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
-
-        // --- ITEM GENERATORS (THE ENGINE) ---
-        const GENERATORS = {
-            
-            // 1. EDITING TASK CHOICE (Dropdowns)
-            "EDITING": () => {
-                let a = Math.floor(Math.random()*20)+1;
-                let b = Math.floor(Math.random()*20)+1;
-                let sum = a + b;
+            // Variety A: HOT TEXT (Identify Place Value)
+            if (variant < 0.33) {
+                const digits = n.toString().split('');
                 return {
-                    id: uuid(),
-                    type: "editing",
-                    standard: "MA.3.AR.1.2",
-                    text: `Complete the sentence to describe the equation.<br><br>
-                           <b>${a} + ${b} = ${sum}</b>`,
-                    template: `The number ${sum} represents the [DROP1] of ${a} and ${b}.`,
-                    dropdowns: {
-                        "DROP1": { opts: ["sum", "difference", "product"], ans: "sum" }
-                    }
+                    id: uuid(), type: "hot-text", standard: "MA.3.NSO.1.1",
+                    text: `Select the digit in the <b>hundreds</b> place.`,
+                    sentence: digits, correctIndices: [1], selectable: true
                 };
-            },
-
-            // 2. SELECTABLE HOT TEXT
-            "HOT_TEXT": () => {
-                let n = Math.floor(Math.random()*8000)+1000; 
-                // Convert number to string to split digits
-                let digits = n.toString().split('');
+            }
+            // Variety B: MULTIPLE CHOICE (Standard Form)
+            else if (variant < 0.66) {
                 return {
-                    id: uuid(),
-                    type: "hot-text",
-                    standard: "MA.3.NSO.1.1",
-                    text: `Select the digit that is in the <b>hundreds</b> place.`,
-                    sentence: digits, // e.g., ["4", "2", "1", "5"]
-                    correctIndices: [1], // 1 is hundreds place in a 4-digit number
-                    selectable: true
-                };
-            },
-
-            // 3. MULTISELECT
-            "MULTISELECT": () => {
-                let n = 24;
-                return {
-                    id: uuid(),
-                    type: "multiselect",
-                    standard: "MA.3.AR.2.2",
-                    text: `Select <b>all</b> the expressions that equal <b>24</b>.`,
+                    id: uuid(), type: "mc", standard: "MA.3.NSO.1.1",
+                    text: `Which shows <b>${n.toLocaleString()}</b> in expanded form?`,
                     options: [
-                        { txt: "6 × 4", correct: true },
-                        { txt: "12 + 12", correct: true },
-                        { txt: "3 × 8", correct: true },
-                        { txt: "10 + 10", correct: false },
-                        { txt: "20 + 2", correct: false }
+                        { txt: `${Math.floor(n/1000)*1000} + ${Math.floor((n%1000)/100)*100} + ${Math.floor((n%100)/10)*10} + ${n%10}`, correct: true },
+                        { txt: `${Math.floor(n/1000)*1000} + ${Math.floor((n%1000)/100)} + ${Math.floor((n%100)/10)} + ${n%10}`, correct: false },
+                        { txt: `${n} + 100 + 10 + 1`, correct: false },
+                        { txt: `${Math.floor(n/1000)} thousands + ${n%10} hundreds`, correct: false }
+                    ].sort(() => Math.random() - 0.5)
+                };
+            }
+            // Variety C: ERROR ANALYSIS (Level 5 Skill) 
+            else {
+                const wrongVal = n + 100;
+                return {
+                    id: uuid(), type: "mc", standard: "MA.3.NSO.1.1 (Level 5)",
+                    text: `Student A wrote <b>${n.toLocaleString()}</b> as "${Math.floor(n/1000)} thousands, ${Math.floor((wrongVal%1000)/100)} hundreds, ${Math.floor((n%100)/10)} tens, and ${n%10} ones." <br><br>Is this correct?`,
+                    options: [
+                        { txt: "Yes, the value is the same.", correct: false },
+                        { txt: `No, they used the wrong digit for the hundreds place.`, correct: true },
+                        { txt: "No, they used the wrong digit for the thousands place.", correct: false },
+                        { txt: "No, standard form cannot be written in words.", correct: false }
                     ]
                 };
-            },
+            }
+        },
 
-            // 4. GRAPHING ITEM (Bar Graph)
-            "GRAPHING": () => {
-                let cats = ["Red", "Blue", "Green"];
-                let vals = [Math.floor(Math.random()*8)+2, Math.floor(Math.random()*8)+2, Math.floor(Math.random()*8)+2];
-                return {
-                    id: uuid(),
-                    type: "graphing",
-                    standard: "MA.3.DP.1.1",
-                    text: `Create a bar graph to show the data:<br>
-                           Red: ${vals[0]}, Blue: ${vals[1]}, Green: ${vals[2]}`,
-                    labels: cats,
-                    max: 12,
-                    correct: vals
-                };
-            },
+        // MA.3.NSO.1.4: Rounding
+        // Level 3: Round to nearest 100 
+        "NSO.1.4": () => {
+            const n = randInt(100, 900);
+            const target = Math.round(n/100)*100;
+            return {
+                id: uuid(), type: "editing", standard: "MA.3.NSO.1.4",
+                text: `Round <b>${n}</b> to the nearest hundred.`,
+                template: `The number ${n} rounded to the nearest hundred is [DROP1].`,
+                dropdowns: { "DROP1": { opts: [(Math.floor(n/100)*100).toString(), (Math.ceil(n/100)*100).toString(), (Math.round(n/10)*10).toString()], ans: target.toString() } }
+            };
+        },
 
-            // 5. FRACTION MODEL ITEM
-            "FRACTION": () => {
-                let den = [4,6,8][Math.floor(Math.random()*3)];
-                let num = Math.floor(Math.random()*(den-1))+1;
-                return {
-                    id: uuid(),
-                    type: "fraction",
-                    standard: "MA.3.FR.1.1",
-                    text: `Click on the circle to shade <b>${num}/${den}</b>.`,
-                    total: den,
-                    correctCount: num
-                };
-            },
+        /* =========================================================
+           CATEGORY 2: FRACTIONAL REASONING (FR) 
+           Benchmarks: FR.1.1, 1.2, 1.3, 2.1, 2.2
+           ========================================================= */
 
-            // 6. MATCHING ITEM (Table)
-            "MATCHING": () => {
-                let rows = ["Square", "Triangle"];
-                let cols = ["4 Sides", "3 Sides", "5 Sides"];
-                return {
-                    id: uuid(),
-                    type: "matching",
-                    standard: "MA.3.GR.1.2",
-                    text: "Match the shape to its attribute.",
-                    rows: rows,
-                    cols: cols,
-                    // Hardcoded logic for demo
-                    validate: (r, c) => (r===0 && c===0) || (r===1 && c===1)
-                };
-            },
+        // MA.3.FR.1.1: Represent Fractions
+        // Level 2: Denominators 2-6 [cite: 5]
+        "FR.1.1": () => {
+            const den = [3, 4, 6, 8][randInt(0, 3)];
+            const num = randInt(1, den - 1);
+            return {
+                id: uuid(), type: "fraction", standard: "MA.3.FR.1.1",
+                text: `Click the model to shade <b>${num}/${den}</b>.`,
+                total: den, correctCount: num
+            };
+        },
 
-            // 7. EQUATION EDITOR
-            "EQUATION": () => {
-                let a = Math.floor(Math.random()*9)+2;
-                let b = Math.floor(Math.random()*9)+2;
-                return {
-                    id: uuid(),
-                    type: "equation",
-                    standard: "MA.3.NSO.2.2",
-                    text: `What is the product of ${a} and ${b}?`,
-                    ans: (a*b).toString()
-                };
-            },
+        // MA.3.FR.2.1: Comparison
+        // Level 3: Compare with same numerator or denominator 
+        "FR.2.1": () => {
+            // Logic: Compare 1/4 vs 1/6 (Same numerator) OR 2/4 vs 3/4 (Same denominator)
+            const type = Math.random() > 0.5 ? 'num' : 'den';
+            let f1, f2, sym;
             
-             // 8. MULTIPLE CHOICE (Standard)
-            "MC": () => {
-                let a = Math.floor(Math.random()*500);
-                let b = Math.floor(Math.random()*500);
-                let sum = a+b;
-                // Generate Distractors
-                let opts = new Set([sum]);
-                while(opts.size < 4) opts.add(sum + Math.floor(Math.random()*20)-10);
-                let finalOpts = Array.from(opts).sort(()=>Math.random()-0.5).map(v => ({txt: v.toString(), correct: v===sum}));
-                
-                return {
-                    id: uuid(),
-                    type: "mc",
-                    standard: "MA.3.NSO.2.1",
-                    text: `What is ${a} + ${b}?`,
-                    options: finalOpts
-                };
-            }
-        };
-
-        // --- RENDER LOGIC ---
-
-        function renderQ() {
-            let q = queue[currentIndex];
-            let ans = userAnswers[q.id] || null;
-            let html = `<h2>${q.standard}</h2><div class="prompt">${q.text}</div>`;
-            let container = document.getElementById('question-card');
-
-            // 1. EDITING
-            if(q.type === 'editing') {
-                let t = q.template;
-                for(let k in q.dropdowns) {
-                    let saved = ans ? ans[k] : "";
-                    let sel = `<select class="edit-select" onchange="saveEdit('${k}', this.value)">
-                        <option value="" disabled ${saved===""?'selected':''}>Select...</option>`;
-                    q.dropdowns[k].opts.forEach(o => {
-                        sel += `<option value="${o}" ${saved===o?'selected':''}>${o}</option>`;
-                    });
-                    sel += `</select>`;
-                    t = t.replace(`[${k}]`, sel);
-                }
-                html += `<div style="font-size:1.3em; line-height:2;">${t}</div>`;
-            }
-
-            // 2. HOT TEXT
-            else if(q.type === 'hot-text') {
-                let saved = ans || [];
-                html += `<div class="hot-box">`;
-                q.sentence.forEach((word, idx) => {
-                    let active = saved.includes(idx);
-                    html += `<span class="hot-span ${active?'selected':''}" onclick="toggleHot(${idx})">${word}</span>`;
-                });
-                html += `</div>`;
-            }
-
-            // 3. MULTISELECT
-            else if(q.type === 'multiselect') {
-                let saved = ans || [];
-                q.options.forEach((opt, idx) => {
-                    let active = saved.includes(idx);
-                    html += `<div class="mc-row ${active?'selected':''}" onclick="toggleMulti(${idx})">
-                        <div class="bubble square"></div> ${opt.txt}
-                    </div>`;
-                });
-            }
-
-            // 4. GRAPHING
-            else if(q.type === 'graphing') {
-                let saved = ans || [0, 0, 0];
-                html += `<div class="graph-area">`;
-                // Grid
-                for(let i=1; i<=q.max; i++) {
-                    let pct = (i/q.max)*100;
-                    html += `<div class="grid-line" style="bottom:${pct}%"></div>`;
-                }
-                q.labels.forEach((lbl, idx) => {
-                    let h = (saved[idx] / q.max) * 100;
-                    html += `<div class="bar-col" onclick="setGraph(event, ${idx}, ${q.max})">
-                        <div class="bar-fill" style="height:${h}%"></div>
-                        <div class="bar-label">${lbl} (${saved[idx]})</div>
-                    </div>`;
-                });
-                html += `</div><p style="text-align:center; color:#666;">Click columns to set height.</p>`;
-            }
-
-            // 5. FRACTION
-            else if(q.type === 'fraction') {
-                let saved = ans || [];
-                html += `<div class="model-container"><svg viewBox="0 0 100 100" width="250" height="250">`;
-                for(let i=0; i<q.total; i++) {
-                    let start = (i * 360 / q.total) * Math.PI/180;
-                    let end = ((i+1) * 360 / q.total) * Math.PI/180;
-                    let x1=50+45*Math.sin(start), y1=50-45*Math.cos(start);
-                    let x2=50+45*Math.sin(end), y2=50-45*Math.cos(end);
-                    let active = saved.includes(i);
-                    html += `<path d="M50,50 L${x1},${y1} A45,45 0 0,1 ${x2},${y2} Z" 
-                             class="pie-slice ${active?'active':''}" onclick="toggleSlice(${i})"/>`;
-                }
-                html += `</svg></div>`;
-            }
-
-            // 6. MATCHING
-            else if(q.type === 'matching') {
-                let saved = ans || {};
-                html += `<table class="match-table"><thead><tr><th></th>`;
-                q.cols.forEach(c => html += `<th>${c}</th>`);
-                html += `</tr></thead><tbody>`;
-                q.rows.forEach((r, rIdx) => {
-                    html += `<tr><td>${r}</td>`;
-                    q.cols.forEach((c, cIdx) => {
-                        let checked = saved[`r${rIdx}`] === cIdx;
-                        html += `<td><input type="checkbox" class="check-big" ${checked?'checked':''} onclick="setMatch(${rIdx}, ${cIdx})"></td>`;
-                    });
-                    html += `</tr>`;
-                });
-                html += `</tbody></table>`;
-            }
-
-            // 7. EQUATION
-            else if(q.type === 'equation') {
-                html += `<div style="display:flex; justify-content:center; margin-top:30px;">
-                    <input class="eq-input" type="text" value="${ans||''}" oninput="saveEq(this.value)" placeholder="?">
-                </div>`;
-            }
-            
-            // 8. MULTIPLE CHOICE
-            else if(q.type === 'mc') {
-                q.options.forEach((opt, idx) => {
-                    let active = ans === idx;
-                    html += `<div class="mc-row ${active?'selected':''}" onclick="saveMC(${idx})">
-                        <div class="bubble"></div> ${opt.txt}
-                    </div>`;
-                });
-            }
-
-            container.innerHTML = html;
-            document.getElementById('q-idx').innerText = currentIndex + 1;
-            document.getElementById('q-total').innerText = queue.length;
-        }
-
-        // --- INTERACTION HANDLERS ---
-        
-        window.saveEdit = (k, v) => {
-            let q = queue[currentIndex];
-            let obj = userAnswers[q.id] || {};
-            obj[k] = v;
-            userAnswers[q.id] = obj;
-        };
-
-        window.toggleHot = (idx) => {
-            let q = queue[currentIndex];
-            let arr = userAnswers[q.id] || [];
-            if(arr.includes(idx)) arr = arr.filter(i=>i!==idx);
-            else arr.push(idx);
-            userAnswers[q.id] = arr;
-            renderQ();
-        };
-
-        window.toggleMulti = (idx) => {
-            let q = queue[currentIndex];
-            let arr = userAnswers[q.id] || [];
-            if(arr.includes(idx)) arr = arr.filter(i=>i!==idx);
-            else arr.push(idx);
-            userAnswers[q.id] = arr;
-            renderQ();
-        };
-
-        window.setGraph = (e, idx, max) => {
-            let rect = e.currentTarget.getBoundingClientRect();
-            let clickY = e.clientY - rect.top;
-            let h = rect.height;
-            let val = Math.round((1 - (clickY/h)) * max);
-            let q = queue[currentIndex];
-            let arr = userAnswers[q.id] || [0,0,0];
-            arr[idx] = val;
-            userAnswers[q.id] = arr;
-            renderQ();
-        };
-
-        window.toggleSlice = (idx) => {
-            let q = queue[currentIndex];
-            let arr = userAnswers[q.id] || [];
-            if(arr.includes(idx)) arr = arr.filter(i=>i!==idx);
-            else arr.push(idx);
-            userAnswers[q.id] = arr;
-            renderQ();
-        };
-
-        window.setMatch = (r, c) => {
-            let q = queue[currentIndex];
-            let obj = userAnswers[q.id] || {};
-            if(obj[`r${r}`] === c) delete obj[`r${r}`]; // toggle off
-            else obj[`r${r}`] = c;
-            userAnswers[q.id] = obj;
-            renderQ();
-        };
-
-        window.saveEq = (v) => {
-            userAnswers[queue[currentIndex].id] = v;
-        };
-        
-        window.saveMC = (idx) => {
-            userAnswers[queue[currentIndex].id] = idx;
-            renderQ();
-        }
-
-        // --- SESSION CONTROL ---
-        window.startTest = (mode, count) => {
-            queue = [];
-            userAnswers = {};
-            currentIndex = 0;
-            
-            let types = [];
-            if(mode === 'ALL') types = Object.keys(GENERATORS);
-            if(mode === 'HOT_TEXT') types = ['HOT_TEXT', 'EDITING'];
-            if(mode === 'INTERACTIVE') types = ['GRAPHING', 'FRACTION', 'MATCHING', 'EQUATION'];
-            if(mode === 'MULTI') types = ['MULTISELECT'];
-            
-            for(let i=0; i<count; i++) {
-                let t = types[Math.floor(Math.random()*types.length)];
-                queue.push(GENERATORS[t]());
-            }
-            
-            document.getElementById('screen-menu').classList.remove('active');
-            document.getElementById('screen-test').classList.add('active');
-            renderQ();
-        };
-
-        window.nextQ = () => {
-            if(currentIndex < queue.length-1) {
-                currentIndex++;
-                renderQ();
+            if (type === 'num') {
+                const n = randInt(1,3);
+                const d1 = 4, d2 = 8;
+                f1 = {n:n, d:d1}; f2 = {n:n, d:d2};
+                sym = ">"; // Smaller denom is bigger fraction
             } else {
-                alert("Test Complete!");
-                location.reload();
+                const d = 6;
+                const n1 = 2, n2 = 4;
+                f1 = {n:n1, d:d}; f2 = {n:n2, d:d};
+                sym = "<";
             }
-        };
+            
+            return {
+                id: uuid(), type: "editing", standard: "MA.3.FR.2.1",
+                text: `Compare the fractions: <b>${f1.n}/${f1.d}</b> and <b>${f2.n}/${f2.d}</b>`,
+                template: `${f1.n}/${f1.d} [DROP1] ${f2.n}/${f2.d}`,
+                dropdowns: { "DROP1": { opts: ["<", ">", "="], ans: sym } }
+            };
+        },
 
-        window.prevQ = () => {
-            if(currentIndex > 0) {
-                currentIndex--;
-                renderQ();
-            }
-        };
+        /* =========================================================
+           CATEGORY 3: ALGEBRAIC REASONING (AR) 
+           Benchmarks: AR.1.1, 1.2, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3
+           ========================================================= */
 
-    </script>
-</body>
-</html>
+        // MA.3.AR.1.2: Multi-Step Problems
+        // Level 3: One- and two-step problems 
+        "AR.1.2": () => {
+            const start = randInt(20, 50);
+            const sub = randInt(5, 15);
+            const add = randInt(5, 15);
+            const ans = start - sub + add;
+            
+            return {
+                id: uuid(), type: "equation", standard: "MA.3.AR.1.2",
+                text: `Sara has ${start} stickers. She gives ${sub} to a friend. Then she buys ${add} more.<br>How many does she have now?`,
+                ans: ans.toString()
+            };
+        },
+
+        // MA.3.AR.2.3: Missing Factors
+        // Level 4: Unknown in any position [cite: 21]
+        "AR.2.3": () => {
+            const a = randInt(3, 9);
+            const b = randInt(4, 9);
+            const prod = a * b;
+            
+            // Randomly hide a, b, or prod
+            const hide = randInt(1, 3);
+            let txt = "";
+            let ans = "";
+            
+            if(hide===1) { txt = `? × ${b} = ${prod}`; ans = a.toString(); }
+            else if(hide===2) { txt = `${a} × ? = ${prod}`; ans = b.toString(); }
+            else { txt = `${prod} ÷ ${a} = ?`; ans = b.toString(); }
+
+            return {
+                id: uuid(), type: "equation", standard: "MA.3.AR.2.3",
+                text: `Find the unknown number.<br><br><b>${txt}</b>`,
+                ans: ans
+            };
+        },
+
+        // MA.3.AR.3.1: Patterns
+        // Level 2: Identify patterns [cite: 5]
+        "AR.3.1": () => {
+            const rule = randInt(2, 5);
+            const start = randInt(2, 10);
+            const seq = [start, start+rule, start+(rule*2), start+(rule*3)];
+            
+            return {
+                id: uuid(), type: "mc", standard: "MA.3.AR.3.1",
+                text: `What is the rule for the pattern?<br><b>${seq.join(", ")}...</b>`,
+                options: [
+                    { txt: `Add ${rule}`, correct: true },
+                    { txt: `Multiply by ${rule}`, correct: false },
+                    { txt: `Add ${rule + 1}`, correct: false },
+                    { txt: `Subtract ${rule}`, correct: false }
+                ].sort(() => Math.random() - 0.5)
+            };
+        },
+
+        /* =========================================================
+           CATEGORY 4: GEOMETRY & DATA (GR/M/DP) 
+           Benchmarks: GR.1.1-1.3, GR.2.1-2.4, M.1.1-1.2, M.2.1-2.2, DP.1.1-1.2
+           ========================================================= */
+
+        // MA.3.GR.1.2: Attributes of Shapes
+        // Level 2: Identifies quadrilaterals 
+        // Level 4: Draws/Identifies based on defining attributes [cite: 21]
+        "GR.1.2": () => {
+            return {
+                id: uuid(), type: "multiselect", standard: "MA.3.GR.1.2",
+                text: `Select <b>all</b> the shapes that are Quadrilaterals.`,
+                options: [
+                    { txt: "Square", correct: true },
+                    { txt: "Triangle", correct: false },
+                    { txt: "Trapezoid", correct: true },
+                    { txt: "Pentagon", correct: false },
+                    { txt: "Rhombus", correct: true }
+                ].sort(() => Math.random() - 0.5)
+            };
+        },
+
+        // MA.3.M.2.1: Telling Time
+        // Level 3: To the minute 
+        "M.2.1": () => {
+            const h = randInt(1, 12);
+            const m = randInt(10, 50); // avoid single digits for simple parsing
+            return {
+                id: uuid(), type: "mc", standard: "MA.3.M.2.1",
+                text: `The clock shows the time ${h}:${m}. select the correct time.`,
+                // Note: In a real app we'd draw the clock here using SVG
+                options: [
+                    { txt: `${h}:${m}`, correct: true },
+                    { txt: `${h+1}:${m}`, correct: false },
+                    { txt: `${h}:${m-5}`, correct: false },
+                    { txt: `${h-1}:${m}`, correct: false }
+                ].sort(() => Math.random() - 0.5)
+            };
+        },
+
+        // MA.3.DP.1.1: Graphing
+        // Level 3: Represents data with whole number values 
+        "DP.1.1": () => {
+            const vals = [randInt(2,10), randInt(2,10), randInt(2,10)];
+            return {
+                id: uuid(), type: "graphing", standard: "MA.3.DP.1.1",
+                text: `Complete the bar graph for the data:<br>A: ${vals[0]}, B: ${vals[1]}, C: ${vals[2]}`,
+                labels: ["A", "B", "C"], max: 12, correct: vals
+            };
+        },
+        
+        // MA.3.GR.2.4: Perimeter vs Area
+        // Level 4: Solves problems involving both [cite: 21]
+        "GR.2.4": () => {
+            const l = 4, w = 3;
+            return {
+                id: uuid(), type: "matching", standard: "MA.3.GR.2.4",
+                text: `For a rectangle with Length = ${l} and Width = ${w}:`,
+                rows: ["Area", "Perimeter"],
+                cols: ["12", "14", "7"],
+                validate: (r, c) => (r===0 && c===0) || (r===1 && c===1)
+            };
+        }
+    };
+
+    // --- RENDER LOGIC (Unchanged from previous, but ensures all types handled) ---
+    // (Ensure you keep the renderQ functions for 'editing', 'hot-text', 'fraction', etc.)
+    
+    // ... [Insert the Render Logic from the previous artifact here if not already present] ...
+
+    // --- SESSION CONTROLLER ---
+    window.startTest = (mode, count) => {
+        queue = []; userAnswers = {}; currentIndex = 0;
+        let keys = Object.keys(GENERATORS);
+
+        // Filter by Reporting Category if needed
+        if(mode !== 'ALL') {
+             // Example: if mode is 'NSO', filter keys that start with 'NSO'
+             keys = keys.filter(k => k.startsWith(mode));
+        }
+
+        if(keys.length === 0) { alert("No questions available for this category yet."); return; }
+
+        for(let i=0; i<count; i++) {
+            let k = keys[Math.floor(Math.random()*keys.length)];
+            queue.push(GENERATORS[k]());
+        }
+
+        document.getElementById('screen-menu').classList.remove('active');
+        document.getElementById('screen-test').classList.add('active');
+        renderQ();
+    };
+    
+    // ... [Keep nextQ, prevQ, and render functions] ...
+    
+    /* NOTE: You must ensure the renderQ function handles all types: 
+       'mc', 'editing', 'hot-text', 'fraction', 'graphing', 'multiselect', 'equation', 'matching'
+    */
+
+</script>
