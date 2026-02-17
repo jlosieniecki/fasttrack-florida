@@ -3,383 +3,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florida FAST Math Simulator (Grade 3)</title>
+    <title>Florida FAST Math Simulator (Word Form & Decomp)</title>
     <style>
-        /* --- 1. CAMBIUM AUTHENTIC THEME --- */
-        :root {
-            --fast-bg: #f2f2f2;           /* Light grey background outside the card */
-            --fast-card-bg: #ffffff;      /* White question paper */
-            --fast-text: #000000;
-            --fast-blue: #005ea2;         /* The official selection blue */
-            --fast-hover: #e1f3f8;        /* Light blue hover state */
-            --fast-border: #000000;       /* High contrast borders */
-            --fast-grey-row: #f0f0f0;     /* Alternating table rows */
-        }
+        /* --- GLOBAL STYLES --- */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
+        
+        #dashboard { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .header { text-align: center; margin-bottom: 50px; }
+        .header h1 { color: #005ea2; font-size: 36px; margin-bottom: 10px; }
+        
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; border-top: 5px solid #ccc; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        .card.nso { border-top-color: #005ea2; }
+        
+        /* SIMULATOR STYLES */
+        #simulator-view { display: none; min-height: 100vh; background-color: #f2f2f2; }
+        :root { --fast-blue: #005ea2; --fast-hover: #e1f3f8; --fast-grey-row: #f0f0f0; }
 
-        body {
-            font-family: 'Verdana', 'Arial', sans-serif; /* Standard testing fonts */
-            background-color: var(--fast-bg);
-            margin: 0;
-            padding-bottom: 100px; /* Space for the footer */
-            color: var(--fast-text);
-        }
-
-        /* The "Paper" Area */
         #question-card {
-            max-width: 900px;
-            margin: 40px auto;
-            background: var(--fast-card-bg);
-            padding: 50px;
-            border: 1px solid #ccc;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            min-height: 400px;
+            max-width: 900px; margin: 0 auto; padding: 50px; background: white;
+            border-left: 1px solid #ccc; border-right: 1px solid #ccc; min-height: 600px;
+            padding-bottom: 100px;
         }
 
-        /* Question Stem Text */
-        .question-stem {
-            font-size: 22px;
-            font-weight: normal; /* FAST uses normal weight, not bold, for stems */
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
+        .question-stem { font-size: 22px; margin-bottom: 30px; line-height: 1.6; }
+        .level-badge { display: inline-block; background: #333; color: white; padding: 2px 8px; font-size: 12px; border-radius: 4px; margin-bottom: 10px; }
 
-        /* --- 2. HOT TEXT STYLES --- */
-        .hot-text-container {
-            font-size: 24px;
-            line-height: 2.5;
-            padding: 20px;
-            border: 1px solid #ddd; /* Container box often used in tests */
-            border-radius: 4px;
-        }
+        .option-row { padding: 15px; border: 1px solid #ccc; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; border-radius: 4px; font-size: 18px; }
+        .option-row:hover { background-color: var(--fast-hover); border-color: var(--fast-blue); }
 
-        .hot-spot {
-            padding: 6px 12px;
-            margin: 0 4px;
-            border: 2px solid transparent; /* Invisible border prevents jumping */
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .hot-spot:hover {
-            background-color: var(--fast-hover);
-            border-color: #bcd6ed;
-        }
-
-        .hot-spot.selected {
-            background-color: var(--fast-blue);
-            color: white;
-            border-color: var(--fast-blue);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        /* --- 3. TABLE MATCH STYLES --- */
-        .fast-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 18px;
-        }
-
-        .fast-table th {
-            background-color: #fff;
-            border-bottom: 2px solid #000;
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .fast-table td {
-            padding: 15px;
-            border-bottom: 1px solid #ccc;
-            text-align: center;
-        }
-
-        /* Zebra Striping */
-        .fast-table tr:nth-child(even) { background-color: var(--fast-grey-row); }
-        .fast-table tr:nth-child(odd) { background-color: #fff; }
-
-        .fast-table .row-label {
-            text-align: left;
-            font-weight: bold;
-            padding-left: 20px;
-        }
-
-        /* Custom Radio Button scaling */
-        input[type="radio"].fast-radio {
-            width: 24px;
-            height: 24px;
-            accent-color: var(--fast-blue);
-            cursor: pointer;
-        }
-
-        /* --- 4. EQUATION EDITOR (KEYPAD) --- */
-        .equation-display {
-            width: 100%;
-            max-width: 400px;
-            height: 60px;
-            border: 2px solid #333;
-            font-size: 32px;
-            padding: 10px;
-            margin-bottom: 20px;
-            background: #fff;
-            display: flex;
-            align-items: center;
-        }
-
-        .keypad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            max-width: 300px;
-        }
-
-        .keypad-btn {
-            padding: 15px;
-            font-size: 20px;
-            background: #f8f9fa;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .keypad-btn:active { background: #e2e6ea; }
-        .keypad-btn.action { background: #e1f3f8; border-color: #005ea2; color: #005ea2; }
-
-        /* --- 5. FOOTER BAR --- */
         .fast-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80px;
-            background-color: #e6e6e6;
-            border-top: 1px solid #b3b3b3;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 40px;
-            box-sizing: border-box;
-            z-index: 100;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
+            background-color: #e6e6e6; border-top: 1px solid #b3b3b3;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; z-index: 100;
         }
-
-        .nav-btn {
-            font-size: 18px;
-            padding: 12px 24px;
-            border-radius: 4px;
-            cursor: pointer;
-            border: 1px solid #aaa;
-        }
-
-        .btn-next {
-            background-color: var(--fast-blue);
-            color: white;
-            border: none;
-            font-weight: bold;
-        }
-        
-        .btn-back { background-color: white; color: #333; }
-
+        .nav-btn { font-size: 18px; padding: 12px 24px; border-radius: 4px; cursor: pointer; border: 1px solid #aaa; }
+        .btn-next { background-color: var(--fast-blue); color: white; border: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div id="question-card">
+    <div id="dashboard">
+        <div class="header">
+            <h1>Florida FAST Math Simulator</h1>
+            <p><strong>New Features:</strong> Word Form & Flexible Decomposition</p>
         </div>
 
-    <div class="fast-footer">
-        <button class="nav-btn btn-back" onclick="prevQuestion()">Back</button>
-        <div style="font-weight: bold; font-size: 18px;">Item <span id="q-num">1</span> of 3</div>
-        <button class="nav-btn btn-next" onclick="nextQuestion()">Next</button>
+        <div class="grid-container">
+            <div class="card nso" onclick="startTest('mock')">
+                <h3>Start Mock Assessment</h3>
+                <p>30 Questions • All Standards</p>
+            </div>
+            <div class="card nso" onclick="startTest('NSO')">
+                <h3>Number Sense (NSO)</h3>
+                <p>10 Questions</p>
+                <p>Word Form, Decomposing ("14 hundreds")</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="simulator-view">
+        <div id="question-card"></div>
+        <div class="fast-footer" id="nav-controls">
+            <button class="nav-btn" onclick="exitTest()" style="background: #ddd;">Exit</button>
+            <div style="font-weight: bold; font-size: 18px;">Item <span id="q-num">1</span> of <span id="q-total">10</span></div>
+            <button class="nav-btn btn-next" onclick="nextQuestion()">Next</button>
+        </div>
     </div>
 
     <script>
-        // --- STATE MANAGEMENT ---
-        let currentQuestionIndex = 0;
-        const questions = [];
-
-        // --- 1. GENERATE QUESTIONS (Authentic Logic) ---
-
-        // MA.3.NSO.1.1 - Table Match
-        function generateTableMatch() {
-            const thousands = Math.floor(Math.random() * 9) + 1;
-            const ones = Math.floor(Math.random() * 9) + 1;
-            const fullNumber = (thousands * 1000) + ones; // e.g., 6004
-
-            return {
-                type: 'table_match',
-                standard: 'MA.3.NSO.1.1',
-                text: `The number is **${fullNumber.toLocaleString()}**. Match the value of the digits below.`,
-                contextNumber: fullNumber,
-                rows: [
-                    { label: `The value of the digit ${thousands}`, id: 'r1' },
-                    { label: `The value of the digit ${ones}`, id: 'r2' }
-                ],
-                columns: ["Thousands", "Hundreds", "Ones"]
-            };
+        // --- HELPERS ---
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
         }
 
-        // MA.3.NSO.1.2 - Hot Text
-        function generateHotText() {
-            const target = Math.floor(Math.random() * 800) + 100; // e.g., 482
+        // Simple Number to Words Converter (0 - 9999)
+        function numToWords(n) {
+            const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+            const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+            const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+            
+            if (n === 0) return "zero";
+            
+            let str = '';
+            if (Math.floor(n / 1000) > 0) {
+                str += ones[Math.floor(n / 1000)] + ' thousand ';
+                n %= 1000;
+            }
+            if (Math.floor(n / 100) > 0) {
+                str += ones[Math.floor(n / 100)] + ' hundred ';
+                n %= 100;
+            }
+            if (n > 0) {
+                if (n < 10) str += ones[n];
+                else if (n < 20) str += teens[n - 10];
+                else {
+                    str += tens[Math.floor(n / 10)];
+                    if (n % 10 > 0) str += '-' + ones[n % 10];
+                }
+            }
+            return str.trim();
+        }
+
+        // --- GENERATORS ---
+
+        function startTest(mode) {
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('simulator-view').style.display = 'block';
+            currentQuestions = [];
+            currentIndex = 0;
+            
+            const count = mode === 'mock' ? 30 : 10;
+            for(let i=0; i<count; i++) {
+                // If NSO, rotate through the 3 specific NSO skills
+                if (mode === 'NSO') {
+                    const r = Math.random();
+                    if(r < 0.33) currentQuestions.push(generateWordFormProblem());
+                    else if(r < 0.66) currentQuestions.push(generateFlexibleDecomposition());
+                    else currentQuestions.push(generateTableMatchNSO());
+                } else {
+                    currentQuestions.push(generateWordFormProblem()); // Fallback for demo
+                }
+            }
+            
+            document.getElementById('q-total').innerText = currentQuestions.length;
+            renderQuestion(0);
+        }
+
+        // 1. STANDARD FORM vs WORD FORM GENERATOR
+        function generateWordFormProblem() {
+            const num = Math.floor(Math.random() * 9000) + 1000;
+            const correctText = numToWords(num);
+            
+            // Generate tricky distractors
+            // Distractor 1: Swap tens/ones (e.g. 1234 -> 1243)
+            const d1_num = num + 9; 
+            // Distractor 2: Just wrong digits
+            const d2_num = num + 100;
             
             return {
-                type: 'hot_text',
-                standard: 'MA.3.NSO.1.2',
-                text: `Select the digit in the **tens** place.`,
-                content: target.toString() // "482"
+                type: 'multiple_choice',
+                level: 'Level 4 (Read & Write)',
+                text: `Select the word form for the number <strong>${num.toLocaleString()}</strong>.`,
+                options: shuffle([
+                    correctText,
+                    numToWords(d1_num),
+                    numToWords(d2_num),
+                    numToWords(num + 1000)
+                ])
             };
         }
 
-        // MA.3.FR.1.1 - Equation Editor
-        function generateEquation() {
+        // 2. FLEXIBLE DECOMPOSITION GENERATOR ("Multiple Ways")
+        function generateFlexibleDecomposition() {
+            // Target: e.g., 2,400
+            const thousands = Math.floor(Math.random() * 5) + 2; 
+            const hundreds = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
+            const total = (thousands * 1000) + (hundreds * 100); 
+            
+            // Valid options
+            const opt1 = `${thousands} thousands, ${hundreds} hundreds`; // Standard
+            const opt2 = `${thousands}${hundreds} hundreds`; // Flexible (e.g., 24 hundreds)
+            const opt3 = `${thousands} thousands, ${hundreds}0 tens`; // Flexible (e.g., 2 thousands 40 tens)
+            
+            // Invalid options
+            const dist1 = `${thousands}${hundreds} tens`; // Too small
+            const dist2 = `${thousands} thousands, ${hundreds} ones`; // Too small
+            
             return {
-                type: 'equation',
-                standard: 'MA.3.FR.1.1',
-                text: "What fraction represents the shaded part? Use the keypad to enter your answer.",
-                imagePlaceholder: "[ FRACTION IMAGE ]" // Placeholder for your SVG logic
+                type: 'multi_select',
+                level: 'Level 4 (Flexible Composition)',
+                text: `Select **all** the ways to represent the number <strong>${total.toLocaleString()}</strong>.`,
+                options: shuffle([opt1, opt2, opt3, dist1, dist2])
             };
         }
 
-        // Initialize Test
-        questions.push(generateTableMatch());
-        questions.push(generateHotText());
-        questions.push(generateEquation());
-        
-        // --- 2. RENDERERS ---
+        // 3. TABLE MATCH (Existing)
+        function generateTableMatchNSO() {
+            const val = Math.floor(Math.random() * 9000) + 1000;
+            return {
+                type: 'table_match',
+                level: 'Level 3',
+                text: `The number is **${val.toLocaleString()}**. Match the value of the digits.`,
+                contextNumber: val,
+                rows: [{label: "Value of hundreds", id:'r1'}, {label: "Value of tens", id:'r2'}],
+                columns: ["Thousands", "Hundreds", "Tens", "Ones"]
+            };
+        }
+
+        // --- RENDERERS ---
 
         function renderQuestion(index) {
-            const q = questions[index];
+            currentIndex = index;
+            const q = currentQuestions[index];
             const container = document.getElementById('question-card');
             document.getElementById('q-num').innerText = index + 1;
             
-            let html = `<div class="question-stem">${q.text}</div>`;
+            let badge = q.level ? `<span class="level-badge">${q.level}</span>` : '';
+            let html = `${badge}<div class="question-stem">${q.text}</div>`;
 
-            if (q.type === 'table_match') {
-                html += renderTableMatchHTML(q);
-            } else if (q.type === 'hot_text') {
-                html += renderHotTextHTML(q);
-            } else if (q.type === 'equation') {
-                html += renderEquationHTML(q);
+            if (q.type === 'multiple_choice') {
+                html += `<div>${q.options.map(opt => 
+                    `<div class="option-row"><input type="radio" name="mc" style="margin-right:15px;"> ${opt}</div>`
+                ).join('')}</div>`;
+            } 
+            else if (q.type === 'multi_select') {
+                html += `<div>${q.options.map(opt => 
+                    `<div class="option-row"><input type="checkbox" style="margin-right:15px;"> ${opt}</div>`
+                ).join('')}</div>`;
+            }
+            else if (q.type === 'table_match') {
+                html += `<div style="background:#f9f9f9; padding:10px; margin-bottom:10px;">Number: <strong>${q.contextNumber}</strong></div>
+                <table style="width:100%; border-collapse:collapse; margin-top:20px; font-size:18px;">
+                    <thead><tr><th></th>${q.columns.map(c=>`<th style="border-bottom:2px solid black; padding:15px;">${c}</th>`).join('')}</tr></thead>
+                    <tbody>${q.rows.map((r, i)=>`<tr><td style="text-align:left; padding:15px; border-bottom:1px solid #ccc;">${r.label}</td>
+                    ${q.columns.map(c=>`<td style="padding:15px; border-bottom:1px solid #ccc; text-align:center;"><input type="radio" name="r${i}" style="width:20px; height:20px;"></td>`).join('')}</tr>`).join('')}</tbody>
+                </table>`;
             }
 
             container.innerHTML = html;
         }
 
-        // HTML Generator: Table Match
-        function renderTableMatchHTML(q) {
-            return `
-                <div style="margin-bottom:20px; font-size:20px; background:#f9f9f9; padding:15px; border-left:4px solid var(--fast-blue);">
-                    Reference Number: <strong>${q.contextNumber}</strong>
-                </div>
-                <table class="fast-table">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            ${q.columns.map(col => `<th>${col}</th>`).join('')}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${q.rows.map((row, rIdx) => `
-                            <tr>
-                                <td class="row-label">${row.label}</td>
-                                ${q.columns.map(col => `
-                                    <td>
-                                        <input type="radio" name="row_${rIdx}" class="fast-radio" value="${col}">
-                                    </td>
-                                `).join('')}
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-
-        // HTML Generator: Hot Text
-        function renderHotTextHTML(q) {
-            // Split "482" into ["4", "8", "2"]
-            const digits = q.content.split('');
-            return `
-                <div class="hot-text-container">
-                    ${digits.map((digit, i) => `
-                        <span class="hot-spot" onclick="toggleHotSpot(this)">${digit}</span>
-                    `).join('')}
-                </div>
-                <p style="color:#666; font-size:14px; margin-top:20px;">* Click the correct digit to select it.</p>
-            `;
-        }
-
-        // HTML Generator: Equation Editor
-        function renderEquationHTML(q) {
-            return `
-                <div style="margin-bottom:20px; padding:20px; border:1px dashed #ccc; text-align:center; color:#888;">
-                    ${q.imagePlaceholder}
-                </div>
-                
-                <div class="equation-display" id="eq-display"></div>
-                
-                <div class="keypad">
-                    <button class="keypad-btn" onclick="typeKey('1')">1</button>
-                    <button class="keypad-btn" onclick="typeKey('2')">2</button>
-                    <button class="keypad-btn" onclick="typeKey('3')">3</button>
-                    <button class="keypad-btn" onclick="typeKey('4')">4</button>
-                    <button class="keypad-btn" onclick="typeKey('5')">5</button>
-                    <button class="keypad-btn" onclick="typeKey('6')">6</button>
-                    <button class="keypad-btn" onclick="typeKey('7')">7</button>
-                    <button class="keypad-btn" onclick="typeKey('8')">8</button>
-                    <button class="keypad-btn" onclick="typeKey('9')">9</button>
-                    <button class="keypad-btn action" onclick="typeKey('/')">/</button>
-                    <button class="keypad-btn" onclick="typeKey('0')">0</button>
-                    <button class="keypad-btn action" onclick="backspace()">⌫</button>
-                </div>
-            `;
-        }
-
-        // --- 3. INTERACTION LOGIC ---
-
-        // Hot Text Toggle
-        function toggleHotSpot(el) {
-            // For this specific question (single select), clear others first
-            document.querySelectorAll('.hot-spot').forEach(s => s.classList.remove('selected'));
-            el.classList.add('selected');
-        }
-
-        // Keypad Logic
-        let currentEqValue = "";
-        function typeKey(val) {
-            currentEqValue += val;
-            updateDisplay();
-        }
-        function backspace() {
-            currentEqValue = currentEqValue.slice(0, -1);
-            updateDisplay();
-        }
-        function updateDisplay() {
-            document.getElementById('eq-display').innerText = currentEqValue;
-        }
-
-        // Navigation
         function nextQuestion() {
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
-                currentEqValue = ""; // Reset calculator
-                renderQuestion(currentQuestionIndex);
-            } else {
-                alert("End of Practice Test");
+            if (currentIndex < currentQuestions.length - 1) renderQuestion(currentIndex + 1);
+            else {
+                document.getElementById('question-card').innerHTML = `<h2>Test Complete</h2><button class="nav-btn btn-next" onclick="location.reload()">Return Home</button>`;
+                document.getElementById('nav-controls').style.display = 'none';
             }
         }
-
-        function prevQuestion() {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                currentEqValue = "";
-                renderQuestion(currentQuestionIndex);
-            }
+        
+        function exitTest() {
+            document.getElementById('simulator-view').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
         }
-
-        // Start
-        renderQuestion(0);
-
+        
+        window.onload = function() {
+            document.getElementById('dashboard').style.display = 'block';
+        };
     </script>
 </body>
 </html>
