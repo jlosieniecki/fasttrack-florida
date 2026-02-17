@@ -5,322 +5,305 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Florida FAST Math Simulator (Grade 3)</title>
     <style>
-        /* --- 1. CAMBIUM AUTHENTIC THEME --- */
-        :root {
-            --fast-bg: #f2f2f2;           
-            --fast-card-bg: #ffffff;      
-            --fast-text: #000000;
-            --fast-blue: #005ea2;         
-            --fast-hover: #e1f3f8;        
-            --fast-border: #000000;       
-            --fast-grey-row: #f0f0f0;     
-        }
-
+        /* --- GLOBAL & DASHBOARD STYLES --- */
         body {
-            font-family: 'Verdana', 'Arial', sans-serif;
-            background-color: var(--fast-bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding-bottom: 100px; /* Space for footer */
-            color: var(--fast-text);
+            background-color: #f4f7f6;
+            color: #333;
         }
 
-        /* The "Paper" Area */
+        /* DASHBOARD (HOMEPAGE) */
+        #dashboard {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            color: #005ea2;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        /* CARDS GRID */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border-top: 5px solid #ccc;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        .card h3 { margin-top: 0; color: #444; }
+        .card p { color: #666; font-size: 14px; }
+
+        /* Specific Card Colors */
+        .card.mock { border-top-color: #d9534f; } /* Red for Big Test */
+        .card.nso { border-top-color: #005ea2; }  /* Blue for Number Sense */
+        .card.fr { border-top-color: #5cb85c; }   /* Green for Fractions */
+        .card.ar { border-top-color: #f0ad4e; }   /* Orange for Algebra */
+
+        /* --- SIMULATOR (TEST) STYLES --- */
+        #simulator-view {
+            display: none; /* Hidden by default */
+            height: 100vh;
+            background-color: #f2f2f2; /* Authentic Grey Background */
+        }
+
+        /* CAMBIUM THEME OVERRIDES */
+        :root {
+            --fast-blue: #005ea2;
+            --fast-hover: #e1f3f8;
+            --fast-grey-row: #f0f0f0;
+        }
+
         #question-card {
             max-width: 900px;
             margin: 40px auto;
-            background: var(--fast-card-bg);
+            background: white;
             padding: 50px;
             border: 1px solid #ccc;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             min-height: 400px;
         }
 
-        .question-stem {
-            font-size: 22px;
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
+        .question-stem { font-size: 22px; margin-bottom: 30px; line-height: 1.6; }
 
-        /* --- 2. DYNAMIC IMAGES (FRACTIONS) --- */
-        .fraction-circle {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 2px solid #000;
-            margin: 0 auto 20px auto;
-            /* This is handled by JS dynamically */
-            background: conic-gradient(var(--fast-blue) 0% 0%, white 0% 100%); 
-        }
-
-        /* --- 3. HOT TEXT STYLES --- */
-        .hot-text-container {
-            font-size: 24px;
-            line-height: 2.5;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
+        /* INTERACTIVE ELEMENTS */
         .hot-spot {
-            padding: 6px 12px;
-            margin: 0 4px;
-            border: 2px solid transparent;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
+            padding: 6px 12px; margin: 0 4px; border: 2px solid transparent; border-radius: 4px; cursor: pointer;
         }
+        .hot-spot:hover { background-color: var(--fast-hover); border-color: #bcd6ed; }
+        .hot-spot.selected { background-color: var(--fast-blue); color: white; border-color: var(--fast-blue); }
 
-        .hot-spot:hover {
-            background-color: var(--fast-hover);
-            border-color: #bcd6ed;
-        }
-
-        .hot-spot.selected {
-            background-color: var(--fast-blue);
-            color: white;
-            border-color: var(--fast-blue);
-        }
-
-        /* --- 4. TABLE MATCH STYLES --- */
-        .fast-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 18px;
-        }
-
-        .fast-table th {
-            background-color: #fff;
-            border-bottom: 2px solid #000;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .fast-table td {
-            padding: 15px;
-            border-bottom: 1px solid #ccc;
-            text-align: center;
-        }
-
+        .fast-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 18px; }
+        .fast-table th { border-bottom: 2px solid #000; padding: 15px; }
+        .fast-table td { padding: 15px; border-bottom: 1px solid #ccc; text-align: center; }
         .fast-table tr:nth-child(even) { background-color: var(--fast-grey-row); }
-        .fast-table tr:nth-child(odd) { background-color: #fff; }
 
-        input[type="radio"].fast-radio {
-            width: 24px;
-            height: 24px;
-            accent-color: var(--fast-blue);
-            cursor: pointer;
-        }
-
-        /* --- 5. EQUATION EDITOR (KEYPAD) --- */
-        .equation-display {
-            width: 100%;
-            max-width: 400px;
-            height: 60px;
-            border: 2px solid #333;
-            font-size: 32px;
-            padding: 10px;
-            margin-bottom: 20px;
-            background: #fff;
-            display: flex;
-            align-items: center;
-        }
-
-        .keypad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            max-width: 300px;
-        }
-
-        .keypad-btn {
-            padding: 15px;
-            font-size: 20px;
-            background: #f8f9fa;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .keypad-btn:active { background: #e2e6ea; }
-        .keypad-btn.action { background: #e1f3f8; border-color: #005ea2; color: #005ea2; }
-
-        /* --- 6. FOOTER BAR --- */
+        /* FOOTER */
         .fast-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 80px;
-            background-color: #e6e6e6;
-            border-top: 1px solid #b3b3b3;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 40px;
-            box-sizing: border-box;
-            z-index: 100;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
+            background-color: #e6e6e6; border-top: 1px solid #b3b3b3;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; box-sizing: border-box; z-index: 100;
         }
 
-        .nav-btn {
-            font-size: 18px;
-            padding: 12px 24px;
-            border-radius: 4px;
-            cursor: pointer;
-            border: 1px solid #aaa;
-        }
-
+        .nav-btn { font-size: 18px; padding: 12px 24px; border-radius: 4px; cursor: pointer; border: 1px solid #aaa; }
         .btn-next { background-color: var(--fast-blue); color: white; border: none; font-weight: bold; }
-        .btn-back { background-color: white; color: #333; }
-
-        /* --- 7. REVIEW SCREEN --- */
-        .review-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .review-item {
-            border: 1px solid #ccc;
-            padding: 15px;
-            background: #fff;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .review-item:hover { border-color: var(--fast-blue); background: #f0f8ff; }
-        .status-answered { color: var(--fast-blue); font-weight: bold; }
-        .status-unanswered { color: #d9534f; font-weight: bold; }
 
     </style>
 </head>
 <body>
 
-    <div id="question-card">
+    <div id="dashboard">
+        <div class="header">
+            <h1>Florida FAST Math Simulator</h1>
+            <p>Select a mode to begin practicing.</p>
         </div>
 
-    <div class="fast-footer" id="nav-controls">
-        <button class="nav-btn btn-back" onclick="prevQuestion()">Back</button>
-        <div style="font-weight: bold; font-size: 18px;">
-            Item <span id="q-num">1</span> of <span id="q-total">3</span>
+        <div class="grid-container">
+            <div class="card mock" onclick="startTest('mock')">
+                <h3>Start Mock Assessment</h3>
+                <p>30 Questions • Mixed Standards</p>
+                <p><strong>Simulates the real test experience.</strong></p>
+            </div>
+
+            <div class="card nso" onclick="startTest('NSO')">
+                <h3>Number Sense (NSO)</h3>
+                <p>10 Questions</p>
+                <p>Place value, Rounding, Addition.</p>
+            </div>
+
+            <div class="card fr" onclick="startTest('FR')">
+                <h3>Fractions (FR)</h3>
+                <p>10 Questions</p>
+                <p>Unit fractions, Equivalence, Comparing.</p>
+            </div>
+
+            <div class="card ar" onclick="startTest('AR')">
+                <h3>Algebraic Reasoning (AR)</h3>
+                <p>10 Questions</p>
+                <p>Multiplication, Division, Patterns.</p>
+            </div>
+            
+            <div class="card" style="border-top-color: #666;" onclick="startTest('GR')">
+                <h3>Geometry (GR)</h3>
+                <p>10 Questions</p>
+                <p>Shapes, Area, Perimeter.</p>
+            </div>
         </div>
-        <button class="nav-btn btn-next" onclick="nextQuestion()">Next</button>
+    </div>
+
+    <div id="simulator-view">
+        <div id="question-card">
+            </div>
+
+        <div class="fast-footer" id="nav-controls">
+            <button class="nav-btn" onclick="exitTest()" style="margin-right: auto; background: #ddd;">Exit</button>
+            <button class="nav-btn btn-back" onclick="prevQuestion()">Back</button>
+            <div style="font-weight: bold; font-size: 18px; margin: 0 20px;">
+                Item <span id="q-num">1</span> of <span id="q-total">10</span>
+            </div>
+            <button class="nav-btn btn-next" onclick="nextQuestion()">Next</button>
+        </div>
     </div>
 
     <script>
-        // --- STATE MANAGEMENT ---
-        let currentQuestionIndex = 0;
-        let questions = [];
-        let userAnswers = []; // Stores answers
+        // --- GLOBAL STATE ---
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let userAnswers = [];
 
-        // --- 1. GENERATE QUESTIONS ---
+        // --- 1. TEST LAUNCHER LOGIC ---
 
-        // MA.3.NSO.1.1 - Table Match
-        function generateTableMatch() {
+        function startTest(mode) {
+            // Hide Dashboard, Show Simulator
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('simulator-view').style.display = 'block';
+
+            currentQuestions = [];
+            currentIndex = 0;
+
+            if (mode === 'mock') {
+                // Generate 30 mixed questions
+                for(let i=0; i<30; i++) {
+                    const type = ['NSO', 'FR', 'AR', 'GR'][Math.floor(Math.random() * 4)];
+                    currentQuestions.push(generateQuestionByDomain(type));
+                }
+            } else {
+                // Generate 10 specific domain questions
+                for(let i=0; i<10; i++) {
+                    currentQuestions.push(generateQuestionByDomain(mode));
+                }
+            }
+            
+            userAnswers = new Array(currentQuestions.length).fill(null);
+            document.getElementById('q-total').innerText = currentQuestions.length;
+            renderQuestion(0);
+        }
+
+        function exitTest() {
+            if(confirm("Exit the test? Your progress will be lost.")) {
+                document.getElementById('simulator-view').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+            }
+        }
+
+        // --- 2. QUESTION GENERATORS (ROUTER) ---
+
+        function generateQuestionByDomain(domain) {
+            // Determine which specific standard to generate based on domain
+            if (domain === 'NSO') {
+                return Math.random() > 0.5 ? generateTableMatchNSO11() : generateHotTextNSO12();
+            } else if (domain === 'FR') {
+                return generateFractionEquation();
+            } else if (domain === 'AR') {
+                return generateMultiSelectAR();
+            } else {
+                // Default fallback (Geometry placeholder)
+                return generateTableMatchNSO11(); 
+            }
+        }
+
+        // Standard: MA.3.NSO.1.1 (Table Match)
+        function generateTableMatchNSO11() {
             const thousands = Math.floor(Math.random() * 9) + 1;
             const ones = Math.floor(Math.random() * 9) + 1;
-            const fullNumber = (thousands * 1000) + ones; 
-
+            const fullNumber = (thousands * 1000) + ones;
             return {
                 type: 'table_match',
-                standard: 'MA.3.NSO.1.1',
-                text: `The number is **${fullNumber.toLocaleString()}**. Match the value of the digits below.`,
+                text: `The number is **${fullNumber.toLocaleString()}**. Match the value of the digits.`,
                 contextNumber: fullNumber,
-                rows: [
-                    { label: `The value of the digit ${thousands}`, id: 'r1' },
-                    { label: `The value of the digit ${ones}`, id: 'r2' }
-                ],
+                rows: [{ label: `Digit ${thousands}`, id: 'r1' }, { label: `Digit ${ones}`, id: 'r2' }],
                 columns: ["Thousands", "Hundreds", "Ones"]
             };
         }
 
-        // MA.3.NSO.1.2 - Hot Text
-        function generateHotText() {
-            const target = Math.floor(Math.random() * 800) + 100;
+        // Standard: MA.3.NSO.1.2 (Hot Text)
+        function generateHotTextNSO12() {
+            const num = Math.floor(Math.random() * 800) + 100;
             return {
                 type: 'hot_text',
-                standard: 'MA.3.NSO.1.2',
                 text: `Select the digit in the **tens** place.`,
-                content: target.toString()
+                content: num.toString()
             };
         }
 
-        // MA.3.FR.1.1 - Equation (Dynamic Image)
-        function generateEquation() {
-            const denominator = [2, 3, 4, 6, 8][Math.floor(Math.random() * 5)];
-            const numerator = 1; // Simplest unit fraction for demo
-            
+        // Standard: MA.3.FR.1.1 (Equation Editor)
+        function generateFractionEquation() {
             return {
                 type: 'equation',
-                standard: 'MA.3.FR.1.1',
-                text: "What fraction represents the shaded part? Use the keypad.",
-                num: numerator,
-                den: denominator
+                text: "What fraction represents the shaded part?",
+                num: 1,
+                den: [2,3,4,6,8][Math.floor(Math.random()*5)]
             };
         }
 
-        // Initialize Test
-        questions.push(generateTableMatch());
-        questions.push(generateHotText());
-        questions.push(generateEquation());
-        
-        userAnswers = new Array(questions.length).fill(null);
-        document.getElementById('q-total').innerText = questions.length;
+        // Standard: MA.3.AR.1.2 (Multi-Select)
+        function generateMultiSelectAR() {
+            return {
+                type: 'multi_select',
+                text: "Select **all** the equations that equal 24.",
+                options: [
+                    { text: "4 x 6", id: 'A' },
+                    { text: "12 + 12", id: 'B' },
+                    { text: "30 - 5", id: 'C' }, // Distractor
+                    { text: "8 x 3", id: 'D' }
+                ]
+            };
+        }
 
-        // --- 2. RENDERERS ---
+        // --- 3. RENDERERS (THE VISUALS) ---
 
         function renderQuestion(index) {
-            currentQuestionIndex = index;
-            const q = questions[index];
+            currentIndex = index;
+            const q = currentQuestions[index];
             const container = document.getElementById('question-card');
-            
-            // Show Footer
-            document.getElementById('nav-controls').style.display = 'flex';
             document.getElementById('q-num').innerText = index + 1;
+            document.getElementById('nav-controls').style.display = 'flex'; // Show footer
             
             let html = `<div class="question-stem">${q.text}</div>`;
 
-            if (q.type === 'table_match') {
-                html += renderTableMatchHTML(q, index);
-            } else if (q.type === 'hot_text') {
-                html += renderHotTextHTML(q, index);
-            } else if (q.type === 'equation') {
-                html += renderEquationHTML(q, index);
-            }
+            if (q.type === 'table_match') html += renderTableMatchHTML(q, index);
+            else if (q.type === 'hot_text') html += renderHotTextHTML(q, index);
+            else if (q.type === 'equation') html += renderEquationHTML(q, index);
+            else if (q.type === 'multi_select') html += renderMultiSelectHTML(q, index);
 
             container.innerHTML = html;
-            
-            // Restore keypad value if previously answered
-            if(q.type === 'equation') {
-                currentEqValue = userAnswers[index] || "";
-                document.getElementById('eq-display').innerText = currentEqValue;
-            }
         }
 
+        // HTML Templates
         function renderTableMatchHTML(q, index) {
             return `
-                <div style="margin-bottom:20px; font-size:20px; background:#f9f9f9; padding:15px; border-left:4px solid var(--fast-blue);">
-                    Reference Number: <strong>${q.contextNumber}</strong>
-                </div>
+                <div style="background:#f9f9f9; padding:15px; margin-bottom:20px;">Reference: <strong>${q.contextNumber}</strong></div>
                 <table class="fast-table">
-                    <thead>
-                        <tr><th></th>${q.columns.map(col => `<th>${col}</th>`).join('')}</tr>
-                    </thead>
+                    <thead><tr><th></th>${q.columns.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
                     <tbody>
                         ${q.rows.map((row, rIdx) => `
                             <tr>
-                                <td class="row-label">${row.label}</td>
+                                <td style="text-align:left; font-weight:bold;">${row.label}</td>
                                 ${q.columns.map(col => `
-                                    <td>
-                                        <input type="radio" 
-                                               name="row_${rIdx}" 
-                                               class="fast-radio" 
-                                               value="${col}"
-                                               ${userAnswers[index] && userAnswers[index][`row_${rIdx}`] === col ? 'checked' : ''}
-                                               onchange="saveTableAnswer(${index}, 'row_${rIdx}', '${col}')">
-                                    </td>
+                                    <td><input type="radio" name="r_${rIdx}" class="fast-radio" onchange="saveAnswer(${index}, 'r_${rIdx}', '${col}')"></td>
                                 `).join('')}
                             </tr>
                         `).join('')}
@@ -329,132 +312,74 @@
         }
 
         function renderHotTextHTML(q, index) {
-            const digits = q.content.split('');
-            return `
-                <div class="hot-text-container">
-                    ${digits.map((digit, i) => `
-                        <span class="hot-spot ${userAnswers[index] === i ? 'selected' : ''}" 
-                              onclick="saveHotTextAnswer(${index}, this, ${i})">${digit}</span>
-                    `).join('')}
-                </div>`;
+            return `<div class="hot-text-container" style="font-size:24px; padding:20px; border:1px solid #ccc;">
+                ${q.content.split('').map((char, i) => `
+                    <span class="hot-spot ${userAnswers[index]===i?'selected':''}" onclick="saveHotText(${index}, this, ${i})">${char}</span>
+                `).join('')}
+            </div>`;
         }
 
+        function renderMultiSelectHTML(q, index) {
+            return `<div style="display:flex; flex-direction:column; gap:10px;">
+                ${q.options.map((opt, i) => `
+                    <label style="padding:15px; border:1px solid #ccc; cursor:pointer; display:flex; align-items:center;">
+                        <input type="checkbox" style="width:20px; height:20px; margin-right:15px;" onchange="saveMultiSelect(${index})">
+                        <span style="font-size:18px;">${opt.text}</span>
+                    </label>
+                `).join('')}
+            </div>`;
+        }
+        
         function renderEquationHTML(q, index) {
-            // Dynamic Circle Generator using CSS Conic Gradient
-            const percentage = (q.num / q.den) * 100;
-            
-            return `
-                <div style="text-align:center;">
-                    <div class="fraction-circle" 
-                         style="background: conic-gradient(var(--fast-blue) 0% ${percentage}%, white ${percentage}% 100%);">
-                    </div>
-                    <p style="color:#666; font-size:14px;">(Shaded part: ${q.num} out of ${q.den})</p>
-                </div>
-
-                <div class="equation-display" id="eq-display"></div>
-                <div class="keypad">
-                    <button class="keypad-btn" onclick="typeKey('1')">1</button>
-                    <button class="keypad-btn" onclick="typeKey('2')">2</button>
-                    <button class="keypad-btn" onclick="typeKey('3')">3</button>
-                    <button class="keypad-btn" onclick="typeKey('4')">4</button>
-                    <button class="keypad-btn" onclick="typeKey('5')">5</button>
-                    <button class="keypad-btn" onclick="typeKey('6')">6</button>
-                    <button class="keypad-btn" onclick="typeKey('7')">7</button>
-                    <button class="keypad-btn" onclick="typeKey('8')">8</button>
-                    <button class="keypad-btn" onclick="typeKey('9')">9</button>
-                    <button class="keypad-btn action" onclick="typeKey('/')">/</button>
-                    <button class="keypad-btn" onclick="typeKey('0')">0</button>
-                    <button class="keypad-btn action" onclick="backspace()">⌫</button>
-                </div>`;
+             const pct = (q.num / q.den) * 100;
+             return `<div style="text-align:center;">
+                        <div style="width:150px; height:150px; border-radius:50%; border:2px solid black; margin:0 auto; background:conic-gradient(#005ea2 0% ${pct}%, white ${pct}% 100%);"></div>
+                     </div>
+                     <div style="margin-top:20px; text-align:center;">Enter Answer: <input type="text" style="font-size:20px; padding:10px; width:100px;"></div>`;
         }
 
-        // --- 3. REVIEW SCREEN LOGIC ---
-        function renderReviewScreen() {
-            const container = document.getElementById('question-card');
-            
-            // Hide normal footer
-            document.getElementById('nav-controls').style.display = 'none';
+        // --- 4. NAVIGATION & SAVING ---
 
-            let html = `
-                <div style="border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
-                    <h2>Review Your Answers</h2>
-                    <p>Click any question to return to it.</p>
-                </div>
-                <div class="review-grid">
-                    ${questions.map((q, i) => `
-                        <div class="review-item" onclick="renderQuestion(${i})">
-                            <span>Question ${i+1}</span>
-                            <span class="${userAnswers[i] ? 'status-answered' : 'status-unanswered'}">
-                                ${userAnswers[i] ? 'Answered' : 'Unanswered'}
-                            </span>
-                        </div>
-                    `).join('')}
-                </div>
-                <div style="margin-top: 40px; text-align: right;">
-                    <button class="nav-btn btn-next" style="font-size: 20px; padding: 15px 30px;" onclick="finishTest()">Submit Test</button>
-                </div>
-            `;
-            container.innerHTML = html;
+        function saveAnswer(qIdx, key, val) {
+            if(!userAnswers[qIdx]) userAnswers[qIdx] = {};
+            userAnswers[qIdx][key] = val;
         }
 
-        function finishTest() {
-            document.getElementById('question-card').innerHTML = `
-                <div style="text-align:center; padding: 60px;">
-                    <h1 style="color: var(--fast-blue); font-size: 48px;">Test Submitted</h1>
-                    <p style="font-size: 20px;">Your answers have been recorded.</p>
-                    <button class="nav-btn btn-next" onclick="location.reload()" style="margin-top:20px;">Start New Test</button>
-                </div>
-            `;
-        }
-
-        // --- 4. INTERACTION ---
-
-        function saveTableAnswer(qIndex, rowId, value) {
-            if (!userAnswers[qIndex]) userAnswers[qIndex] = {};
-            userAnswers[qIndex][rowId] = value;
-        }
-
-        function saveHotTextAnswer(qIndex, el, digitIndex) {
-            document.querySelectorAll('.hot-spot').forEach(s => s.classList.remove('selected'));
+        function saveHotText(qIdx, el, val) {
+            // Clear siblings
+            el.parentElement.querySelectorAll('.hot-spot').forEach(s => s.classList.remove('selected'));
             el.classList.add('selected');
-            userAnswers[qIndex] = digitIndex;
+            userAnswers[qIdx] = val;
         }
 
-        let currentEqValue = "";
-        function typeKey(val) {
-            currentEqValue += val;
-            updateDisplay();
-            userAnswers[currentQuestionIndex] = currentEqValue;
-        }
-        function backspace() {
-            currentEqValue = currentEqValue.slice(0, -1);
-            updateDisplay();
-            userAnswers[currentQuestionIndex] = currentEqValue;
-        }
-        function updateDisplay() {
-            document.getElementById('eq-display').innerText = currentEqValue;
-        }
-
-        // --- 5. NAVIGATION ---
         function nextQuestion() {
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
-                renderQuestion(currentQuestionIndex);
+            if (currentIndex < currentQuestions.length - 1) {
+                renderQuestion(currentIndex + 1);
             } else {
-                renderReviewScreen();
+                finishTest();
             }
         }
 
         function prevQuestion() {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                renderQuestion(currentQuestionIndex);
-            }
+            if (currentIndex > 0) renderQuestion(currentIndex - 1);
         }
 
-        // Start
-        renderQuestion(0);
-
+        function finishTest() {
+            // Simple Review Screen
+            const container = document.getElementById('question-card');
+            document.getElementById('nav-controls').style.display = 'none';
+            
+            let html = `<h2>Review Your Answers</h2><div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:10px;">`;
+            
+            currentQuestions.forEach((q, i) => {
+                const status = userAnswers[i] ? "Answered" : "Unanswered";
+                const color = userAnswers[i] ? "#005ea2" : "#d9534f";
+                html += `<div onclick="renderQuestion(${i})" style="padding:10px; border:1px solid #ccc; color:${color}; cursor:pointer;">Q${i+1}: ${status}</div>`;
+            });
+            
+            html += `</div><button onclick="location.reload()" style="margin-top:20px; padding:15px; background:#005ea2; color:white; border:none; font-size:18px; cursor:pointer;">Return to Home</button>`;
+            container.innerHTML = html;
+        }
     </script>
 </body>
 </html>
