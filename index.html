@@ -3,158 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florida FAST B.E.S.T. Simulator 4.0</title>
+    <title>Florida FAST Math Simulator (Ultimate Edition 3.0)</title>
     <style>
-        :root { --fast-blue: #005ea2; --fast-hover: #e1f3f8; --fast-grey: #f0f0f0; }
-        body { font-family: 'Verdana', sans-serif; margin: 0; background: #f4f7f6; color: #222; }
+        /* --- 1. CAMBIUM / FAST THEME --- */
+        :root {
+            --fast-blue: #005ea2;
+            --fast-hover: #e1f3f8;
+            --fast-grey-row: #f0f0f0;
+            --fast-text: #222;
+        }
+
+        body { font-family: 'Verdana', sans-serif; margin: 0; background-color: #f4f7f6; color: var(--fast-text); }
         
-        /* Dashboard */
+        /* DASHBOARD */
         #dashboard { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; border-top: 6px solid #ccc; transition: 0.2s; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.15); }
-        .card.nso { border-top-color: #005ea2; } .card.fr { border-top-color: #5cb85c; } .card.ar { border-top-color: #f0ad4e; } .card.gr { border-top-color: #6f42c1; }
-
-        /* Simulator */
-        #simulator-view { display: none; min-height: 100vh; background: #f2f2f2; }
-        #question-card { max-width: 950px; margin: 0 auto; padding: 50px; background: white; border-left: 1px solid #ccc; border-right: 1px solid #ccc; min-height: 600px; padding-bottom: 120px; }
-        .question-stem { font-size: 20px; line-height: 1.6; margin-bottom: 20px; font-weight: 500; }
-        .std-tag { font-size: 11px; color: #777; margin-bottom: 5px; font-weight: bold; }
-
-        /* Tech Enhanced */
-        .option-row { padding: 15px; border: 1px solid #ccc; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; border-radius: 4px; font-size: 17px; background: white; }
-        .option-row:hover { background: var(--fast-hover); border-color: var(--fast-blue); }
-        .hot-spot { display: inline-block; padding: 8px 15px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; background: #f9f9f9; }
-        .hot-spot.selected { background: var(--fast-blue); color: white; border-color: var(--fast-blue); }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { color: var(--fast-blue); font-size: 32px; margin-bottom: 10px; }
         
-        /* Visuals */
-        .visual-container { text-align: center; margin: 25px 0; padding: 15px; border: 1px solid #eee; background: #fff; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; border-top: 6px solid #ccc; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
         
-        /* Navigation */
-        .fast-footer { position: fixed; bottom: 0; width: 100%; height: 75px; background: #e6e6e6; border-top: 1px solid #bbb; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; box-sizing: border-box; }
-        .nav-btn { font-size: 16px; padding: 10px 25px; border-radius: 4px; cursor: pointer; border: 1px solid #999; background: white; font-weight: bold; }
-        .btn-next { background: var(--fast-blue); color: white; border: none; }
+        .card.mock { border-top-color: #d9534f; }
+        .card.nso { border-top-color: #005ea2; }
+        .card.fr { border-top-color: #5cb85c; }
+        .card.ar { border-top-color: #f0ad4e; }
+        .card.gr { border-top-color: #6f42c1; }
+
+        /* SIMULATOR */
+        #simulator-view { display: none; min-height: 100vh; background-color: #f2f2f2; }
+        #question-card {
+            max-width: 950px; margin: 0 auto; padding: 50px; background: white;
+            border-left: 1px solid #ccc; border-right: 1px solid #ccc; min-height: 600px;
+            padding-bottom: 120px;
+        }
+
+        .question-stem { font-size: 20px; margin-bottom: 25px; line-height: 1.6; font-weight: 500; }
+        .std-tag { font-size: 12px; color: #666; background: #eee; padding: 2px 6px; border-radius: 4px; display:inline-block; margin-bottom: 10px;}
+
+        /* --- TECH ENHANCED ITEMS --- */
+        .option-row { padding: 15px; border: 1px solid #ccc; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; border-radius: 4px; font-size: 18px; transition: 0.1s; background: white; }
+        .option-row:hover { background-color: var(--fast-hover); border-color: var(--fast-blue); }
+        
+        .hot-spot { display: inline-block; padding: 5px 10px; margin: 0 2px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; background: #f0f0f0; }
+        .hot-spot:hover { border-color: var(--fast-blue); background: var(--fast-hover); }
+        .hot-spot.selected { background-color: var(--fast-blue); color: white; border-color: var(--fast-blue); }
+
+        .fast-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 18px; }
+        .fast-table th { border-bottom: 2px solid #000; padding: 15px; background: #fff; }
+        .fast-table td { padding: 15px; border-bottom: 1px solid #ccc; text-align: center; }
+        .fast-table tr:nth-child(even) { background-color: var(--fast-grey-row); }
+        .fast-radio { width: 24px; height: 24px; accent-color: var(--fast-blue); cursor: pointer; }
+
+        /* VISUALS */
+        .visual-container { text-align: center; margin: 20px 0; padding: 20px; background: #fff; border: 1px solid #eee; }
+        
+        /* FOOTER */
+        .fast-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
+            background-color: #e6e6e6; border-top: 1px solid #b3b3b3;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 40px; box-sizing: border-box; z-index: 1000;
+        }
+        .nav-btn { font-size: 16px; padding: 10px 24px; border-radius: 4px; cursor: pointer; border: 1px solid #aaa; background: white; font-weight: bold; }
+        .btn-next { background-color: var(--fast-blue); color: white; border: none; }
     </style>
 </head>
 <body>
 
     <div id="dashboard">
-        <div style="text-align:center; margin-bottom:40px;">
-            <h1>Florida FAST B.E.S.T. Training Portal</h1>
-            <p>Rigorous, High-Complexity Level 3-5 Practice</p>
+        <div class="header">
+            <h1>Florida FAST Math Simulator</h1>
+            <p><strong>Ultimate Edition 3.0:</strong> Complete B.E.S.T. Standards Coverage</p>
         </div>
-        <div class="grid">
-            <div class="card nso" onclick="startTest('NSO')"><h3>Number Sense (NSO)</h3><p>25 Questions • Place Value, Multi-Digit Ops, Flexible Base-10.</p></div>
-            <div class="card fr" onclick="startTest('FR')"><h3>Fractions (FR)</h3><p>25 Questions • Equivalence, Number Lines, Comparisons.</p></div>
-            <div class="card ar" onclick="startTest('AR')"><h3>Algebraic Reasoning (AR)</h3><p>25 Questions • Multi-step Problems, Distributive Property, Patterns.</p></div>
-            <div class="card gr" onclick="startTest('GR')"><h3>Measurement & Geometry (GR/M)</h3><p>25 Questions • Area/Perimeter, Time, Line Plots, Volume.</p></div>
+
+        <div class="grid-container">
+            <div class="card mock" onclick="startTest('mock')">
+                <h3>🏆 Full Mock Assessment</h3>
+                <p><strong>30 Questions</strong> • Random Mix</p>
+                <p>Simulates the full end-of-year test.</p>
+            </div>
+            <div class="card nso" onclick="startTest('NSO')">
+                <h3>Number Sense (NSO)</h3>
+                <p><strong>Master Quiz</strong></p>
+                <p>Rounding, Expanded Form, Errors.</p>
+            </div>
+            <div class="card fr" onclick="startTest('FR')">
+                <h3>Fractions (FR)</h3>
+                <p><strong>Master Quiz</strong></p>
+                <p>Equivalence, Ordering, Number Lines.</p>
+            </div>
+            <div class="card ar" onclick="startTest('AR')">
+                <h3>Algebraic Reasoning (AR)</h3>
+                <p><strong>Master Quiz</strong></p>
+                <p>Patterns, Distributive Prop, True/False.</p>
+            </div>
+            <div class="card gr" onclick="startTest('GR')">
+                <h3>Geometry & Data (GR)</h3>
+                <p><strong>Master Quiz</strong></p>
+                <p>Time, Temperature, Line Plots, Area.</p>
+            </div>
         </div>
     </div>
 
     <div id="simulator-view">
         <div id="question-card"></div>
-        <div class="fast-footer">
-            <button class="nav-btn" onclick="location.reload()">Exit</button>
-            <div style="font-weight:bold;">Question <span id="q-num">1</span> of <span id="q-total">25</span></div>
+        <div class="fast-footer" id="nav-controls">
+            <button class="nav-btn" onclick="exitTest()">Exit</button>
+            <div style="font-weight: bold; font-size: 18px;">Item <span id="q-num">1</span></div>
             <button class="nav-btn btn-next" onclick="nextQuestion()">Next</button>
         </div>
     </div>
 
     <script>
-        let currentQuestions = [];
-        let currentIndex = 0;
-
-        // --- AUTHENTIC VISUAL GENERATORS ---
-        function drawClock(h, m) {
-            const hDeg = (h % 12) * 30 + (m * 0.5);
-            const mDeg = m * 6;
-            return `<svg width="160" height="160" viewBox="0 0 200 200"><circle cx="100" cy="100" r="95" fill="white" stroke="black" stroke-width="3"/><circle cx="100" cy="100" r="4"/><line x1="100" y1="100" x2="100" y2="55" stroke="black" stroke-width="6" transform="rotate(${hDeg} 100 100)"/><line x1="100" y1="100" x2="100" y2="30" stroke="black" stroke-width="3" transform="rotate(${mDeg} 100 100)"/></svg>`;
+        // --- 1. UTILITY FUNCTIONS ---
+        
+        // Corrected Number to Words Logic
+        function numberToWords(n) {
+            if (n === 0) return "zero";
+            const ones = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+            const teens = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+            const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+            
+            let str = "";
+            if (n >= 1000) { str += ones[Math.floor(n/1000)] + " thousand "; n %= 1000; }
+            if (n >= 100) { str += ones[Math.floor(n/100)] + " hundred "; n %= 100; }
+            if (n >= 20) { str += tens[Math.floor(n/10)] + (n%10?"-"+ones[n%10]:"") + " "; n=0; }
+            if (n >= 10) { str += teens[n-10] + " "; n=0; }
+            if (n > 0) { str += ones[n] + " "; }
+            return str.trim();
         }
 
-        function drawRuler(val) {
-            const width = val * 50;
-            return `<svg width="350" height="80" viewBox="0 0 400 100">
-                <rect x="10" y="40" width="${width}" height="15" fill="#f0ad4e" stroke="black"/>
-                <rect x="10" y="60" width="380" height="30" fill="white" stroke="black"/>
-                ${Array.from({length:9}).map((_,i) => `<line x1="${10+i*50}" y1="60" x2="${10+i*50}" y2="75" stroke="black"/><text x="${8+i*50}" y="95" font-size="12">${i}</text>`).join('')}
+        function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+
+        // --- 2. SVG VISUALS ---
+
+        function svgClock(h, m) {
+            const hDeg = (h % 12) * 30 + (m * 0.5);
+            const mDeg = m * 6;
+            return `<svg width="180" height="180" viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="90" fill="white" stroke="black" stroke-width="4"/>
+                <circle cx="100" cy="100" r="3" fill="black"/>
+                ${[12,1,2,3,4,5,6,7,8,9,10,11].map(n=>`<text x="${100+75*Math.cos((n*30-90)*(Math.PI/180))}" y="${100+75*Math.sin((n*30-90)*(Math.PI/180))}" text-anchor="middle" dominant-baseline="middle" font-size="16">${n}</text>`).join('')}
+                <line x1="100" y1="100" x2="100" y2="60" stroke="black" stroke-width="6" transform="rotate(${hDeg} 100 100)" stroke-linecap="round"/>
+                <line x1="100" y1="100" x2="100" y2="35" stroke="black" stroke-width="4" transform="rotate(${mDeg} 100 100)" stroke-linecap="round"/>
+                <circle cx="100" cy="100" r="5" fill="black"/>
             </svg>`;
         }
 
-        // --- DYNAMIC GENERATORS (Word form engine) ---
-        function nToW(n) {
-            const o = ["","one","two","three","four","five","six","seven","eight","nine"];
-            const t = ["ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
-            const ty = ["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
-            if(n===0) return "zero";
-            let s = "";
-            if(n>=1000){ s += o[Math.floor(n/1000)] + " thousand "; n%=1000; }
-            if(n>=100){ s += o[Math.floor(n/100)] + " hundred "; n%=100; }
-            if(n>=20){ s += ty[Math.floor(n/10)] + (n%10?"-"+o[n%10]:"") + " "; n=0; }
-            if(n>=10){ s += t[n-10] + " "; n=0; }
-            if(n>0) s += o[n];
-            return s.trim();
+        function svgThermometer(temp) {
+            const h = temp * 2; // scale
+            return `<svg width="100" height="250" viewBox="0 0 100 250">
+                <rect x="35" y="20" width="30" height="200" rx="15" fill="white" stroke="black" stroke-width="2"/>
+                <circle cx="50" cy="210" r="25" fill="#d9534f" stroke="black"/>
+                <rect x="40" y="${200-h}" width="20" height="${h+10}" fill="#d9534f"/>
+                <line x1="35" y1="150" x2="25" y2="150" stroke="black"/><text x="10" y="155" font-size="12">60</text>
+                <line x1="35" y1="110" x2="25" y2="110" stroke="black"/><text x="10" y="115" font-size="12">80</text>
+                <line x1="35" y1="70" x2="25" y2="70" stroke="black"/><text x="5" y="75" font-size="12">100</text>
+            </svg>`;
         }
 
-        // --- QUESTION BANK ---
-        const NSO_POOL = [
-            () => { 
-                const n = Math.floor(Math.random()*8000)+1000;
-                return { std:'MA.3.NSO.1.1', type:'mc', text:`Select the <b>Word Form</b> for ${n.toLocaleString()}.`, options:[nToW(n), nToW(n+100), nToW(n+10), nToW(n-100)] };
-            },
+        function svgLinePlot(data) {
+            return `<svg width="300" height="150" viewBox="0 0 300 150">
+                <line x1="20" y1="120" x2="280" y2="120" stroke="black" stroke-width="2"/>
+                <text x="50" y="140" text-anchor="middle">1/4</text>
+                <text x="150" y="140" text-anchor="middle">2/4</text>
+                <text x="250" y="140" text-anchor="middle">3/4</text>
+                ${data.map((col, i) => {
+                    let xs = "";
+                    for(let j=0; j<col; j++) xs += `<text x="${50 + i*100}" y="${110 - j*20}" text-anchor="middle" font-size="20" fill="blue">X</text>`;
+                    return xs;
+                }).join('')}
+            </svg>`;
+        }
+
+        // --- 3. QUESTION GENERATORS (Dynamic) ---
+
+        // NSO: Number Sense
+        const NSO_GENS = [
+            // Word Form (Level 3/4)
             () => {
-                const h = Math.floor(Math.random()*7)+12; // e.g. 14 hundreds
-                const total = h * 100;
-                return { std:'MA.3.NSO.1.1', type:'multi', text:`Which of the following are equal to <b>${total.toLocaleString()}</b>? Select ALL that apply.`, options:[`${h} hundreds`, `${h*10} tens`, `${Math.floor(h/10)} thousand and ${h%10} hundreds`, `${h} tens`] };
+                const n = Math.floor(Math.random()*9000)+1000;
+                return { type: 'mc', standard: 'MA.3.NSO.1.1', text: `Select the **Word Form** for: <strong>${n.toLocaleString()}</strong>`, 
+                         options: [numberToWords(n), numberToWords(n+100), numberToWords(n+10)] };
             },
+            // Expanded Form (Level 4)
             () => {
-                const a = Math.floor(Math.random()*400)+500;
-                const b = Math.floor(Math.random()*200)+100;
-                return { std:'MA.3.NSO.2.1', type:'mc', text:`Solve using the standard algorithm: ${a} - ${b}`, options:[a-b, a-b+10, a-b-10, a-b+100] };
-            }
+                const th = Math.floor(Math.random()*9)+1;
+                const hu = Math.floor(Math.random()*9)+1;
+                const te = Math.floor(Math.random()*9)+1;
+                const on = Math.floor(Math.random()*9)+1;
+                const total = (th*1000)+(hu*100)+(te*10)+on;
+                return { type: 'mc', standard: 'MA.3.NSO.1.1', text: `Select the **Expanded Form** for: <strong>${total.toLocaleString()}</strong>`,
+                         options: [`${th*1000} + ${hu*100} + ${te*10} + ${on}`, `${th} + ${hu} + ${te} + ${on}`, `${th*1000} + ${hu} + ${te} + ${on}`] };
+            },
+            // Rounding (Level 3)
+            () => {
+                const base = Math.floor(Math.random()*80)*10;
+                return { type: 'hot_text', standard: 'MA.3.NSO.1.4', text: `Select the numbers that round to **${base}** (nearest 10).`,
+                         content: [(base-2).toString(), (base+3).toString(), (base+12).toString(), (base-15).toString()] };
+            },
+            // Comparing (Level 3)
+            () => { return { type: 'mc', standard: 'MA.3.NSO.1.3', text: `Compare: 3,409 ? 3,490`, options: ['<', '>', '='] }; },
+            // Add/Sub Error (Level 5)
+            () => { return { type: 'mc', standard: 'MA.3.NSO.2.1', text: `Jon solved 500 - 248 = 348. What is his error?`, options: ['Regrouping Error', 'Addition Error', 'He is correct'] }; }
         ];
 
-        const AR_POOL = [
-            () => {
-                const p = Math.floor(Math.random()*5)+4; // bags
-                const q = Math.floor(Math.random()*3)+6; // items
-                return { std:'MA.3.AR.1.2', type:'mc', text:`Sarah has ${p} bags with ${q} marbles in each. She gives 5 marbles to a friend. Which equation shows how many marbles she has now?`, options:[`(${p} × ${q}) - 5`, `(${p} + ${q}) - 5`, `${p} × ${q} × 5`, `(${p} × ${q}) + 5`] };
-            },
-            () => {
-                return { std:'MA.3.AR.2.2', type:'mc', text:`Which equation is FALSE?`, options:['12 ÷ 3 = 2 × 3', '4 × 6 = 24', '15 ÷ 5 = 3', '8 × 2 = 4 × 4'] };
-            }
+        // FR: Fractions
+        const FR_GENS = [
+            // Fractions > 1 (Level 4)
+            () => { return { type: 'mc', standard: 'MA.3.FR.1.1', text: `Which represents 7 copies of 1/4?`, options: ['7/4', '1/4', '4/7'] }; },
+            // Equivalence (Level 3)
+            () => { return { type: 'table_match', standard: 'MA.3.FR.2.2', text: `Identify equivalent fractions.`, rows: [{label:'2/4',id:'r1'},{label:'2/3',id:'r2'}], columns: ['1/2','4/6','3/4'] }; },
+            // Comparing (Level 3)
+            () => { return { type: 'mc', standard: 'MA.3.FR.2.1', text: `Compare: 3/8 ? 3/5`, options: ['<', '>', '='] }; }
         ];
 
-        const GR_POOL = [
+        // AR: Algebraic Reasoning
+        const AR_GENS = [
+            // Distributive Prop (Level 4)
+            () => { return { type: 'mc', standard: 'MA.3.AR.1.1', text: `Which shows 8 x 14?`, options: ['(8x10) + (8x4)', '(8+10) x (8+4)', '8 x 10 x 4'] }; },
+            // Patterns (Level 3)
+            () => { return { type: 'mc', standard: 'MA.3.AR.3.3', text: `Pattern: 3, 6, 9, 12... Rule?`, options: ['Add 3', 'Multiply by 2', 'Add 6'] }; },
+            // True/False (Level 4)
+            () => { return { type: 'table_match', standard: 'MA.3.AR.2.2', text: `Is the equation True or False?`, rows:[{label:'6x4=24',id:'r1'},{label:'15/3=6',id:'r2'}], columns:['True','False'] }; }
+        ];
+
+        // GR: Geometry & Data (Including NEW types)
+        const GR_GENS = [
+            // Temperature (Level 4 - NEW)
+            () => {
+                const t = [60, 70, 80, 90][Math.floor(Math.random()*4)];
+                return { type: 'mc', standard: 'MA.3.M.1.1', text: `What is the temperature?`, visual: svgThermometer(t), options: [`${t}°F`, `${t+10}°F`, `${t-5}°F`] };
+            },
+            // Line Plot (Level 4 - NEW)
+            () => {
+                return { type: 'mc', standard: 'MA.3.DP.1.1', text: `How many items are 2/4 inches long?`, visual: svgLinePlot([2, 5, 1]), options: ['5', '2', '8'] };
+            },
+            // Time to Minute (Level 3)
             () => {
                 const h = Math.floor(Math.random()*11)+1;
-                const m = Math.floor(Math.random()*59);
-                return { std:'MA.3.M.2.1', type:'mc', text:`What time is shown on the clock?`, visual: drawClock(h, m), options:[`${h}:${m<10?'0'+m:m}`, `${h==12?1:h+1}:${m<10?'0'+m:m}`, `${m}:${h}`, `${h}:00`] };
+                const m = Math.floor(Math.random()*50)+10; // Avoid single digits for simplicity
+                return { type: 'mc', standard: 'MA.3.M.2.1', text: `What time is shown?`, visual: svgClock(h, m), options: [`${h}:${m}`, `${h+1}:${m}`, `${m}:${h}`] };
             },
+            // Elapsed Time (Level 3/4)
             () => {
-                const len = (Math.floor(Math.random()*12)+4)/4; // Quarter inch intervals
-                return { std:'MA.3.M.1.1', type:'mc', text:`Measure the object to the nearest <b>quarter-inch</b>.`, visual: drawRuler(len), options:[`${len} inches`, `${len+0.25} inches`, `${len-0.25} inches`, `${len+1} inches`] };
-            }
+                return { type: 'mc', standard: 'MA.3.M.2.2', text: `Class starts at 1:15 and ends at 2:05. How long is it?`, options: ['50 minutes', '40 minutes', '1 hour'] };
+            },
+            // Area (Level 3)
+            () => { return { type: 'equation', standard: 'MA.3.GR.2.2', text: `Rectangle area: Length=8, Width=6.`, num: 48 }; }
         ];
 
-        const FR_POOL = [
-            () => {
-                return { std:'MA.3.FR.2.1', type:'mc', text:`Which comparison is true?`, options:['1/3 > 1/4', '1/3 < 1/4', '2/6 = 2/3', '1/2 < 1/8'] };
-            }
-        ];
+        // --- 4. ENGINE ---
 
-        // --- CORE ENGINE ---
-        function startTest(domain) {
+        function startTest(mode) {
             document.getElementById('dashboard').style.display = 'none';
             document.getElementById('simulator-view').style.display = 'block';
             currentQuestions = [];
-            
-            let pool = [];
-            if(domain==='NSO') pool = NSO_POOL;
-            else if(domain==='FR') pool = FR_POOL;
-            else if(domain==='AR') pool = AR_POOL;
-            else if(domain==='GR') pool = GR_POOL;
+            currentIndex = 0;
 
-            for(let i=0; i<25; i++) {
+            let pool = [];
+            if(mode === 'NSO') pool = NSO_GENS;
+            else if(mode === 'FR') pool = FR_GENS;
+            else if(mode === 'AR') pool = AR_GENS;
+            else if(mode === 'GR') pool = GR_GENS;
+            else if(mode === 'mock') pool = [...NSO_GENS, ...FR_GENS, ...AR_GENS, ...GR_GENS];
+
+            const count = (mode === 'mock') ? 30 : 25;
+            for(let i=0; i<count; i++) {
                 const gen = pool[i % pool.length];
                 currentQuestions.push(gen());
             }
@@ -162,39 +278,63 @@
         }
 
         function renderQuestion(index) {
-            currentIndex = index;
             const q = currentQuestions[index];
             const container = document.getElementById('question-card');
-            document.getElementById('q-num').innerText = index + 1;
-            document.getElementById('q-total').innerText = currentQuestions.length;
+            
+            let html = `<div class="std-tag">${q.standard || 'MA.3.MATH'}</div><div class="question-stem">${q.text}</div>`;
+            if (q.visual) html += `<div class="visual-container">${q.visual}</div>`;
 
-            let html = `<div class="std-tag">${q.std}</div><div class="question-stem">${q.text}</div>`;
-            if(q.visual) html += `<div class="visual-container">${q.visual}</div>`;
-            
-            const shuffled = [...q.options].sort(() => Math.random() - 0.5);
-            html += shuffled.map(o => `<div class="option-row" onclick="handleSelect(this)"><input type="${q.type==='multi'?'checkbox':'radio'}" name="q" style="margin-right:15px;"> ${o}</div>`).join('');
-            
+            if (q.type === 'mc') html += renderMC(q);
+            else if (q.type === 'multi_select') html += renderMultiSelect(q);
+            else if (q.type === 'table_match') html += renderTableMatch(q);
+            else if (q.type === 'hot_text') html += renderHotText(q);
+            else if (q.type === 'equation') html += renderEquation(q);
+
             container.innerHTML = html;
         }
 
-        function handleSelect(el) {
-            const input = el.querySelector('input');
-            if(input.type==='radio'){
-                document.querySelectorAll('.option-row').forEach(r => {r.style.background='white'; r.style.borderColor='#ccc';});
-                input.checked = true;
-            } else {
-                input.checked = !input.checked;
-            }
-            if(input.checked){ el.style.background='var(--fast-hover)'; el.style.borderColor='var(--fast-blue)'; }
-            else { el.style.background='white'; el.style.borderColor='#ccc'; }
+        // RENDERERS
+        function renderMC(q) {
+            return `<div>${shuffle(q.options).map(o => `<div class="option-row" onclick="selectRow(this)"><input type="radio" name="opt" style="margin-right:15px;"> ${o}</div>`).join('')}</div>`;
+        }
+        function renderMultiSelect(q) {
+            return `<div>${shuffle(q.options).map(o => `<div class="option-row" onclick="selectRow(this)"><input type="checkbox" style="margin-right:15px;"> ${o}</div>`).join('')}</div>`;
+        }
+        function renderTableMatch(q) {
+            return `<table class="fast-table"><thead><tr><th></th>${q.columns.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${q.rows.map((r,i)=>`<tr><td style="text-align:left;">${r.label}</td>${q.columns.map(c=>`<td><input type="radio" name="r${i}" class="fast-radio"></td>`).join('')}</tr>`).join('')}</tbody></table>`;
+        }
+        function renderHotText(q) {
+            return `<div style="line-height:2.5;">${q.content.map(c => `<span class="hot-spot" onclick="toggleHot(this)">${c}</span>`).join(' ')}</div>`;
+        }
+        function renderEquation(q) {
+             return `<div style="text-align:center;"><input type="text" style="font-size:24px; padding:10px; width:150px; text-align:center; border:2px solid #333;" placeholder="Answer"></div>`;
         }
 
-        function nextQuestion() {
-            if(currentIndex < currentQuestions.length - 1) renderQuestion(++currentIndex);
-            else {
-                document.getElementById('question-card').innerHTML = `<div style="text-align:center;"><h2>Test Submitted</h2><button class="nav-btn btn-next" onclick="location.reload()">Return Home</button></div>`;
-            }
+        // HANDLERS
+        function selectRow(el) {
+            const input = el.querySelector('input');
+            if(input.type === 'radio') {
+                document.querySelectorAll('.option-row').forEach(d => {d.style.background='white'; d.style.borderColor='#ccc';});
+                input.checked = true;
+            } else { input.checked = !input.checked; }
+            if(input.checked) { el.style.background='var(--fast-hover)'; el.style.borderColor='var(--fast-blue)'; }
+            else { el.style.background='white'; el.style.borderColor='#ccc'; }
         }
+        function toggleHot(el) { el.classList.toggle('selected'); }
+        
+        function nextQuestion() {
+            if (currentIndex < currentQuestions.length - 1) renderQuestion(++currentIndex);
+            else finishTest();
+        }
+
+        function finishTest() {
+            document.getElementById('question-card').innerHTML = `<h2 style="text-align:center;">Test Complete</h2><button class="nav-btn btn-next" onclick="location.reload()" style="display:block; margin:20px auto;">Home</button>`;
+            document.getElementById('nav-controls').style.display = 'none';
+        }
+
+        function exitTest() { location.reload(); }
+        window.onload = function() { document.getElementById('dashboard').style.display = 'block'; };
+
     </script>
 </body>
 </html>
