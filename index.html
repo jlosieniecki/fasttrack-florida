@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florida FAST Math Simulator (Grade 3)</title>
+    <title>Florida FAST Math Simulator</title>
     <style>
-        /* --- GLOBAL & DASHBOARD STYLES --- */
+        /* --- RESET & FONTS --- */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -13,8 +13,9 @@
             color: #333;
         }
 
-        /* DASHBOARD (HOMEPAGE) */
+        /* --- DASHBOARD (HOMEPAGE) STYLES --- */
         #dashboard {
+            display: block; /* Visible by default */
             max-width: 1000px;
             margin: 0 auto;
             padding: 40px 20px;
@@ -31,7 +32,6 @@
             margin-bottom: 10px;
         }
 
-        /* CARDS GRID */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -53,23 +53,20 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.15);
         }
 
-        .card h3 { margin-top: 0; color: #444; }
-        .card p { color: #666; font-size: 14px; }
+        /* Card Colors */
+        .card.mock { border-top-color: #d9534f; }
+        .card.nso { border-top-color: #005ea2; }
+        .card.fr { border-top-color: #5cb85c; }
+        .card.ar { border-top-color: #f0ad4e; }
 
-        /* Specific Card Colors */
-        .card.mock { border-top-color: #d9534f; } /* Red for Big Test */
-        .card.nso { border-top-color: #005ea2; }  /* Blue for Number Sense */
-        .card.fr { border-top-color: #5cb85c; }   /* Green for Fractions */
-        .card.ar { border-top-color: #f0ad4e; }   /* Orange for Algebra */
-
-        /* --- SIMULATOR (TEST) STYLES --- */
+        /* --- SIMULATOR (TEST VIEW) STYLES --- */
         #simulator-view {
             display: none; /* Hidden by default */
-            height: 100vh;
-            background-color: #f2f2f2; /* Authentic Grey Background */
+            min-height: 100vh;
+            background-color: #f2f2f2;
         }
 
-        /* CAMBIUM THEME OVERRIDES */
+        /* Cambium/FAST Theme */
         :root {
             --fast-blue: #005ea2;
             --fast-hover: #e1f3f8;
@@ -78,17 +75,18 @@
 
         #question-card {
             max-width: 900px;
-            margin: 40px auto;
-            background: white;
+            margin: 0 auto;
             padding: 50px;
-            border: 1px solid #ccc;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            min-height: 400px;
+            background: white;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            min-height: 600px;
+            padding-bottom: 100px; /* Space for footer */
         }
 
         .question-stem { font-size: 22px; margin-bottom: 30px; line-height: 1.6; }
 
-        /* INTERACTIVE ELEMENTS */
+        /* Interactive Elements */
         .hot-spot {
             padding: 6px 12px; margin: 0 4px; border: 2px solid transparent; border-radius: 4px; cursor: pointer;
         }
@@ -100,17 +98,16 @@
         .fast-table td { padding: 15px; border-bottom: 1px solid #ccc; text-align: center; }
         .fast-table tr:nth-child(even) { background-color: var(--fast-grey-row); }
 
-        /* FOOTER */
+        /* Footer */
         .fast-footer {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
             background-color: #e6e6e6; border-top: 1px solid #b3b3b3;
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 40px; box-sizing: border-box; z-index: 100;
         }
-
+        
         .nav-btn { font-size: 18px; padding: 12px 24px; border-radius: 4px; cursor: pointer; border: 1px solid #aaa; }
         .btn-next { background-color: var(--fast-blue); color: white; border: none; font-weight: bold; }
-
     </style>
 </head>
 <body>
@@ -124,8 +121,8 @@
         <div class="grid-container">
             <div class="card mock" onclick="startTest('mock')">
                 <h3>Start Mock Assessment</h3>
-                <p>30 Questions • Mixed Standards</p>
-                <p><strong>Simulates the real test experience.</strong></p>
+                <p><strong>30 Questions</strong> • Mixed Standards</p>
+                <p>Simulates the real full-length test.</p>
             </div>
 
             <div class="card nso" onclick="startTest('NSO')">
@@ -159,7 +156,7 @@
             </div>
 
         <div class="fast-footer" id="nav-controls">
-            <button class="nav-btn" onclick="exitTest()" style="margin-right: auto; background: #ddd;">Exit</button>
+            <button class="nav-btn" onclick="exitTest()" style="margin-right: auto; background: #ddd;">Exit Test</button>
             <button class="nav-btn btn-back" onclick="prevQuestion()">Back</button>
             <div style="font-weight: bold; font-size: 18px; margin: 0 20px;">
                 Item <span id="q-num">1</span> of <span id="q-total">10</span>
@@ -174,10 +171,15 @@
         let currentIndex = 0;
         let userAnswers = [];
 
-        // --- 1. TEST LAUNCHER LOGIC ---
+        // Ensure Dashboard is visible on load
+        window.onload = function() {
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('simulator-view').style.display = 'none';
+        };
+
+        // --- 1. START / STOP TEST ---
 
         function startTest(mode) {
-            // Hide Dashboard, Show Simulator
             document.getElementById('dashboard').style.display = 'none';
             document.getElementById('simulator-view').style.display = 'block';
 
@@ -191,7 +193,7 @@
                     currentQuestions.push(generateQuestionByDomain(type));
                 }
             } else {
-                // Generate 10 specific domain questions
+                // Generate 10 specific questions
                 for(let i=0; i<10; i++) {
                     currentQuestions.push(generateQuestionByDomain(mode));
                 }
@@ -203,29 +205,21 @@
         }
 
         function exitTest() {
-            if(confirm("Exit the test? Your progress will be lost.")) {
+            if(confirm("Are you sure you want to exit?")) {
                 document.getElementById('simulator-view').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
             }
         }
 
-        // --- 2. QUESTION GENERATORS (ROUTER) ---
+        // --- 2. QUESTION GENERATORS ---
 
         function generateQuestionByDomain(domain) {
-            // Determine which specific standard to generate based on domain
-            if (domain === 'NSO') {
-                return Math.random() > 0.5 ? generateTableMatchNSO11() : generateHotTextNSO12();
-            } else if (domain === 'FR') {
-                return generateFractionEquation();
-            } else if (domain === 'AR') {
-                return generateMultiSelectAR();
-            } else {
-                // Default fallback (Geometry placeholder)
-                return generateTableMatchNSO11(); 
-            }
+            if (domain === 'NSO') return Math.random() > 0.5 ? generateTableMatchNSO11() : generateHotTextNSO12();
+            if (domain === 'FR') return generateFractionEquation();
+            if (domain === 'AR') return generateMultiSelectAR();
+            return generateTableMatchNSO11(); // Default fallback
         }
 
-        // Standard: MA.3.NSO.1.1 (Table Match)
         function generateTableMatchNSO11() {
             const thousands = Math.floor(Math.random() * 9) + 1;
             const ones = Math.floor(Math.random() * 9) + 1;
@@ -239,7 +233,6 @@
             };
         }
 
-        // Standard: MA.3.NSO.1.2 (Hot Text)
         function generateHotTextNSO12() {
             const num = Math.floor(Math.random() * 800) + 100;
             return {
@@ -249,7 +242,6 @@
             };
         }
 
-        // Standard: MA.3.FR.1.1 (Equation Editor)
         function generateFractionEquation() {
             return {
                 type: 'equation',
@@ -259,28 +251,29 @@
             };
         }
 
-        // Standard: MA.3.AR.1.2 (Multi-Select)
         function generateMultiSelectAR() {
             return {
                 type: 'multi_select',
-                text: "Select **all** the equations that equal 24.",
+                text: "Select **all** the equations that are true.",
                 options: [
-                    { text: "4 x 6", id: 'A' },
-                    { text: "12 + 12", id: 'B' },
-                    { text: "30 - 5", id: 'C' }, // Distractor
-                    { text: "8 x 3", id: 'D' }
+                    { text: "4 x 5 = 20", id: 'A' },
+                    { text: "3 x 3 = 6", id: 'B' },
+                    { text: "10 + 10 = 20", id: 'C' },
+                    { text: "20 - 5 = 10", id: 'D' }
                 ]
             };
         }
 
-        // --- 3. RENDERERS (THE VISUALS) ---
+        // --- 3. RENDERERS ---
 
         function renderQuestion(index) {
             currentIndex = index;
             const q = currentQuestions[index];
             const container = document.getElementById('question-card');
+            
+            // Show Navigation
+            document.getElementById('nav-controls').style.display = 'flex';
             document.getElementById('q-num').innerText = index + 1;
-            document.getElementById('nav-controls').style.display = 'flex'; // Show footer
             
             let html = `<div class="question-stem">${q.text}</div>`;
 
@@ -292,7 +285,6 @@
             container.innerHTML = html;
         }
 
-        // HTML Templates
         function renderTableMatchHTML(q, index) {
             return `
                 <div style="background:#f9f9f9; padding:15px; margin-bottom:20px;">Reference: <strong>${q.contextNumber}</strong></div>
@@ -338,7 +330,7 @@
                      <div style="margin-top:20px; text-align:center;">Enter Answer: <input type="text" style="font-size:20px; padding:10px; width:100px;"></div>`;
         }
 
-        // --- 4. NAVIGATION & SAVING ---
+        // --- 4. SAVING ANSWERS ---
 
         function saveAnswer(qIdx, key, val) {
             if(!userAnswers[qIdx]) userAnswers[qIdx] = {};
@@ -346,11 +338,17 @@
         }
 
         function saveHotText(qIdx, el, val) {
-            // Clear siblings
             el.parentElement.querySelectorAll('.hot-spot').forEach(s => s.classList.remove('selected'));
             el.classList.add('selected');
             userAnswers[qIdx] = val;
         }
+
+        function saveMultiSelect(qIdx) {
+            // Simplified for demo: just marks as answered
+            userAnswers[qIdx] = "answered"; 
+        }
+
+        // --- 5. NAVIGATION ---
 
         function nextQuestion() {
             if (currentIndex < currentQuestions.length - 1) {
@@ -365,7 +363,6 @@
         }
 
         function finishTest() {
-            // Simple Review Screen
             const container = document.getElementById('question-card');
             document.getElementById('nav-controls').style.display = 'none';
             
@@ -374,10 +371,13 @@
             currentQuestions.forEach((q, i) => {
                 const status = userAnswers[i] ? "Answered" : "Unanswered";
                 const color = userAnswers[i] ? "#005ea2" : "#d9534f";
-                html += `<div onclick="renderQuestion(${i})" style="padding:10px; border:1px solid #ccc; color:${color}; cursor:pointer;">Q${i+1}: ${status}</div>`;
+                html += `<div onclick="renderQuestion(${i})" style="padding:10px; border:1px solid #ccc; color:${color}; cursor:pointer; text-align:center;">Q${i+1}<br><small>${status}</small></div>`;
             });
             
-            html += `</div><button onclick="location.reload()" style="margin-top:20px; padding:15px; background:#005ea2; color:white; border:none; font-size:18px; cursor:pointer;">Return to Home</button>`;
+            html += `</div>
+            <div style="margin-top:30px; text-align:center;">
+                <button onclick="location.reload()" style="padding:15px 30px; background:#005ea2; color:white; border:none; font-size:18px; cursor:pointer;">Submit & Return Home</button>
+            </div>`;
             container.innerHTML = html;
         }
     </script>
