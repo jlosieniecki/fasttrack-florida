@@ -5,57 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Florida FAST Math Simulator (Ultimate Edition)</title>
     <style>
-        /* --- 1. GLOBAL STYLES --- */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
+        /* --- 1. CAMBIUM / FAST THEME --- */
+        :root {
+            --fast-blue: #005ea2;
+            --fast-hover: #e1f3f8;
+            --fast-grey-row: #f0f0f0;
+            --fast-border: #000;
+        }
+
+        body { font-family: 'Segoe UI', Verdana, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
         
-        #dashboard { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
-        .header { text-align: center; margin-bottom: 50px; }
-        .header h1 { color: #005ea2; font-size: 36px; margin-bottom: 10px; }
+        /* DASHBOARD */
+        #dashboard { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { color: var(--fast-blue); font-size: 36px; margin-bottom: 5px; }
         
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        .card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; border-top: 5px solid #ccc; transition: transform 0.2s; }
-        .card:hover { transform: translateY(-5px); }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; border-top: 6px solid #ccc; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
         
-        /* Card Themes */
-        .card.mock { border-top-color: #d9534f; border-left: 5px solid #d9534f; }
+        .card.mock { border-top-color: #d9534f; }
         .card.nso { border-top-color: #005ea2; }
         .card.fr { border-top-color: #5cb85c; }
         .card.ar { border-top-color: #f0ad4e; }
         .card.gr { border-top-color: #6f42c1; }
 
-        /* --- 2. SIMULATOR VIEW --- */
+        /* SIMULATOR */
         #simulator-view { display: none; min-height: 100vh; background-color: #f2f2f2; }
-        
         #question-card {
-            max-width: 900px; margin: 0 auto; padding: 50px; background: white;
+            max-width: 950px; margin: 0 auto; padding: 50px; background: white;
             border-left: 1px solid #ccc; border-right: 1px solid #ccc; min-height: 600px;
-            padding-bottom: 100px;
+            padding-bottom: 120px; /* Space for footer */
         }
 
-        .question-stem { font-size: 22px; margin-bottom: 30px; line-height: 1.6; }
-        .level-badge { display: inline-block; background: #333; color: white; padding: 2px 8px; font-size: 12px; border-radius: 4px; margin-bottom: 10px; }
+        .question-stem { font-size: 22px; margin-bottom: 25px; line-height: 1.6; }
+        
+        /* --- TECH ENHANCED ITEMS CSS --- */
+        
+        /* 1. Hot Text */
+        .hot-text-container { font-size: 24px; line-height: 2.5; padding: 20px; border: 1px solid #ddd; }
+        .hot-spot { padding: 6px 12px; margin: 0 4px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .hot-spot:hover { background-color: var(--fast-hover); border-color: #bcd6ed; }
+        .hot-spot.selected { background-color: var(--fast-blue); color: white; border-color: var(--fast-blue); }
+
+        /* 2. Table Match */
+        .fast-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 18px; }
+        .fast-table th { border-bottom: 2px solid #000; padding: 15px; background: #fff; }
+        .fast-table td { padding: 15px; border-bottom: 1px solid #ccc; text-align: center; }
+        .fast-table tr:nth-child(even) { background-color: var(--fast-grey-row); }
+        .fast-radio { width: 24px; height: 24px; accent-color: var(--fast-blue); cursor: pointer; }
+
+        /* 3. Graphic Response (Selectable Images) */
+        .graphic-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 20px; }
+        .graphic-option { border: 2px solid #ccc; border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .graphic-option:hover { background-color: var(--fast-hover); border-color: var(--fast-blue); }
+        .graphic-option.selected { background-color: var(--fast-hover); border-color: var(--fast-blue); box-shadow: 0 0 0 2px var(--fast-blue); }
+
+        /* 4. Equation Editor */
+        .eq-display { width: 100%; max-width: 300px; height: 50px; border: 2px solid #333; font-size: 28px; padding: 5px 10px; margin-bottom: 15px; display: flex; align-items: center; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 250px; }
+        .key-btn { padding: 12px; font-size: 18px; border: 1px solid #ccc; background: #f8f9fa; cursor: pointer; border-radius: 4px; }
+        .key-btn:active { background: #e2e6ea; }
+
+        /* 5. Multi-Select / Multiple Choice */
+        .option-row { padding: 15px; border: 1px solid #ccc; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; border-radius: 4px; font-size: 18px; transition: 0.2s; }
+        .option-row:hover { background-color: var(--fast-hover); border-color: var(--fast-blue); }
 
         /* VISUALS */
-        .visual-container { text-align: center; margin: 20px 0; padding: 20px; background: #fff; border: 1px solid #eee; }
-        svg { max-width: 100%; height: auto; }
-
-        /* INTERACTIVE ELEMENTS */
-        .option-row { padding: 15px; border: 1px solid #ccc; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; border-radius: 4px; font-size: 18px; }
-        .option-row:hover { background-color: #e1f3f8; border-color: #005ea2; }
-
-        .fast-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 18px; }
-        .fast-table th { border-bottom: 2px solid #000; padding: 15px; }
-        .fast-table td { padding: 15px; border-bottom: 1px solid #ccc; text-align: center; }
+        .visual-container { text-align: center; margin: 20px 0; }
         
         /* FOOTER */
         .fast-footer {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
             background-color: #e6e6e6; border-top: 1px solid #b3b3b3;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; box-sizing: border-box; z-index: 100;
+            padding: 0 40px; box-sizing: border-box; z-index: 1000;
         }
-        .nav-btn { font-size: 18px; padding: 12px 24px; border-radius: 4px; cursor: pointer; border: 1px solid #aaa; }
-        .btn-next { background-color: #005ea2; color: white; border: none; font-weight: bold; }
+        .nav-btn { font-size: 18px; padding: 12px 24px; border-radius: 4px; cursor: pointer; border: 1px solid #aaa; background: white; }
+        .btn-next { background-color: var(--fast-blue); color: white; border: none; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -63,44 +90,45 @@
     <div id="dashboard">
         <div class="header">
             <h1>Florida FAST Math Simulator</h1>
-            <p>Comprehensive Master Quizzes for Every B.E.S.T. Domain</p>
+            <p><strong>Ultimate Edition:</strong> Tech-Enhanced Items & Dynamic Visuals</p>
         </div>
 
         <div class="grid-container">
             <div class="card mock" onclick="startTest('mock')">
                 <h3>🏆 Full Mock Assessment</h3>
-                <p><strong>30 Questions</strong> • All Domains</p>
-                <p>A mix of every standard.</p>
+                <p><strong>30 Questions</strong> • Mixed Standards</p>
+                <p>Simulates the full end-of-year test experience.</p>
             </div>
 
             <div class="card nso" onclick="startTest('NSO')">
                 <h3>Number Sense (NSO)</h3>
-                <p><strong>Master Quiz</strong></p>
-                <p>Covers: Place Value, Decomposing, Rounding, Addition/Subtraction.</p>
+                <p><strong>25 Questions</strong> • Master Quiz</p>
+                <p>Place Value, Rounding, Decomposition, Comparing.</p>
             </div>
             <div class="card fr" onclick="startTest('FR')">
                 <h3>Fractions (FR)</h3>
-                <p><strong>Master Quiz</strong></p>
-                <p>Covers: Unit Fractions, Equivalence, Comparing, Plotting.</p>
+                <p><strong>25 Questions</strong> • Master Quiz</p>
+                <p>Models, Equivalence, Number Lines, Ordering.</p>
             </div>
             <div class="card ar" onclick="startTest('AR')">
                 <h3>Algebraic Reasoning (AR)</h3>
-                <p><strong>Master Quiz</strong></p>
-                <p>Covers: Mult/Div, Patterns, Properties, Multi-step.</p>
+                <p><strong>25 Questions</strong> • Master Quiz</p>
+                <p>Multiplication, Division, Patterns, Equations.</p>
             </div>
             <div class="card gr" onclick="startTest('GR')">
                 <h3>Geometry & Data (GR)</h3>
-                <p><strong>Master Quiz</strong></p>
-                <p>Covers: Area, Perimeter, Time, Symmetry, Bar Graphs.</p>
+                <p><strong>25 Questions</strong> • Master Quiz</p>
+                <p>Area, Perimeter, Time, Symmetry, Graphs.</p>
             </div>
         </div>
     </div>
 
     <div id="simulator-view">
         <div id="question-card"></div>
+
         <div class="fast-footer" id="nav-controls">
-            <button class="nav-btn" onclick="exitTest()" style="background: #ddd;">Exit</button>
-            <div style="font-weight: bold; font-size: 18px;">Item <span id="q-num">1</span> of <span id="q-total">10</span></div>
+            <button class="nav-btn" onclick="exitTest()">Exit</button>
+            <div style="font-weight: bold; font-size: 18px;">Item <span id="q-num">1</span> of <span id="q-total">25</span></div>
             <button class="nav-btn btn-next" onclick="nextQuestion()">Next</button>
         </div>
     </div>
@@ -109,83 +137,121 @@
         // --- GLOBAL STATE ---
         let currentQuestions = [];
         let currentIndex = 0;
-        let userAnswers = [];
+        let userAnswers = []; // To store user input
 
-        // --- 1. SVG DRAWING TOOLS ---
-        function drawClockSVG(h, m) {
-            const hDeg=(h*30)+(m*0.5), mDeg=m*6;
-            return `<svg width="150" height="150" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="white" stroke="black" stroke-width="4"/><circle cx="100" cy="100" r="3"/><line x1="100" y1="100" x2="100" y2="50" stroke="black" stroke-width="6" transform="rotate(${hDeg} 100 100)"/><line x1="100" y1="100" x2="100" y2="30" stroke="black" stroke-width="4" transform="rotate(${mDeg} 100 100)"/></svg>`;
-        }
-        function drawBarGraphSVG(v1, v2) {
-            return `<svg width="200" height="150" viewBox="0 0 200 150"><rect x="20" y="${140-(v1*10)}" width="40" height="${v1*10}" fill="#005ea2"/><rect x="80" y="${140-(v2*10)}" width="40" height="${v2*10}" fill="#5cb85c"/><line x1="10" y1="140" x2="150" y2="140" stroke="black"/><text x="30" y="150" font-size="12">A</text><text x="90" y="150" font-size="12">B</text></svg>`;
-        }
-        function drawCompositeSVG() {
-            return `<svg width="200" height="150" viewBox="0 0 300 200"><path d="M50,50 L200,50 L200,100 L120,100 L120,150 L50,150 Z" fill="#e1f3f8" stroke="#005ea2" stroke-width="3"/><text x="125" y="40">6</text><text x="25" y="100">5</text><text x="210" y="80">3</text><text x="80" y="170">4</text></svg>`;
-        }
-
-        // --- 2. GENERATOR LIBRARY (Mapped to Standards) ---
+        // --- 1. SVG GENERATORS (DYNAMIC VISUALS) ---
         
-        // --- NSO GENERATORS ---
-        const nsoGenerators = [
-            function nso_decomp() { // Skill: Decompose multiple ways
-                const n = Math.floor(Math.random()*4000)+1000;
-                return { type:'mc', text:`Select the way to decompose **${n}**.`, options:[`${Math.floor(n/100)} hundreds, ${n%100} ones`, `${Math.floor(n/1000)} hundreds, ${n%100} tens`, `${n} tens`] };
+        function svgClock(h, m) {
+            const hDeg = (h * 30) + (m * 0.5);
+            const mDeg = m * 6;
+            return `<svg width="180" height="180" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="white" stroke="black" stroke-width="4"/><circle cx="100" cy="100" r="4" fill="black"/>${[12,1,2,3,4,5,6,7,8,9,10,11].map(n=>`<text x="${100+75*Math.cos((n*30-90)*(Math.PI/180))}" y="${100+75*Math.sin((n*30-90)*(Math.PI/180))}" text-anchor="middle" dominant-baseline="middle" font-size="16" font-family="Arial">${n}</text>`).join('')}<line x1="100" y1="100" x2="100" y2="55" stroke="black" stroke-width="6" transform="rotate(${hDeg} 100 100)" stroke-linecap="round"/><line x1="100" y1="100" x2="100" y2="30" stroke="black" stroke-width="4" transform="rotate(${mDeg} 100 100)" stroke-linecap="round"/></svg>`;
+        }
+
+        function svgBarGraph(v1, v2, label1, label2) {
+            const max = Math.max(v1, v2) + 2;
+            const h1 = (v1/max)*140; 
+            const h2 = (v2/max)*140;
+            return `<svg width="250" height="180" viewBox="0 0 250 180"><line x1="30" y1="160" x2="240" y2="160" stroke="black" stroke-width="2"/><line x1="30" y1="160" x2="30" y2="10" stroke="black" stroke-width="2"/><rect x="50" y="${160-h1}" width="50" height="${h1}" fill="#005ea2"/><rect x="140" y="${160-h2}" width="50" height="${h2}" fill="#5cb85c"/><text x="75" y="175" text-anchor="middle">${label1}</text><text x="165" y="175" text-anchor="middle">${label2}</text><text x="15" y="160" font-size="12">0</text><text x="15" y="20" font-size="12">${max}</text></svg>`;
+        }
+
+        function svgComposite(w1, h1, w2, h2) {
+            return `<svg width="220" height="180" viewBox="0 0 250 200"><path d="M50,50 L${50+(w1*20)},50 L${50+(w1*20)},${50+(h1*20)} L${50+((w1+w2)*20)},${50+(h1*20)} L${50+((w1+w2)*20)},${50+((h1+h2)*20)} L50,${50+((h1+h2)*20)} Z" fill="#e1f3f8" stroke="#005ea2" stroke-width="3"/><text x="${50+(w1*10)}" y="40">${w1}</text><text x="30" y="${50+((h1+h2)*10)}">${h1+h2}</text></svg>`;
+        }
+
+        function svgShape(type) {
+            if(type==='Trapezoid') return `<svg width="100" height="80" viewBox="0 0 100 80"><polygon points="20,70 80,70 65,10 35,10" fill="none" stroke="black" stroke-width="2"/></svg>`;
+            if(type==='Rectangle') return `<svg width="100" height="80" viewBox="0 0 100 80"><rect x="10" y="20" width="80" height="40" fill="none" stroke="black" stroke-width="2"/></svg>`;
+            if(type==='Triangle') return `<svg width="100" height="80" viewBox="0 0 100 80"><polygon points="10,70 90,70 30,10" fill="none" stroke="black" stroke-width="2"/></svg>`;
+            if(type==='Circle') return `<svg width="100" height="80" viewBox="0 0 100 80"><circle cx="50" cy="40" r="35" fill="none" stroke="black" stroke-width="2"/></svg>`;
+            return '';
+        }
+
+        // --- 2. QUESTION GENERATORS (THE ENGINE) ---
+        // Each domain has a list of generators. The system picks randomly from these to create 25 questions.
+
+        const NSO_GENS = [
+            () => { // Table Match: Value of Digits
+                const n = Math.floor(Math.random()*9000)+1000;
+                return { type: 'table_match', text: `Match the value of the digits in **${n.toLocaleString()}**.`, 
+                         rows: [{label:`Value of hundreds`, id:'r1'}, {label:`Value of ones`, id:'r2'}], 
+                         columns: ['Thousands', 'Hundreds', 'Tens', 'Ones'] };
             },
-            function nso_round() { // Skill: Rounding
-                const n = Math.floor(Math.random()*800)+100;
-                return { type:'mc', text:`Round **${n}** to the nearest 100.`, options:[Math.round(n/100)*100, Math.floor(n/10)*10, n+10, 1000] };
+            () => { // Hot Text: Rounding
+                const base = Math.floor(Math.random()*80)*10;
+                const target = base + Math.floor(Math.random()*9);
+                return { type: 'hot_text', text: `Select the number that **${target}** rounds to (nearest 10).`, 
+                         content: [base.toString(), (base+10).toString(), (base+100).toString()] };
             },
-            function nso_word() { // Skill: Word Form
-                const n = 1250; 
-                return { type:'mc', text:`Select the word form for **1,250**.`, options:['One thousand two hundred fifty', 'Twelve hundred five', 'One thousand two hundred five'] };
+            () => { // Multi-Select: Flexible Decomposition
+                const h = Math.floor(Math.random()*8)+1;
+                const total = h*100;
+                return { type: 'multi_select', text: `Select **all** ways to represent **${total}**.`, 
+                         options: [`${h} hundreds`, `${h}0 tens`, `${h}00 ones`, `${h+1} hundreds`] };
             },
-            function nso_compare() { // Skill: Comparing
-                return { type:'mc', text:`Select the correct statement.`, options:['4,200 > 4,020', '3,900 < 3,090', '1,500 = 1,050'] };
+            () => { // Multiple Choice: Comparing
+                const n1 = Math.floor(Math.random()*5000)+1000;
+                const n2 = n1 + (Math.random()>0.5 ? 10 : -10);
+                return { type: 'mc', text: `Select the correct comparison.`, options: [`${n1} < ${n2}`, `${n1} > ${n2}`, `${n1} = ${n2}`] };
             }
         ];
 
-        // --- FR GENERATORS ---
-        const frGenerators = [
-            function fr_unit() { // Skill: Unit Fractions
-                return { type:'mc', text:`Which fraction represents 1 part of 8?`, options:['1/8', '8/1', '8/8'] };
+        const FR_GENS = [
+            () => { // Equation: Unit Fraction
+                return { type: 'equation', text: `What fraction represents one part of a whole divided into 6 equal parts?`, num: 1, den: 6 };
             },
-            function fr_equiv() { // Skill: Equivalence
-                return { type:'mc', text:`Which fraction is equivalent to **1/2**?`, options:['3/6', '3/4', '2/5', '5/8'] };
+            () => { // MC: Equivalence
+                return { type: 'mc', text: `Which fraction is equivalent to **1/2**?`, options: ['2/4', '2/3', '3/8', '1/3'] };
             },
-            function fr_compare() { // Skill: Compare same denom
-                return { type:'mc', text:`Which is true?`, options:['3/8 < 5/8', '3/8 > 5/8', '3/8 = 5/8'] };
+            () => { // Table Match: Compare Fractions
+                return { type: 'table_match', text: `Compare the fractions.`, 
+                         rows: [{label:'1/3 vs 1/4', id:'r1'}, {label:'2/8 vs 4/8', id:'r2'}], 
+                         columns: ['>', '<', '='] };
+            },
+            () => { // Multi-Select: Number Line
+                return { type: 'multi_select', text: `Select all fractions greater than **1**.`, options: ['5/4', '3/2', '2/2', '1/3'] };
             }
         ];
 
-        // --- AR GENERATORS ---
-        const arGenerators = [
-            function ar_pattern() { // Skill: Patterns
-                return { type:'mc', text:`Identify the pattern: 3, 6, 9, 12...`, options:['Add 3', 'Multiply by 2', 'Add 6'] };
+        const AR_GENS = [
+            () => { // MC: Multiplication Pattern
+                const start = Math.floor(Math.random()*3)+2;
+                return { type: 'mc', text: `Identify the pattern: ${start}, ${start*2}, ${start*4}...`, options: ['Multiply by 2', 'Add 2', 'Multiply by 4'] };
             },
-            function ar_mult() { // Skill: Multiplication Property
-                return { type:'mc', text:`Which shows the Distributive Property for 7 x 12?`, options:['(7x10) + (7x2)', '(7+10) x (7+2)', '7 x 1 x 2'] };
+            () => { // Hot Text: Equation Truth
+                return { type: 'hot_text', text: `Select the **true** equation.`, content: ['4x5=20', '3x3=6', '10/2=8'] };
             },
-            function ar_error() { // Skill: Error Analysis (Level 5)
-                return { type:'mc', text:`Jon says 4x8=36. Is he correct?`, options:['No, 4x8=32', 'Yes', 'No, 4x8=24'] };
+            () => { // Equation: Missing Factor
+                const a = Math.floor(Math.random()*9)+2;
+                const b = Math.floor(Math.random()*9)+2;
+                return { type: 'equation', text: `Find the unknown: ? x ${a} = ${a*b}`, num: b };
+            },
+            () => { // MC: Error Analysis (Level 5)
+                return { type: 'mc', text: `Jon says 15 ÷ 3 = 6 because 6 + 6 + 6 = 18. Is he correct?`, options: ['No, he should add to 15.', 'Yes.', 'No, division is not addition.'] };
             }
         ];
 
-        // --- GR GENERATORS ---
-        const grGenerators = [
-            function gr_time() { // Skill: Time
-                return { type:'mc', text:`The clock shows 3:15. What time is it 30 mins later?`, visual: drawClockSVG(3,15), options:['3:45', '3:30', '4:00'] };
+        const GR_GENS = [
+            () => { // Graphic Response: Symmetry
+                return { type: 'graphic_response', text: `Select the shape with **no lines of symmetry**.`, 
+                         options: [{label:'Scalene', shape:'Triangle'}, {label:'Square', shape:'Rectangle'}, {label:'Circle', shape:'Circle'}] };
             },
-            function gr_area() { // Skill: Area Composite
-                return { type:'mc', text:`Find the area of the combined shape.`, visual: drawCompositeSVG(), options:['26 sq ft', '22 sq ft', '30 sq ft'] };
+            () => { // MC: Time
+                const h = Math.floor(Math.random()*11)+1;
+                const m = [15, 30, 45][Math.floor(Math.random()*3)];
+                return { type: 'mc', text: `What time is shown?`, visual: svgClock(h, m), options: [`${h}:${m}`, `${h+1}:${m}`, `${m}:${h}`] };
             },
-            function gr_data() { // Skill: Bar Graphs
-                return { type:'mc', text:`How many more in B than A? (Scale: 1 line = 1 unit)`, visual: drawBarGraphSVG(4, 9), options:['5', '4', '13'] };
+            () => { // MC: Area Composite
+                const w1=4, h1=3, w2=2, h2=4;
+                return { type: 'mc', text: `Find the total area.`, visual: svgComposite(w1,h1,w2,h2), options: [`${(w1*h1)+((w1+w2)*h2)}`, '20', '30'] };
+            },
+            () => { // MC: Data
+                const v1 = Math.floor(Math.random()*8)+2;
+                const v2 = v1 + 3;
+                return { type: 'mc', text: `How many more in Green than Blue?`, visual: svgBarGraph(v1, v2, 'Blue', 'Green'), options: ['3', '5', '2'] };
             }
         ];
 
-
-        // --- 3. TEST LOGIC ---
-        function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+        // --- 3. TEST CONTROL ---
 
         function startTest(mode) {
             document.getElementById('dashboard').style.display = 'none';
@@ -193,62 +259,126 @@
             currentQuestions = [];
             currentIndex = 0;
             
-            // SELECT GENERATORS BASED ON MODE
-            let gens = [];
-            if (mode === 'NSO') gens = nsoGenerators;
-            else if (mode === 'FR') gens = frGenerators;
-            else if (mode === 'AR') gens = arGenerators;
-            else if (mode === 'GR') gens = grGenerators;
-            else if (mode === 'mock') gens = [...nsoGenerators, ...frGenerators, ...arGenerators, ...grGenerators];
+            // Build the question pool
+            let pool = [];
+            if (mode === 'NSO') pool = NSO_GENS;
+            else if (mode === 'FR') pool = FR_GENS;
+            else if (mode === 'AR') pool = AR_GENS;
+            else if (mode === 'GR') pool = GR_GENS;
+            else if (mode === 'mock') pool = [...NSO_GENS, ...FR_GENS, ...AR_GENS, ...GR_GENS];
 
-            // Generate Questions (Cycle through the specific list to hit EVERY standard)
-            // If Mock, pick 30 random. If Domain, run ALL its generators.
-            const count = (mode === 'mock') ? 30 : gens.length * 2; // Run domain skills twice for practice
-            
+            // Generate 25 (or 30 for mock) unique questions
+            const count = (mode === 'mock') ? 30 : 25;
             for(let i=0; i<count; i++) {
-                const gen = gens[i % gens.length]; // Cycle through generators
-                currentQuestions.push(gen());
+                // Cycle through generators to ensure variety
+                const generator = pool[i % pool.length];
+                currentQuestions.push(generator());
             }
 
             document.getElementById('q-total').innerText = currentQuestions.length;
             renderQuestion(0);
         }
 
+        // --- 4. RENDERERS (THE UI) ---
+
         function renderQuestion(index) {
-            currentIndex = index;
             const q = currentQuestions[index];
             const container = document.getElementById('question-card');
             document.getElementById('q-num').innerText = index + 1;
-
-            let visual = q.visual ? `<div class="visual-container">${q.visual}</div>` : '';
-            // Shuffle options for rendering
-            let opts = q.options.map(o => `<div class="option-row" onclick="selectOption(this)"><div style="width:20px; height:20px; border:1px solid #333; border-radius:50%; margin-right:10px;"></div>${o}</div>`).join('');
             
-            container.innerHTML = `<div class="question-stem">${q.text}</div>${visual}<div>${opts}</div>`;
+            let html = `<div class="question-stem">${q.text}</div>`;
+            if (q.visual) html += `<div class="visual-container">${q.visual}</div>`;
+
+            // ROUTE TO ITEM TYPE
+            if (q.type === 'mc') html += renderMC(q);
+            else if (q.type === 'multi_select') html += renderMultiSelect(q);
+            else if (q.type === 'table_match') html += renderTableMatch(q);
+            else if (q.type === 'hot_text') html += renderHotText(q);
+            else if (q.type === 'graphic_response') html += renderGraphic(q);
+            else if (q.type === 'equation') html += renderEquation(q);
+
+            container.innerHTML = html;
         }
 
-        function selectOption(el) {
-            // Visual selection only for this demo
-            document.querySelectorAll('.option-row').forEach(e => e.style.backgroundColor = 'white');
-            el.style.backgroundColor = '#e1f3f8';
+        function renderMC(q) {
+            return `<div>${shuffle(q.options).map(o => `<div class="option-row" onclick="selectRow(this)"><input type="radio" name="opt" style="margin-right:15px;"> ${o}</div>`).join('')}</div>`;
         }
+
+        function renderMultiSelect(q) {
+            return `<div>${shuffle(q.options).map(o => `<div class="option-row" onclick="selectRow(this)"><input type="checkbox" style="margin-right:15px;"> ${o}</div>`).join('')}</div>`;
+        }
+
+        function renderTableMatch(q) {
+            return `<table class="fast-table"><thead><tr><th></th>${q.columns.map(c=>`<th>${c}</th>`).join('')}</tr></thead><tbody>${q.rows.map((r,i)=>`<tr><td style="text-align:left;">${r.label}</td>${q.columns.map(c=>`<td><input type="radio" name="r${i}" class="fast-radio"></td>`).join('')}</tr>`).join('')}</tbody></table>`;
+        }
+
+        function renderHotText(q) {
+            return `<div class="hot-text-container">${q.content.map(c => `<span class="hot-spot" onclick="toggleHot(this)">${c}</span>`).join(' &nbsp; ')}</div>`;
+        }
+
+        function renderGraphic(q) {
+            return `<div class="graphic-grid">${q.options.map(o => `<div class="graphic-option" onclick="selectGraphic(this)">${svgShape(o.shape)}<br><b>${o.label}</b></div>`).join('')}</div>`;
+        }
+
+        function renderEquation(q) {
+            return `<div style="text-align:center;"><div class="eq-display" id="eq-screen"></div><div class="keypad" style="margin:0 auto;">${[1,2,3,4,5,6,7,8,9,0,'/','⌫'].map(k => `<button class="key-btn" onclick="pressKey('${k}')">${k}</button>`).join('')}</div></div>`;
+        }
+
+        // --- 5. INTERACTION HANDLERS ---
+        
+        function selectRow(el) {
+            // Visual feedback
+            const input = el.querySelector('input');
+            if(input.type === 'radio') {
+                document.querySelectorAll('.option-row').forEach(d => {d.style.background='white'; d.style.borderColor='#ccc';});
+                input.checked = true;
+            } else {
+                input.checked = !input.checked;
+            }
+            if(input.checked) { el.style.background='var(--fast-hover)'; el.style.borderColor='var(--fast-blue)'; }
+            else { el.style.background='white'; el.style.borderColor='#ccc'; }
+        }
+
+        function toggleHot(el) {
+            document.querySelectorAll('.hot-spot').forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function selectGraphic(el) {
+            document.querySelectorAll('.graphic-option').forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        let eqVal = "";
+        function pressKey(k) {
+            if (k === '⌫') eqVal = eqVal.slice(0,-1);
+            else eqVal += k;
+            document.getElementById('eq-screen').innerText = eqVal;
+        }
+
+        function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
 
         function nextQuestion() {
-            if (currentIndex < currentQuestions.length - 1) renderQuestion(currentIndex + 1);
-            else {
-                document.getElementById('question-card').innerHTML = `<h2>Test Complete</h2><button class="nav-btn btn-next" onclick="location.reload()">Return Home</button>`;
-                document.getElementById('nav-controls').style.display = 'none';
+            if (currentIndex < currentQuestions.length - 1) {
+                renderQuestion(++currentIndex);
+                eqVal = ""; // reset equation
+            } else {
+                finishTest();
             }
         }
-        
+
+        function finishTest() {
+            document.getElementById('question-card').innerHTML = `<h2 style="text-align:center; color:var(--fast-blue);">Test Complete!</h2><p style="text-align:center;">Great job practicing your B.E.S.T. Standards.</p><div style="text-align:center; margin-top:40px;"><button class="nav-btn btn-next" onclick="location.reload()">Return to Dashboard</button></div>`;
+            document.getElementById('nav-controls').style.display = 'none';
+        }
+
         function exitTest() {
             document.getElementById('simulator-view').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
         }
 
-        window.onload = function() {
-            document.getElementById('dashboard').style.display = 'block';
-        };
+        // Init
+        window.onload = function() { document.getElementById('dashboard').style.display = 'block'; };
 
     </script>
 </body>
