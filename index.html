@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florida FAST Math Simulator (Ultimate Edition)</title>
+    <title>Florida FAST Math Simulator (Ultimate Edition 2.0)</title>
     <style>
         /* --- 1. CAMBIUM / FAST THEME --- */
         :root {
@@ -43,8 +43,8 @@
         /* --- TECH ENHANCED ITEMS CSS --- */
         
         /* 1. Hot Text */
-        .hot-text-container { font-size: 24px; line-height: 2.5; padding: 20px; border: 1px solid #ddd; }
-        .hot-spot { padding: 6px 12px; margin: 0 4px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .hot-text-container { font-size: 24px; line-height: 2.5; padding: 20px; border: 1px solid #ddd; display: flex; flex-wrap: wrap; gap: 10px; }
+        .hot-spot { padding: 8px 16px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; transition: 0.2s; background: #f9f9f9; border: 1px solid #ccc; }
         .hot-spot:hover { background-color: var(--fast-hover); border-color: #bcd6ed; }
         .hot-spot.selected { background-color: var(--fast-blue); color: white; border-color: var(--fast-blue); }
 
@@ -90,7 +90,7 @@
     <div id="dashboard">
         <div class="header">
             <h1>Florida FAST Math Simulator</h1>
-            <p><strong>Ultimate Edition:</strong> Tech-Enhanced Items & Dynamic Visuals</p>
+            <p><strong>Ultimate Edition 2.0:</strong> Complete B.E.S.T. Standards Coverage</p>
         </div>
 
         <div class="grid-container">
@@ -103,22 +103,22 @@
             <div class="card nso" onclick="startTest('NSO')">
                 <h3>Number Sense (NSO)</h3>
                 <p><strong>25 Questions</strong> • Master Quiz</p>
-                <p>Place Value, Rounding, Decomposition, Comparing.</p>
+                <p>Place Value, Rounding, Addition, Subtraction.</p>
             </div>
             <div class="card fr" onclick="startTest('FR')">
                 <h3>Fractions (FR)</h3>
                 <p><strong>25 Questions</strong> • Master Quiz</p>
-                <p>Models, Equivalence, Number Lines, Ordering.</p>
+                <p>Unit Fractions, >1, Equivalence, Number Lines.</p>
             </div>
             <div class="card ar" onclick="startTest('AR')">
                 <h3>Algebraic Reasoning (AR)</h3>
                 <p><strong>25 Questions</strong> • Master Quiz</p>
-                <p>Multiplication, Division, Patterns, Equations.</p>
+                <p>Distributive Prop, Patterns, Missing Factors.</p>
             </div>
             <div class="card gr" onclick="startTest('GR')">
                 <h3>Geometry & Data (GR)</h3>
                 <p><strong>25 Questions</strong> • Master Quiz</p>
-                <p>Area, Perimeter, Time, Symmetry, Graphs.</p>
+                <p>Area, Measurement (Liquid/Length), Lines, Time.</p>
             </div>
         </div>
     </div>
@@ -137,7 +137,6 @@
         // --- GLOBAL STATE ---
         let currentQuestions = [];
         let currentIndex = 0;
-        let userAnswers = []; // To store user input
 
         // --- 1. SVG GENERATORS (DYNAMIC VISUALS) ---
         
@@ -147,15 +146,21 @@
             return `<svg width="180" height="180" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="white" stroke="black" stroke-width="4"/><circle cx="100" cy="100" r="4" fill="black"/>${[12,1,2,3,4,5,6,7,8,9,10,11].map(n=>`<text x="${100+75*Math.cos((n*30-90)*(Math.PI/180))}" y="${100+75*Math.sin((n*30-90)*(Math.PI/180))}" text-anchor="middle" dominant-baseline="middle" font-size="16" font-family="Arial">${n}</text>`).join('')}<line x1="100" y1="100" x2="100" y2="55" stroke="black" stroke-width="6" transform="rotate(${hDeg} 100 100)" stroke-linecap="round"/><line x1="100" y1="100" x2="100" y2="30" stroke="black" stroke-width="4" transform="rotate(${mDeg} 100 100)" stroke-linecap="round"/></svg>`;
         }
 
-        function svgBarGraph(v1, v2, label1, label2) {
-            const max = Math.max(v1, v2) + 2;
-            const h1 = (v1/max)*140; 
-            const h2 = (v2/max)*140;
-            return `<svg width="250" height="180" viewBox="0 0 250 180"><line x1="30" y1="160" x2="240" y2="160" stroke="black" stroke-width="2"/><line x1="30" y1="160" x2="30" y2="10" stroke="black" stroke-width="2"/><rect x="50" y="${160-h1}" width="50" height="${h1}" fill="#005ea2"/><rect x="140" y="${160-h2}" width="50" height="${h2}" fill="#5cb85c"/><text x="75" y="175" text-anchor="middle">${label1}</text><text x="165" y="175" text-anchor="middle">${label2}</text><text x="15" y="160" font-size="12">0</text><text x="15" y="20" font-size="12">${max}</text></svg>`;
+        function svgBeaker(level) {
+            // Level 0-4 (0=empty, 4=full)
+            const h = level * 30; 
+            return `<svg width="100" height="150" viewBox="0 0 100 150"><rect x="20" y="20" width="60" height="120" fill="none" stroke="black" stroke-width="3"/><rect x="20" y="${140-h}" width="60" height="${h}" fill="#a2d9f7" opacity="0.8"/><line x1="20" y1="50" x2="40" y2="50" stroke="black"/><line x1="20" y1="80" x2="40" y2="80" stroke="black"/><line x1="20" y1="110" x2="40" y2="110" stroke="black"/><text x="85" y="55" font-size="12">1 Cup</text><text x="85" y="85" font-size="12">1/2</text></svg>`;
         }
 
-        function svgComposite(w1, h1, w2, h2) {
-            return `<svg width="220" height="180" viewBox="0 0 250 200"><path d="M50,50 L${50+(w1*20)},50 L${50+(w1*20)},${50+(h1*20)} L${50+((w1+w2)*20)},${50+(h1*20)} L${50+((w1+w2)*20)},${50+((h1+h2)*20)} L50,${50+((h1+h2)*20)} Z" fill="#e1f3f8" stroke="#005ea2" stroke-width="3"/><text x="${50+(w1*10)}" y="40">${w1}</text><text x="30" y="${50+((h1+h2)*10)}">${h1+h2}</text></svg>`;
+        function svgRuler(len) {
+            // Draws a ruler measuring a bar of 'len' inches (scaled)
+            const pixels = len * 40; 
+            return `<svg width="300" height="100" viewBox="0 0 300 100"><rect x="10" y="40" width="${pixels}" height="20" fill="#f0ad4e" stroke="black"/><rect x="10" y="65" width="260" height="30" fill="#fff" stroke="black"/><line x1="10" y1="65" x2="10" y2="80" stroke="black"/><text x="10" y="90" font-size="10">0</text><line x1="50" y1="65" x2="50" y2="80" stroke="black"/><text x="50" y="90" font-size="10">1</text><line x1="90" y1="65" x2="90" y2="80" stroke="black"/><text x="90" y="90" font-size="10">2</text><line x1="130" y1="65" x2="130" y2="80" stroke="black"/><text x="130" y="90" font-size="10">3</text><line x1="170" y1="65" x2="170" y2="80" stroke="black"/><text x="170" y="90" font-size="10">4</text><line x1="210" y1="65" x2="210" y2="80" stroke="black"/><text x="210" y="90" font-size="10">5</text><line x1="250" y1="65" x2="250" y2="80" stroke="black"/><text x="250" y="90" font-size="10">6</text></svg>`;
+        }
+
+        function svgGridShape(w, h) {
+            // Draws a grid of squares
+            return `<svg width="${w*30}" height="${h*30}" viewBox="0 0 ${w*30} ${h*30}"><defs><pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse"><rect width="30" height="30" fill="white" stroke="#ccc" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid)" stroke="black" stroke-width="2"/></svg>`;
         }
 
         function svgShape(type) {
@@ -163,92 +168,95 @@
             if(type==='Rectangle') return `<svg width="100" height="80" viewBox="0 0 100 80"><rect x="10" y="20" width="80" height="40" fill="none" stroke="black" stroke-width="2"/></svg>`;
             if(type==='Triangle') return `<svg width="100" height="80" viewBox="0 0 100 80"><polygon points="10,70 90,70 30,10" fill="none" stroke="black" stroke-width="2"/></svg>`;
             if(type==='Circle') return `<svg width="100" height="80" viewBox="0 0 100 80"><circle cx="50" cy="40" r="35" fill="none" stroke="black" stroke-width="2"/></svg>`;
+            if(type==='Ray') return `<svg width="100" height="50"><circle cx="10" cy="25" r="3"/><line x1="10" y1="25" x2="90" y2="25" stroke="black" stroke-width="2"/><polygon points="90,20 90,30 100,25" fill="black"/></svg>`;
+            if(type==='Line') return `<svg width="100" height="50"><polygon points="10,20 10,30 0,25" fill="black"/><line x1="0" y1="25" x2="100" y2="25" stroke="black" stroke-width="2"/><polygon points="90,20 90,30 100,25" fill="black"/></svg>`;
+            if(type==='Segment') return `<svg width="100" height="50"><circle cx="10" cy="25" r="3"/><line x1="10" y1="25" x2="90" y2="25" stroke="black" stroke-width="2"/><circle cx="90" cy="25" r="3"/></svg>`;
             return '';
         }
 
-        // --- 2. QUESTION GENERATORS (THE ENGINE) ---
-        // Each domain has a list of generators. The system picks randomly from these to create 25 questions.
+        // --- 2. QUESTION GENERATORS ---
+        
+        // HELPER: Shuffle
+        function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+        // HELPER: Num to Words
+        function toWords(n) { const w=["zero","one","two","three","four","five","six","seven","eight","nine"]; return w[n]||n; }
 
+        // --- NSO DOMAIN (Number Sense & Ops) ---
         const NSO_GENS = [
-            () => { // Table Match: Value of Digits
+            // 1. Expanded/Word Form (Level 3/4)
+            () => { 
                 const n = Math.floor(Math.random()*9000)+1000;
-                return { type: 'table_match', text: `Match the value of the digits in **${n.toLocaleString()}**.`, 
-                         rows: [{label:`Value of hundreds`, id:'r1'}, {label:`Value of ones`, id:'r2'}], 
-                         columns: ['Thousands', 'Hundreds', 'Tens', 'Ones'] };
+                return { type: 'mc', text: `Select the **Word Form** for ${n}.`, options: [`${toWords(Math.floor(n/1000))} thousand...`, `Ten thousand...`, `${n} ones`] }; 
             },
-            () => { // Hot Text: Rounding
-                const base = Math.floor(Math.random()*80)*10;
-                const target = base + Math.floor(Math.random()*9);
-                return { type: 'hot_text', text: `Select the number that **${target}** rounds to (nearest 10).`, 
-                         content: [base.toString(), (base+10).toString(), (base+100).toString()] };
-            },
-            () => { // Multi-Select: Flexible Decomposition
+            // 2. Flexible Decomposition (Level 4/5)
+            () => { 
                 const h = Math.floor(Math.random()*8)+1;
-                const total = h*100;
-                return { type: 'multi_select', text: `Select **all** ways to represent **${total}**.`, 
-                         options: [`${h} hundreds`, `${h}0 tens`, `${h}00 ones`, `${h+1} hundreds`] };
+                return { type: 'multi_select', text: `Select **all** ways to make ${h}00.`, options: [`${h} hundreds`, `${h}0 tens`, `${h}00 ones`, `${h+1} hundreds`] }; 
             },
-            () => { // Multiple Choice: Comparing
-                const n1 = Math.floor(Math.random()*5000)+1000;
-                const n2 = n1 + (Math.random()>0.5 ? 10 : -10);
-                return { type: 'mc', text: `Select the correct comparison.`, options: [`${n1} < ${n2}`, `${n1} > ${n2}`, `${n1} = ${n2}`] };
-            }
+            // 3. Comparing (Level 3)
+            () => { return { type: 'mc', text: `Compare: 4,050 ? 4,005`, options: ['>', '<', '='] }; },
+            // 4. Rounding (Level 3/4)
+            () => { return { type: 'hot_text', text: `Select numbers that round to **400** (nearest 100).`, content: ['390', '404', '340', '460'] }; },
+            // 5. Addition Algorithm (Level 4)
+            () => { const a=Math.floor(Math.random()*400)+100; const b=Math.floor(Math.random()*400)+100; return { type: 'equation', text: `Solve: ${a} + ${b} = ?`, num: a+b }; },
+            // 6. Subtraction Algorithm (Level 4)
+            () => { const a=Math.floor(Math.random()*400)+500; const b=Math.floor(Math.random()*400)+100; return { type: 'equation', text: `Solve: ${a} - ${b} = ?`, num: a-b }; },
+            // 7. Multiply Multiples of 10 (Level 3)
+            () => { const a=Math.floor(Math.random()*8)+1; return { type: 'mc', text: `Solve: ${a} x 60`, options: [`${a*60}`, `${a*6}00`, `${a*6}`] }; },
+            // 8. Error Analysis (Level 5)
+            () => { return { type: 'mc', text: `Jon subtracted 500 - 248 and got 348. What is his error?`, options: ['He did not regroup correctly.', 'He added instead.', 'He is correct.'] }; }
         ];
 
+        // --- FR DOMAIN (Fractions) ---
         const FR_GENS = [
-            () => { // Equation: Unit Fraction
-                return { type: 'equation', text: `What fraction represents one part of a whole divided into 6 equal parts?`, num: 1, den: 6 };
-            },
-            () => { // MC: Equivalence
-                return { type: 'mc', text: `Which fraction is equivalent to **1/2**?`, options: ['2/4', '2/3', '3/8', '1/3'] };
-            },
-            () => { // Table Match: Compare Fractions
-                return { type: 'table_match', text: `Compare the fractions.`, 
-                         rows: [{label:'1/3 vs 1/4', id:'r1'}, {label:'2/8 vs 4/8', id:'r2'}], 
-                         columns: ['>', '<', '='] };
-            },
-            () => { // Multi-Select: Number Line
-                return { type: 'multi_select', text: `Select all fractions greater than **1**.`, options: ['5/4', '3/2', '2/2', '1/3'] };
-            }
+            // 1. Unit Fractions
+            () => { return { type: 'mc', text: `What fraction is 1 part of 8?`, options: ['1/8', '8/1', '1/1'] }; },
+            // 2. Fractions > 1 (Level 4)
+            () => { return { type: 'mc', text: `Which represents 5 copies of 1/3?`, options: ['5/3', '1/3', '5/1'] }; },
+            // 3. Equivalence (Level 3)
+            () => { return { type: 'table_match', text: `Match equivalent fractions.`, rows: [{label:'1/2', id:'r1'},{label:'2/3', id:'r2'}], columns: ['2/4', '4/6', '1/3'] }; },
+            // 4. Comparing (Same Denom)
+            () => { return { type: 'mc', text: `Compare: 3/8 ? 5/8`, options: ['<', '>', '='] }; },
+            // 5. Comparing (Same Num)
+            () => { return { type: 'mc', text: `Compare: 2/3 ? 2/6`, options: ['>', '<', '='] }; },
+            // 6. Number Line
+            () => { return { type: 'hot_text', text: `Select fractions equal to **1 whole**.`, content: ['3/3', '4/4', '5/4', '2/1'] }; }
         ];
 
+        // --- AR DOMAIN (Algebraic Reasoning) ---
         const AR_GENS = [
-            () => { // MC: Multiplication Pattern
-                const start = Math.floor(Math.random()*3)+2;
-                return { type: 'mc', text: `Identify the pattern: ${start}, ${start*2}, ${start*4}...`, options: ['Multiply by 2', 'Add 2', 'Multiply by 4'] };
-            },
-            () => { // Hot Text: Equation Truth
-                return { type: 'hot_text', text: `Select the **true** equation.`, content: ['4x5=20', '3x3=6', '10/2=8'] };
-            },
-            () => { // Equation: Missing Factor
-                const a = Math.floor(Math.random()*9)+2;
-                const b = Math.floor(Math.random()*9)+2;
-                return { type: 'equation', text: `Find the unknown: ? x ${a} = ${a*b}`, num: b };
-            },
-            () => { // MC: Error Analysis (Level 5)
-                return { type: 'mc', text: `Jon says 15 ÷ 3 = 6 because 6 + 6 + 6 = 18. Is he correct?`, options: ['No, he should add to 15.', 'Yes.', 'No, division is not addition.'] };
-            }
+            // 1. Patterns (Level 3)
+            () => { return { type: 'mc', text: `Identify pattern: 4, 8, 12, 16...`, options: ['Add 4', 'Multiply by 2', 'Add 2'] }; },
+            // 2. Distributive Property (Level 4)
+            () => { return { type: 'mc', text: `Which shows 7 x 12?`, options: ['(7x10) + (7x2)', '(7+10) x (7+2)', '7 x 1 x 2'] }; },
+            // 3. Missing Factor (Level 3)
+            () => { return { type: 'equation', text: `Find ?: 4 x ? = 32`, num: 8 }; },
+            // 4. True/False Equations (Level 4)
+            () => { return { type: 'table_match', text: `True or False?`, rows: [{label:'4x5=20', id:'r1'},{label:'10/2=4', id:'r2'}], columns: ['True', 'False'] }; },
+            // 5. Even/Odd (Level 3)
+            () => { const n=Math.floor(Math.random()*90)+10; return { type: 'mc', text: `Is ${n} Even or Odd?`, options: [n%2==0?'Even':'Odd', n%2==0?'Odd':'Even'] }; },
+            // 6. Multiples (Level 3)
+            () => { return { type: 'multi_select', text: `Select multiples of 5.`, options: ['25', '30', '12', '7'] }; }
         ];
 
+        // --- GR DOMAIN (Geometry & Measurement) ---
         const GR_GENS = [
-            () => { // Graphic Response: Symmetry
-                return { type: 'graphic_response', text: `Select the shape with **no lines of symmetry**.`, 
-                         options: [{label:'Scalene', shape:'Triangle'}, {label:'Square', shape:'Rectangle'}, {label:'Circle', shape:'Circle'}] };
-            },
-            () => { // MC: Time
-                const h = Math.floor(Math.random()*11)+1;
-                const m = [15, 30, 45][Math.floor(Math.random()*3)];
-                return { type: 'mc', text: `What time is shown?`, visual: svgClock(h, m), options: [`${h}:${m}`, `${h+1}:${m}`, `${m}:${h}`] };
-            },
-            () => { // MC: Area Composite
-                const w1=4, h1=3, w2=2, h2=4;
-                return { type: 'mc', text: `Find the total area.`, visual: svgComposite(w1,h1,w2,h2), options: [`${(w1*h1)+((w1+w2)*h2)}`, '20', '30'] };
-            },
-            () => { // MC: Data
-                const v1 = Math.floor(Math.random()*8)+2;
-                const v2 = v1 + 3;
-                return { type: 'mc', text: `How many more in Green than Blue?`, visual: svgBarGraph(v1, v2, 'Blue', 'Green'), options: ['3', '5', '2'] };
-            }
+            // 1. Identify Quadrilaterals (Level 3)
+            () => { return { type: 'graphic_response', text: `Select the **Trapezoid**.`, options: [{label:'Trap', shape:'Trapezoid'}, {label:'Rect', shape:'Rectangle'}, {label:'Circ', shape:'Circle'}] }; },
+            // 2. Lines of Symmetry (Level 3/4)
+            () => { return { type: 'mc', text: `Which has NO lines of symmetry?`, options: ['Scalene Triangle', 'Square', 'Circle'] }; },
+            // 3. Rays/Lines/Segments (Level 4)
+            () => { return { type: 'graphic_response', text: `Select the **Ray**.`, options: [{label:'Ray', shape:'Ray'}, {label:'Line', shape:'Line'}, {label:'Seg', shape:'Segment'}] }; },
+            // 4. Area by Counting (Level 3)
+            () => { return { type: 'mc', text: `Find the area (count squares).`, visual: svgGridShape(4,3), options: ['12 sq units', '7 sq units', '14 sq units'] }; },
+            // 5. Area Formula (Level 4)
+            () => { return { type: 'equation', text: `Rectangle is 6ft by 4ft. Area = ?`, num: 24 }; },
+            // 6. Liquid Volume (Level 3)
+            () => { return { type: 'mc', text: `Estimate the volume.`, visual: svgBeaker(2), options: ['1/2 Cup', '1 Cup', '1/4 Cup'] }; },
+            // 7. Length (Level 3)
+            () => { return { type: 'mc', text: `Measure the orange bar.`, visual: svgRuler(3.5), options: ['3 1/2 in', '3 in', '4 in'] }; },
+            // 8. Time (Level 3)
+            () => { return { type: 'mc', text: `What time is shown?`, visual: svgClock(4,30), options: ['4:30', '5:30', '6:00'] }; }
         ];
 
         // --- 3. TEST CONTROL ---
@@ -267,10 +275,9 @@
             else if (mode === 'GR') pool = GR_GENS;
             else if (mode === 'mock') pool = [...NSO_GENS, ...FR_GENS, ...AR_GENS, ...GR_GENS];
 
-            // Generate 25 (or 30 for mock) unique questions
+            // Generate 25 (or 30 for mock) unique questions by cycling the pool
             const count = (mode === 'mock') ? 30 : 25;
             for(let i=0; i<count; i++) {
-                // Cycle through generators to ensure variety
                 const generator = pool[i % pool.length];
                 currentQuestions.push(generator());
             }
@@ -279,7 +286,7 @@
             renderQuestion(0);
         }
 
-        // --- 4. RENDERERS (THE UI) ---
+        // --- 4. RENDERERS ---
 
         function renderQuestion(index) {
             const q = currentQuestions[index];
@@ -289,7 +296,6 @@
             let html = `<div class="question-stem">${q.text}</div>`;
             if (q.visual) html += `<div class="visual-container">${q.visual}</div>`;
 
-            // ROUTE TO ITEM TYPE
             if (q.type === 'mc') html += renderMC(q);
             else if (q.type === 'multi_select') html += renderMultiSelect(q);
             else if (q.type === 'table_match') html += renderTableMatch(q);
@@ -313,7 +319,7 @@
         }
 
         function renderHotText(q) {
-            return `<div class="hot-text-container">${q.content.map(c => `<span class="hot-spot" onclick="toggleHot(this)">${c}</span>`).join(' &nbsp; ')}</div>`;
+            return `<div class="hot-text-container">${q.content.map(c => `<span class="hot-spot" onclick="toggleHot(this)">${c}</span>`).join('')}</div>`;
         }
 
         function renderGraphic(q) {
@@ -327,7 +333,6 @@
         // --- 5. INTERACTION HANDLERS ---
         
         function selectRow(el) {
-            // Visual feedback
             const input = el.querySelector('input');
             if(input.type === 'radio') {
                 document.querySelectorAll('.option-row').forEach(d => {d.style.background='white'; d.style.borderColor='#ccc';});
@@ -340,8 +345,7 @@
         }
 
         function toggleHot(el) {
-            document.querySelectorAll('.hot-spot').forEach(s => s.classList.remove('selected'));
-            el.classList.add('selected');
+            el.classList.toggle('selected');
         }
 
         function selectGraphic(el) {
@@ -356,12 +360,10 @@
             document.getElementById('eq-screen').innerText = eqVal;
         }
 
-        function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
-
         function nextQuestion() {
             if (currentIndex < currentQuestions.length - 1) {
                 renderQuestion(++currentIndex);
-                eqVal = ""; // reset equation
+                eqVal = ""; 
             } else {
                 finishTest();
             }
