@@ -3,421 +3,382 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florida FAST Math Simulator (Final Version)</title>
+    <title>Florida FAST Math Simulator (Grade 3)</title>
     <style>
-        /* --- 1. GLOBAL & DASHBOARD STYLES --- */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
-        
-        /* Dashboard */
-        #dashboard { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
-        .header { text-align: center; margin-bottom: 50px; }
-        .header h1 { color: #005ea2; font-size: 36px; margin-bottom: 10px; }
-        
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        .card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; border-top: 5px solid #ccc; transition: transform 0.2s; }
-        .card:hover { transform: translateY(-5px); }
-        .card.mock { border-top-color: #d9534f; }
-        .card.nso { border-top-color: #005ea2; }
-        .card.fr { border-top-color: #5cb85c; }
-        .card.ar { border-top-color: #f0ad4e; }
-        .card.gr { border-top-color: #6f42c1; }
+        /* --- 1. CAMBIUM AUTHENTIC THEME --- */
+        :root {
+            --fast-bg: #f2f2f2;           /* Light grey background outside the card */
+            --fast-card-bg: #ffffff;      /* White question paper */
+            --fast-text: #000000;
+            --fast-blue: #005ea2;         /* The official selection blue */
+            --fast-hover: #e1f3f8;        /* Light blue hover state */
+            --fast-border: #000000;       /* High contrast borders */
+            --fast-grey-row: #f0f0f0;     /* Alternating table rows */
+        }
 
-        /* --- 2. SIMULATOR (TEST VIEW) --- */
-        #simulator-view { display: none; min-height: 100vh; background-color: #f2f2f2; }
-        
-        :root { --fast-blue: #005ea2; --fast-hover: #e1f3f8; --fast-grey-row: #f0f0f0; }
+        body {
+            font-family: 'Verdana', 'Arial', sans-serif; /* Standard testing fonts */
+            background-color: var(--fast-bg);
+            margin: 0;
+            padding-bottom: 100px; /* Space for the footer */
+            color: var(--fast-text);
+        }
 
+        /* The "Paper" Area */
         #question-card {
-            max-width: 900px; margin: 0 auto; padding: 50px; background: white;
-            border-left: 1px solid #ccc; border-right: 1px solid #ccc; min-height: 600px;
-            padding-bottom: 100px;
+            max-width: 900px;
+            margin: 40px auto;
+            background: var(--fast-card-bg);
+            padding: 50px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-height: 400px;
         }
 
-        .question-stem { font-size: 22px; margin-bottom: 30px; line-height: 1.6; }
-        .level-badge { display: inline-block; background: #333; color: white; padding: 2px 8px; font-size: 12px; border-radius: 4px; margin-bottom: 10px; }
+        /* Question Stem Text */
+        .question-stem {
+            font-size: 22px;
+            font-weight: normal; /* FAST uses normal weight, not bold, for stems */
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
 
-        /* VISUALS (SVGs) */
-        .visual-container { text-align: center; margin: 20px 0; padding: 20px; background: #fff; border: 1px solid #eee; }
-        svg { max-width: 100%; height: auto; }
+        /* --- 2. HOT TEXT STYLES --- */
+        .hot-text-container {
+            font-size: 24px;
+            line-height: 2.5;
+            padding: 20px;
+            border: 1px solid #ddd; /* Container box often used in tests */
+            border-radius: 4px;
+        }
 
-        /* Question Types */
-        .fast-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 18px; }
-        .fast-table th { border-bottom: 2px solid #000; padding: 15px; }
-        .fast-table td { padding: 15px; border-bottom: 1px solid #ccc; text-align: center; }
+        .hot-spot {
+            padding: 6px 12px;
+            margin: 0 4px;
+            border: 2px solid transparent; /* Invisible border prevents jumping */
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .hot-spot:hover {
+            background-color: var(--fast-hover);
+            border-color: #bcd6ed;
+        }
+
+        .hot-spot.selected {
+            background-color: var(--fast-blue);
+            color: white;
+            border-color: var(--fast-blue);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* --- 3. TABLE MATCH STYLES --- */
+        .fast-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .fast-table th {
+            background-color: #fff;
+            border-bottom: 2px solid #000;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .fast-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ccc;
+            text-align: center;
+        }
+
+        /* Zebra Striping */
         .fast-table tr:nth-child(even) { background-color: var(--fast-grey-row); }
+        .fast-table tr:nth-child(odd) { background-color: #fff; }
 
-        .option-row { padding: 15px; border: 1px solid #ccc; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; border-radius: 4px; }
-        .option-row:hover { background-color: var(--fast-hover); border-color: var(--fast-blue); }
-
-        /* Footer */
-        .fast-footer {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
-            background-color: #e6e6e6; border-top: 1px solid #b3b3b3;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; box-sizing: border-box; z-index: 100;
+        .fast-table .row-label {
+            text-align: left;
+            font-weight: bold;
+            padding-left: 20px;
         }
-        .nav-btn { font-size: 18px; padding: 12px 24px; border-radius: 4px; cursor: pointer; border: 1px solid #aaa; }
-        .btn-next { background-color: var(--fast-blue); color: white; border: none; font-weight: bold; }
+
+        /* Custom Radio Button scaling */
+        input[type="radio"].fast-radio {
+            width: 24px;
+            height: 24px;
+            accent-color: var(--fast-blue);
+            cursor: pointer;
+        }
+
+        /* --- 4. EQUATION EDITOR (KEYPAD) --- */
+        .equation-display {
+            width: 100%;
+            max-width: 400px;
+            height: 60px;
+            border: 2px solid #333;
+            font-size: 32px;
+            padding: 10px;
+            margin-bottom: 20px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 300px;
+        }
+
+        .keypad-btn {
+            padding: 15px;
+            font-size: 20px;
+            background: #f8f9fa;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .keypad-btn:active { background: #e2e6ea; }
+        .keypad-btn.action { background: #e1f3f8; border-color: #005ea2; color: #005ea2; }
+
+        /* --- 5. FOOTER BAR --- */
+        .fast-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: #e6e6e6;
+            border-top: 1px solid #b3b3b3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            box-sizing: border-box;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            font-size: 18px;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #aaa;
+        }
+
+        .btn-next {
+            background-color: var(--fast-blue);
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+        
+        .btn-back { background-color: white; color: #333; }
+
     </style>
 </head>
 <body>
 
-    <div id="dashboard">
-        <div class="header">
-            <h1>Florida FAST Math Simulator</h1>
-            <p>Aligned to B.E.S.T. Achievement Levels 3, 4, and 5</p>
+    <div id="question-card">
         </div>
 
-        <div class="grid-container">
-            <div class="card mock" onclick="startTest('mock')">
-                <h3>Start Mock Assessment</h3>
-                <p><strong>30 Questions</strong> • Mixed Levels</p>
-                <p>Includes Error Analysis & Visuals</p>
-            </div>
-            <div class="card nso" onclick="startTest('NSO')">
-                <h3>Number Sense (NSO)</h3>
-                <p>10 Questions</p>
-                <p>Place Value, Rounding, Comparing</p>
-            </div>
-            <div class="card fr" onclick="startTest('FR')">
-                <h3>Fractions (FR)</h3>
-                <p>10 Questions</p>
-                <p>Equivalence, Ordering</p>
-            </div>
-            <div class="card ar" onclick="startTest('AR')">
-                <h3>Algebraic Reasoning (AR)</h3>
-                <p>10 Questions</p>
-                <p>Patterns, Multi-step, Errors</p>
-            </div>
-            <div class="card gr" onclick="startTest('GR')">
-                <h3>Geometry & Measure (GR/M)</h3>
-                <p>10 Questions</p>
-                <p>Clocks, Area, Symmetry</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="simulator-view">
-        <div id="question-card"></div>
-        <div class="fast-footer" id="nav-controls">
-            <button class="nav-btn" onclick="exitTest()" style="background: #ddd;">Exit</button>
-            <div style="font-weight: bold; font-size: 18px;">Item <span id="q-num">1</span> of <span id="q-total">10</span></div>
-            <button class="nav-btn btn-next" onclick="nextQuestion()">Next</button>
-        </div>
+    <div class="fast-footer">
+        <button class="nav-btn btn-back" onclick="prevQuestion()">Back</button>
+        <div style="font-weight: bold; font-size: 18px;">Item <span id="q-num">1</span> of 3</div>
+        <button class="nav-btn btn-next" onclick="nextQuestion()">Next</button>
     </div>
 
     <script>
-        // --- GLOBAL STATE ---
-        let currentQuestions = [];
-        let currentIndex = 0;
-        let userAnswers = [];
+        // --- STATE MANAGEMENT ---
+        let currentQuestionIndex = 0;
+        const questions = [];
 
-        // --- 1. SVG DRAWING FUNCTIONS (THE VISUALS) ---
-        
-        function drawClockSVG(hour, minute) {
-            const hDeg = (hour * 30) + (minute * 0.5);
-            const mDeg = minute * 6;
-            return `
-            <svg width="180" height="180" viewBox="0 0 200 200">
-                <circle cx="100" cy="100" r="90" fill="white" stroke="black" stroke-width="4"/>
-                <circle cx="100" cy="100" r="3" fill="black"/>
-                ${[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((n, i) => {
-                    const angle = (n * 30 - 90) * (Math.PI / 180);
-                    const x = 100 + 75 * Math.cos(angle);
-                    const y = 100 + 75 * Math.sin(angle);
-                    return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="16" font-family="Arial">${n}</text>`;
-                }).join('')}
-                <line x1="100" y1="100" x2="100" y2="50" stroke="black" stroke-width="6" transform="rotate(${hDeg} 100 100)" stroke-linecap="round"/>
-                <line x1="100" y1="100" x2="100" y2="30" stroke="black" stroke-width="4" transform="rotate(${mDeg} 100 100)" stroke-linecap="round"/>
-            </svg>`;
-        }
+        // --- 1. GENERATE QUESTIONS (Authentic Logic) ---
 
-        function drawCompositeSVG(w1, h1, w2, h2) {
-            // Draws an L-shape dynamically based on random numbers
-            return `
-            <svg width="250" height="180" viewBox="0 0 300 200">
-                <path d="M50,50 L200,50 L200,100 L120,100 L120,150 L50,150 Z" fill="#e1f3f8" stroke="#005ea2" stroke-width="3"/>
-                <text x="125" y="40" font-size="16">${w1+w2} ft</text>
-                <text x="25" y="100" font-size="16">${h1+h2} ft</text>
-                <text x="210" y="80" font-size="16">${h1} ft</text>
-                <text x="80" y="170" font-size="16">${w1} ft</text>
-            </svg>`;
-        }
+        // MA.3.NSO.1.1 - Table Match
+        function generateTableMatch() {
+            const thousands = Math.floor(Math.random() * 9) + 1;
+            const ones = Math.floor(Math.random() * 9) + 1;
+            const fullNumber = (thousands * 1000) + ones; // e.g., 6004
 
-        function drawShapeSVG(type) {
-            if (type === 'Trapezoid') {
-                return `<svg width="80" height="60" viewBox="0 0 100 80"><polygon points="20,60 80,60 60,20 40,20" fill="none" stroke="black" stroke-width="2"/></svg>`;
-            } else if (type === 'Rectangle') {
-                return `<svg width="80" height="60" viewBox="0 0 100 80"><rect x="10" y="20" width="80" height="40" fill="none" stroke="black" stroke-width="2"/></svg>`;
-            } else if (type === 'Triangle') {
-                return `<svg width="80" height="60" viewBox="0 0 100 80"><polygon points="10,60 90,60 30,10" fill="none" stroke="black" stroke-width="2"/></svg>`;
-            } else {
-                return `<svg width="80" height="60" viewBox="0 0 100 80"><circle cx="50" cy="40" r="30" fill="none" stroke="black" stroke-width="2"/></svg>`;
-            }
-        }
-
-        // --- 2. GENERATOR LOGIC (NOW WITH RANDOMIZATION) ---
-        
-        // Helper to shuffle answer options so correct one isn't always first
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function startTest(mode) {
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('simulator-view').style.display = 'block';
-            currentQuestions = [];
-            currentIndex = 0;
-            const count = mode === 'mock' ? 30 : 10;
-            
-            for(let i=0; i<count; i++) {
-                if (mode === 'mock') {
-                    const types = ['NSO', 'FR', 'AR', 'GR'];
-                    currentQuestions.push(generateQuestionByDomain(types[Math.floor(Math.random() * types.length)]));
-                } else {
-                    currentQuestions.push(generateQuestionByDomain(mode));
-                }
-            }
-            userAnswers = new Array(currentQuestions.length).fill(null);
-            document.getElementById('q-total').innerText = currentQuestions.length;
-            renderQuestion(0);
-        }
-
-        function generateQuestionByDomain(domain) {
-            const isLevel5 = Math.random() > 0.7; 
-            if (domain === 'NSO') return isLevel5 ? generateLevel5Comparing() : generateTableMatchNSO();
-            if (domain === 'FR') return generateFractionEquation();
-            if (domain === 'AR') return isLevel5 ? generateErrorAnalysisAR() : generateMultiSelectAR();
-            if (domain === 'GR') {
-                const subType = Math.random();
-                if (subType < 0.33) return generateTimeProblem();
-                if (subType < 0.66) return generateAreaProblem();
-                return generateSymmetryProblem();
-            }
-            return generateTableMatchNSO();
-        }
-
-        // --- SPECIFIC GENERATORS ---
-
-        function generateTableMatchNSO() {
-            const val = Math.floor(Math.random() * 9000) + 1000;
             return {
                 type: 'table_match',
-                text: `The number is **${val.toLocaleString()}**. Match the value of the digits.`,
-                contextNumber: val,
-                rows: [{label: "Value of hundreds", id:'r1'}, {label: "Value of tens", id:'r2'}],
-                columns: ["Thousands", "Hundreds", "Tens", "Ones"]
+                standard: 'MA.3.NSO.1.1',
+                text: `The number is **${fullNumber.toLocaleString()}**. Match the value of the digits below.`,
+                contextNumber: fullNumber,
+                rows: [
+                    { label: `The value of the digit ${thousands}`, id: 'r1' },
+                    { label: `The value of the digit ${ones}`, id: 'r2' }
+                ],
+                columns: ["Thousands", "Hundreds", "Ones"]
             };
         }
 
-        function generateLevel5Comparing() {
-            // Randomly generate two numbers
-            const base = Math.floor(Math.random() * 4000) + 4000;
-            const diff = [10, 100, 1000][Math.floor(Math.random() * 3)];
-            const n1 = base;
-            const n2 = base + diff;
+        // MA.3.NSO.1.2 - Hot Text
+        function generateHotText() {
+            const target = Math.floor(Math.random() * 800) + 100; // e.g., 482
             
             return {
-                type: 'multiple_choice',
-                level: 'Level 5',
-                text: `Select the statement that correctly compares <strong>${n1}</strong> and <strong>${n2}</strong>.`,
-                options: shuffle([
-                    `${n1} < ${n2} because ${n1} has fewer ${diff >= 1000 ? 'thousands' : (diff >= 100 ? 'hundreds' : 'tens')}.`,
-                    `${n1} > ${n2} because ${n1} has more ones.`,
-                    `${n1} = ${n2} because they have the same number of digits.`,
-                    `${n1} > ${n2} because ${n1} is written first.`
-                ])
+                type: 'hot_text',
+                standard: 'MA.3.NSO.1.2',
+                text: `Select the digit in the **tens** place.`,
+                content: target.toString() // "482"
             };
         }
 
-        function generateTimeProblem() {
-            const hour = Math.floor(Math.random() * 12) + 1;
-            const min = [0, 15, 30, 45][Math.floor(Math.random() * 4)];
-            const minStr = min === 0 ? "00" : min;
-            return {
-                type: 'multiple_choice',
-                level: 'Level 3',
-                text: `What time is shown on the clock?`,
-                visual: drawClockSVG(hour, min),
-                options: shuffle([
-                    `${hour}:${minStr}`,
-                    `${hour+1}:${minStr}`,
-                    `${min === 0 ? 12 : min}:${hour === 0 ? 12 : hour}`,
-                    `${hour === 12 ? 1 : hour+1}:00`
-                ])
-            };
-        }
-
-        function generateAreaProblem() {
-            // Random dimensions to avoid repetition
-            const w1 = Math.floor(Math.random() * 4) + 2; 
-            const h1 = Math.floor(Math.random() * 4) + 2;
-            const w2 = Math.floor(Math.random() * 4) + 2; 
-            const h2 = Math.floor(Math.random() * 4) + 2;
-            
-            const area1 = w1 * (h1 + h2); // Top rect
-            const area2 = w2 * h2; // Side rect
-            // Simplified calculation for L-shape logic
-            // For this demo we just ask for total of two arbitrary rects presented in the SVG
-            const totalArea = (w1 * h1) + ((w1+w2)*h2); // Approximation for the visual
-            
-            return {
-                type: 'multiple_choice',
-                level: 'Level 4',
-                text: "A garden is made of two rectangles shown below. What is the total area?",
-                visual: drawCompositeSVG(w1, h1, w2, h2),
-                options: shuffle([
-                    `${(w1*h1) + (w2*h2) + (w1*h2)} sq ft`, // Correct-ish based on diagram logic
-                    `${(w1*h1) + (w2*h2)} sq ft`,
-                    `${(w1+w2) * (h1+h2)} sq ft`,
-                    `${20} sq ft`
-                ])
-            };
-        }
-
-        function generateSymmetryProblem() {
-            // Randomize the Question Target
-            const types = [
-                {q: "exactly two lines", a: "Rectangle", others: ["Trapezoid", "Scalene", "Circle"]},
-                {q: "exactly one line", a: "Trapezoid", others: ["Rectangle", "Scalene", "Circle"]},
-                {q: "no lines", a: "Scalene", others: ["Rectangle", "Trapezoid", "Circle"]}
-            ];
-            const selected = types[Math.floor(Math.random() * types.length)];
-            
-            // Build options list
-            let opts = [{text: selected.a, shape: selected.a === 'Scalene' ? 'Triangle' : selected.a}];
-            selected.others.forEach(o => opts.push({text: o, shape: o === 'Scalene' ? 'Triangle' : o}));
-
-            return {
-                type: 'graphic_select',
-                level: 'Level 4',
-                text: `Which figure appears to have <strong>${selected.q}</strong> of symmetry?`,
-                options: shuffle(opts)
-            };
-        }
-
-        function generateErrorAnalysisAR() {
-            // Randomize numbers
-            const f1 = Math.floor(Math.random() * 3) + 3; // 3 to 5
-            const f2 = Math.floor(Math.random() * 5) + 5; // 5 to 9
-            const wrongProduct = (f1 * f1) * 2; // The "doubling" error logic
-            
-            return {
-                type: 'multiple_choice',
-                level: 'Level 5 (Exemplary)',
-                text: `Jon solved: <strong>${f1} × ${f2} = ?</strong><br>He said: 'I know ${f1} × ${f1} = ${f1*f1}, so I just doubled it to get ${wrongProduct}.'<br>Is Jon correct?`,
-                options: shuffle([
-                    `Yes, because ${f2} is double ${f1}.`,
-                    `No, because he should have added ${f1}, not doubled.`,
-                    `No, because ${f2} is not double ${f1}.`,
-                    `Yes, because the math works out.`
-                ])
-            };
-        }
-
-        function generateFractionEquation() {
+        // MA.3.FR.1.1 - Equation Editor
+        function generateEquation() {
             return {
                 type: 'equation',
-                text: "What fraction represents the shaded part?",
-                num: 1, den: 4
+                standard: 'MA.3.FR.1.1',
+                text: "What fraction represents the shaded part? Use the keypad to enter your answer.",
+                imagePlaceholder: "[ FRACTION IMAGE ]" // Placeholder for your SVG logic
             };
         }
 
-        function generateMultiSelectAR() {
-            const target = Math.floor(Math.random() * 10) + 10;
-            return {
-                type: 'multi_select',
-                text: `Select **all** equations that equal ${target}.`,
-                options: shuffle([
-                    `${target} x 1 = ${target}`,
-                    `${target * 2} ÷ 2 = ${target}`,
-                    `${target - 1} + 1 = ${target}`,
-                    `${target} + 5 = ${target + 5}`
-                ])
-            };
-        }
-
-        // --- 3. RENDERERS ---
+        // Initialize Test
+        questions.push(generateTableMatch());
+        questions.push(generateHotText());
+        questions.push(generateEquation());
+        
+        // --- 2. RENDERERS ---
 
         function renderQuestion(index) {
-            currentIndex = index;
-            const q = currentQuestions[index];
+            const q = questions[index];
             const container = document.getElementById('question-card');
             document.getElementById('q-num').innerText = index + 1;
             
-            let badge = q.level ? `<span class="level-badge">${q.level}</span>` : '';
-            let visual = q.visual ? `<div class="visual-container">${q.visual}</div>` : '';
-            
-            let html = `${badge}<div class="question-stem">${q.text}</div>${visual}`;
+            let html = `<div class="question-stem">${q.text}</div>`;
 
-            if (q.type === 'table_match') html += renderTableMatch(q);
-            else if (q.type === 'multiple_choice') html += renderMultipleChoice(q);
-            else if (q.type === 'multi_select') html += renderMultiSelect(q);
-            else if (q.type === 'equation') html += renderEquation(q);
-            else if (q.type === 'graphic_select') html += renderGraphicSelect(q);
+            if (q.type === 'table_match') {
+                html += renderTableMatchHTML(q);
+            } else if (q.type === 'hot_text') {
+                html += renderHotTextHTML(q);
+            } else if (q.type === 'equation') {
+                html += renderEquationHTML(q);
+            }
 
             container.innerHTML = html;
         }
 
-        function renderTableMatch(q) {
-            return `<div style="background:#f9f9f9; padding:10px; margin-bottom:10px;">Number: <strong>${q.contextNumber}</strong></div>
-            <table class="fast-table">
-                <thead><tr><th></th>${q.columns.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
-                <tbody>${q.rows.map((r, i)=>`<tr><td style="text-align:left;">${r.label}</td>
-                ${q.columns.map(c=>`<td><input type="radio" name="r${i}" class="fast-radio"></td>`).join('')}</tr>`).join('')}</tbody>
-            </table>`;
-        }
-
-        function renderMultipleChoice(q) {
-            return `<div>${q.options.map(opt=>`
-                <div class="option-row"><input type="radio" name="mc" style="margin-right:15px;"> ${opt}</div>
-            `).join('')}</div>`;
-        }
-
-        function renderMultiSelect(q) {
-            return `<div>${q.options.map(opt=>`
-                <div class="option-row"><input type="checkbox" style="margin-right:15px;"> ${opt}</div>
-            `).join('')}</div>`;
-        }
-        
-        function renderGraphicSelect(q) {
-            return `<div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:20px;">${q.options.map(opt=>`
-                <div style="border:1px solid #ccc; padding:20px; border-radius:8px; cursor:pointer; text-align:center;">
-                    ${drawShapeSVG(opt.shape)}
-                    <div style="font-weight:bold; margin-top:10px;">${opt.text}</div>
+        // HTML Generator: Table Match
+        function renderTableMatchHTML(q) {
+            return `
+                <div style="margin-bottom:20px; font-size:20px; background:#f9f9f9; padding:15px; border-left:4px solid var(--fast-blue);">
+                    Reference Number: <strong>${q.contextNumber}</strong>
                 </div>
-            `).join('')}</div>`;
+                <table class="fast-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            ${q.columns.map(col => `<th>${col}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${q.rows.map((row, rIdx) => `
+                            <tr>
+                                <td class="row-label">${row.label}</td>
+                                ${q.columns.map(col => `
+                                    <td>
+                                        <input type="radio" name="row_${rIdx}" class="fast-radio" value="${col}">
+                                    </td>
+                                `).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
         }
 
-        function renderEquation(q) {
-            return `<div style="text-align:center; margin-bottom:20px;">
-                <div style="width:100px; height:100px; border-radius:50%; border:2px solid black; margin:0 auto; background:conic-gradient(#005ea2 0% 25%, white 25% 100%);"></div>
-            </div>
-            <div style="text-align:center;">Answer: <input type="text" style="font-size:18px; padding:5px;"></div>`;
+        // HTML Generator: Hot Text
+        function renderHotTextHTML(q) {
+            // Split "482" into ["4", "8", "2"]
+            const digits = q.content.split('');
+            return `
+                <div class="hot-text-container">
+                    ${digits.map((digit, i) => `
+                        <span class="hot-spot" onclick="toggleHotSpot(this)">${digit}</span>
+                    `).join('')}
+                </div>
+                <p style="color:#666; font-size:14px; margin-top:20px;">* Click the correct digit to select it.</p>
+            `;
         }
 
-        // --- 4. NAVIGATION ---
+        // HTML Generator: Equation Editor
+        function renderEquationHTML(q) {
+            return `
+                <div style="margin-bottom:20px; padding:20px; border:1px dashed #ccc; text-align:center; color:#888;">
+                    ${q.imagePlaceholder}
+                </div>
+                
+                <div class="equation-display" id="eq-display"></div>
+                
+                <div class="keypad">
+                    <button class="keypad-btn" onclick="typeKey('1')">1</button>
+                    <button class="keypad-btn" onclick="typeKey('2')">2</button>
+                    <button class="keypad-btn" onclick="typeKey('3')">3</button>
+                    <button class="keypad-btn" onclick="typeKey('4')">4</button>
+                    <button class="keypad-btn" onclick="typeKey('5')">5</button>
+                    <button class="keypad-btn" onclick="typeKey('6')">6</button>
+                    <button class="keypad-btn" onclick="typeKey('7')">7</button>
+                    <button class="keypad-btn" onclick="typeKey('8')">8</button>
+                    <button class="keypad-btn" onclick="typeKey('9')">9</button>
+                    <button class="keypad-btn action" onclick="typeKey('/')">/</button>
+                    <button class="keypad-btn" onclick="typeKey('0')">0</button>
+                    <button class="keypad-btn action" onclick="backspace()">⌫</button>
+                </div>
+            `;
+        }
+
+        // --- 3. INTERACTION LOGIC ---
+
+        // Hot Text Toggle
+        function toggleHotSpot(el) {
+            // For this specific question (single select), clear others first
+            document.querySelectorAll('.hot-spot').forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        // Keypad Logic
+        let currentEqValue = "";
+        function typeKey(val) {
+            currentEqValue += val;
+            updateDisplay();
+        }
+        function backspace() {
+            currentEqValue = currentEqValue.slice(0, -1);
+            updateDisplay();
+        }
+        function updateDisplay() {
+            document.getElementById('eq-display').innerText = currentEqValue;
+        }
+
+        // Navigation
         function nextQuestion() {
-            if (currentIndex < currentQuestions.length - 1) renderQuestion(currentIndex + 1);
-            else {
-                document.getElementById('question-card').innerHTML = `<h2>Test Complete</h2><button class="nav-btn btn-next" onclick="location.reload()">Return Home</button>`;
-                document.getElementById('nav-controls').style.display = 'none';
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                currentEqValue = ""; // Reset calculator
+                renderQuestion(currentQuestionIndex);
+            } else {
+                alert("End of Practice Test");
             }
         }
-        
-        function exitTest() {
-            document.getElementById('simulator-view').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
+
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                currentEqValue = "";
+                renderQuestion(currentQuestionIndex);
+            }
         }
 
-        window.onload = function() {
-            document.getElementById('dashboard').style.display = 'block';
-            document.getElementById('simulator-view').style.display = 'none';
-        };
+        // Start
+        renderQuestion(0);
 
     </script>
 </body>
