@@ -3,32 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAST Math Accelerated | Ultimate Simulator 4.0</title>
+    <title>FAST Grade 3 Accelerated Math Simulator (Ultimate)</title>
     <style>
         :root {
             --primary: #005ea2; /* FL DOE Blue */
-            --dark: #1b1b1b;
-            --light: #f4f6f8;
-            --correct: #2e8540;
-            --incorrect: #cd2026;
-            --warning: #e5a000;
+            --secondary: #e1f3f8;
+            --text: #1b1b1b;
+            --border: #888;
+            --success: #2e8540;
+            --error: #d93025;
+            --flag: #e37400;
         }
 
-        * { box-sizing: border-box; }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
+            background-color: #f9f9f9;
+            color: var(--text);
             height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* --- NAVIGATION --- */
-        .top-bar {
+        /* --- HEADER & NAV --- */
+        header {
             background: white;
-            border-bottom: 3px solid #000;
+            border-bottom: 4px solid #000;
             padding: 10px 30px;
             display: flex;
             justify-content: space-between;
@@ -36,592 +36,558 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .logo { font-size: 1.2rem; font-weight: 800; color: var(--primary); }
-        .session-info { font-weight: 600; }
+        h1 { font-size: 1.2rem; margin: 0; color: var(--primary); font-weight: 800; }
+        
+        .timer-box {
+            font-family: monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            background: #eee;
+            padding: 5px 15px;
+            border-radius: 4px;
+        }
 
-        .toolbar { display: flex; gap: 10px; }
+        .tools { display: flex; gap: 10px; }
         .tool-btn {
             background: white; border: 1px solid #333; padding: 5px 12px;
-            border-radius: 4px; cursor: pointer; font-size: 0.9rem;
+            cursor: pointer; font-size: 0.9rem; border-radius: 4px;
         }
         .tool-btn:hover { background: #eee; }
 
-        /* --- SCREENS --- */
+        /* --- LAYOUTS --- */
         .screen { display: none; height: 100%; overflow-y: auto; padding: 20px; }
         .screen.active { display: block; }
 
-        /* --- DASHBOARD --- */
-        .dashboard-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 30px;
-            max-width: 1000px; margin: 40px auto;
+        /* --- HOME DASHBOARD --- */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1100px;
+            margin: 40px auto;
         }
-        .mode-card {
-            background: white; padding: 30px; border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 5px solid var(--primary);
-            cursor: pointer; transition: transform 0.2s;
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-top: 6px solid var(--primary);
+            transition: transform 0.2s;
         }
-        .mode-card:hover { transform: translateY(-5px); }
-        .domain-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px;
-        }
+        .card:hover { transform: translateY(-5px); }
+
+        .domain-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 20px; }
         .domain-btn {
-            background: #e7f1ff; border: 1px solid var(--primary); color: var(--primary);
-            padding: 10px; border-radius: 4px; text-align: center; cursor: pointer; font-size: 0.9rem;
+            padding: 12px; border: 1px solid var(--primary); color: var(--primary);
+            background: var(--secondary); text-align: center; cursor: pointer; font-weight: bold; border-radius: 4px;
         }
         .domain-btn:hover { background: var(--primary); color: white; }
 
         /* --- TEST INTERFACE --- */
-        .test-container {
-            max-width: 1100px; margin: 0 auto; background: white;
-            min-height: 80vh; display: flex; box-shadow: 0 0 15px rgba(0,0,0,0.05);
+        .test-wrapper {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            min-height: 80vh;
+            box-shadow: 0 0 15px rgba(0,0,0,0.05);
+            border: 1px solid #ccc;
         }
-        .question-area { flex: 3; padding: 40px; border-right: 1px solid #ddd; }
-        .sidebar { flex: 1; padding: 20px; background: #fcfcfc; }
-        
-        .q-header {
-            display: flex; justify-content: space-between; margin-bottom: 20px;
-            color: #666; font-size: 0.9rem;
-        }
-        .q-text { font-size: 1.3rem; line-height: 1.6; margin-bottom: 25px; }
 
-        /* --- VISUALS (SVG/CSS) --- */
-        .visual-container {
-            margin: 20px 0; padding: 20px; background: #fff;
-            display: flex; justify-content: center; align-items: center;
-        }
-        
-        /* Bar Graph CSS */
-        .bar-graph { display: flex; align-items: flex-end; height: 200px; gap: 20px; border-bottom: 2px solid #333; border-left: 2px solid #333; padding: 10px; }
-        .bar-col { width: 40px; background: var(--primary); text-align: center; color: white; transition: height 0.5s; position: relative; }
-        .bar-label { position: absolute; bottom: -25px; width: 100%; color: #000; font-size: 0.8rem; }
-        
-        /* Circle Graph (Pie) */
-        .pie-chart { width: 200px; height: 200px; border-radius: 50%; border: 1px solid #333; position: relative; }
-        .pie-legend { margin-left: 20px; font-size: 0.9rem; }
+        .q-panel { flex: 3; padding: 40px; border-right: 1px solid #ddd; }
+        .nav-panel { flex: 1; padding: 20px; background: #fafafa; }
 
-        /* Clock */
-        .clock-svg { width: 200px; height: 200px; }
+        .q-meta { display: flex; justify-content: space-between; margin-bottom: 20px; color: #666; font-size: 0.9rem; }
+        .std-badge { background: #eee; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+
+        .q-text { font-size: 1.3rem; line-height: 1.5; margin-bottom: 25px; }
+
+        /* --- VISUALS --- */
+        .visual-area { margin: 20px 0; padding: 20px; border: 1px solid #eee; display: flex; justify-content: center; background: #fff; }
 
         /* --- INPUTS --- */
-        .option-item {
+        .options-group { display: grid; gap: 12px; }
+        .option-row {
             display: flex; align-items: center; padding: 15px;
-            border: 2px solid #ccc; border-radius: 6px; cursor: pointer; margin-bottom: 10px;
+            border: 2px solid #ccc; border-radius: 8px; cursor: pointer; transition: 0.2s;
         }
-        .option-item:hover { background: #f9f9f9; border-color: #999; }
-        .option-item.selected { border-color: var(--primary); background: #eef6fc; border-width: 3px; }
-        
-        .radio-circle, .checkbox-box {
-            width: 20px; height: 20px; border: 2px solid #555; margin-right: 15px;
+        .option-row:hover { border-color: #999; background: #f9f9f9; }
+        .option-row.selected { border-color: var(--primary); background: #eef6fc; border-width: 3px; }
+
+        .bubble {
+            width: 24px; height: 24px; border: 2px solid #555; margin-right: 15px;
             display: flex; align-items: center; justify-content: center;
         }
-        .radio-circle { border-radius: 50%; }
-        .selected .radio-circle::after { content:''; width:10px; height:10px; background:var(--primary); border-radius:50%; }
-        .selected .checkbox-box::after { content:'✔'; font-size:14px; color:var(--primary); }
+        .radio .bubble { border-radius: 50%; }
+        .check .bubble { border-radius: 4px; }
+        
+        .selected .radio .bubble::after { content: ''; width: 14px; height: 14px; background: var(--primary); border-radius: 50%; }
+        .selected .check .bubble::after { content: '✔'; font-weight: bold; color: var(--primary); font-size: 16px; }
 
-        .equation-input {
+        .eq-input {
             width: 100%; padding: 15px; font-size: 1.2rem;
-            border: 2px solid #333; border-radius: 4px; margin-top: 10px;
+            border: 2px solid #333; border-radius: 4px;
         }
 
-        /* --- FOOTER & FEEDBACK --- */
-        .test-footer {
-            background: #333; padding: 15px; color: white; display: flex; justify-content: space-between;
+        /* --- FEEDBACK & FOOTER --- */
+        .feedback-box {
+            margin-top: 25px; padding: 20px; border-radius: 6px; display: none;
+            border-left: 5px solid transparent;
         }
-        .nav-btn {
-            padding: 10px 25px; border: none; border-radius: 4px; font-size: 1rem;
-            cursor: pointer; background: var(--primary); color: white;
-        }
-        .nav-btn.secondary { background: #666; }
+        .feedback-box.correct { background: #e6f4ea; border-left-color: var(--success); color: #0d5122; }
+        .feedback-box.incorrect { background: #fce8e6; border-left-color: var(--error); color: #8a1f1f; }
 
-        .feedback-panel {
-            margin-top: 20px; padding: 15px; border-radius: 6px; display: none;
+        .footer { padding: 15px 30px; background: #333; color: white; display: flex; justify-content: space-between; }
+        .btn { padding: 10px 25px; cursor: pointer; font-size: 1rem; border: none; border-radius: 4px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-sec { background: #666; color: white; }
+
+        /* --- NAV GRID --- */
+        .grid-map { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
+        .grid-item {
+            padding: 8px; border: 1px solid #ccc; text-align: center; cursor: pointer; background: white;
         }
-        .feedback-panel.correct { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
-        .feedback-panel.incorrect { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .grid-item.active { border: 2px solid black; font-weight: bold; }
+        .grid-item.answered { background: #e6f4ea; color: var(--success); }
+        .grid-item.flagged { border-color: var(--flag); color: var(--flag); }
+        .grid-item.flagged::before { content: '🚩 '; font-size: 0.8rem; }
 
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        <div class="logo">FAST Accelerated Simulator 4.0</div>
-        <div class="toolbar">
-            <button class="tool-btn" onclick="app.toggleFlag()">🚩 Flag for Review</button>
-            <div id="timer-display" style="padding: 5px 10px; font-weight:bold; color:#cd2026;">--:--</div>
+    <header>
+        <h1>FAST Grade 3 Accelerated Simulator</h1>
+        <div class="tools">
+            <button class="tool-btn" onclick="App.toggleFlag()">🚩 Flag Item</button>
+            <div id="timer" class="timer-box">--:--</div>
         </div>
-    </div>
+    </header>
 
     <div id="screen-home" class="screen active">
-        <div class="dashboard-grid">
-            <div class="mode-card" onclick="app.startSession('sim')">
-                <h2>📝 Test Simulation</h2>
-                <p>60 Minutes. 20 Questions. No immediate feedback. Real test conditions.</p>
-                <button class="nav-btn" style="width:100%">Start Mock Test</button>
+        <div class="dash-grid">
+            <div class="card">
+                <h2>📝 Full Test Simulation</h2>
+                <p><strong>Simulation Mode:</strong></p>
+                <ul>
+                    <li>60 Minutes</li>
+                    <li>32 Questions (All Standards)</li>
+                    <li>No Repeats (Unique Session)</li>
+                    <li>Feedback hidden until end</li>
+                </ul>
+                <button class="btn btn-primary" style="width:100%" onclick="App.startSession('sim')">Start Mock Test</button>
             </div>
-            <div class="mode-card">
-                <h2>🎯 Domain Practice</h2>
-                <p>Select a standard. Instant feedback enabled.</p>
-                <div class="domain-grid">
-                    <div class="domain-btn" onclick="app.startSession('practice', 'NSO')">Number Sense</div>
-                    <div class="domain-btn" onclick="app.startSession('practice', 'FR')">Fractions</div>
-                    <div class="domain-btn" onclick="app.startSession('practice', 'AR')">Algebra</div>
-                    <div class="domain-btn" onclick="app.startSession('practice', 'GR')">Geometry</div>
-                    <div class="domain-btn" onclick="app.startSession('practice', 'DP')">Data & Time</div>
+            
+            <div class="card">
+                <h2>🎯 Targeted Practice</h2>
+                <p>Select a domain to practice. Instant feedback and Level 5 descriptors included.</p>
+                <div class="domain-list">
+                    <div class="domain-btn" onclick="App.startSession('practice', 'NSO')">Number Sense</div>
+                    <div class="domain-btn" onclick="App.startSession('practice', 'FR')">Fractions</div>
+                    <div class="domain-btn" onclick="App.startSession('practice', 'AR')">Algebra</div>
+                    <div class="domain-btn" onclick="App.startSession('practice', 'GR')">Geometry</div>
+                    <div class="domain-btn" onclick="App.startSession('practice', 'DP')">Data/Msmt</div>
+                    <div class="domain-btn" onclick="App.startSession('practice', 'M')">Time/Length</div>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="screen-test" class="screen">
-        <div class="test-container">
-            <div class="question-area">
-                <div class="q-header">
+        <div class="test-wrapper">
+            <div class="q-panel">
+                <div class="q-meta">
                     <span id="q-counter">Question 1</span>
-                    <span id="q-standard" style="background:#eee; padding:2px 6px; border-radius:4px;">Standard</span>
+                    <span id="q-std" class="std-badge">MA.3.NSO.1.1</span>
                 </div>
-
-                <div id="q-content" class="q-text"></div>
                 
-                <div id="q-visual" class="visual-container" style="display:none;"></div>
+                <div id="q-text" class="q-text"></div>
+                <div id="q-visual" class="visual-area" style="display:none;"></div>
+                <div id="q-input"></div>
 
-                <div id="q-input-area"></div>
-
-                <div id="feedback-area" class="feedback-panel"></div>
+                <div id="feedback" class="feedback-box"></div>
             </div>
 
-            <div class="sidebar">
-                <h3>Question Map</h3>
-                <div id="q-map" style="display:grid; grid-template-columns:repeat(5, 1fr); gap:5px;"></div>
+            <div class="nav-panel">
+                <h3>Session Map</h3>
+                <div id="nav-grid" class="grid-map"></div>
                 <hr>
-                <p style="font-size:0.8rem; color:#666;">
+                <div style="font-size:0.85rem; color:#555; line-height: 1.6;">
                     <strong>Tech-Enhanced Items:</strong><br>
-                    - Equation Editor<br>
-                    - Multi-Select<br>
-                    - Dynamic Graphs<br>
-                    - Analog Clocks
-                </p>
+                    • Equation Editor<br>
+                    • Multi-Select (Checkboxes)<br>
+                    • Visual Models
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="test-footer" id="test-footer" style="display:none;">
-        <button class="nav-btn secondary" onclick="app.prevQ()">Back</button>
-        <button class="nav-btn secondary" id="btn-submit" onclick="app.submitAnswer()">Check / Submit</button>
-        <button class="nav-btn" onclick="app.nextQ()">Next</button>
+        <div class="footer">
+            <button class="btn btn-sec" onclick="App.nav(-1)">Back</button>
+            <button class="btn btn-primary" id="btn-check" onclick="App.check()">Check Answer</button>
+            <button class="btn btn-primary" id="btn-next" style="display:none;" onclick="App.nav(1)">Next Question</button>
+        </div>
     </div>
 
     <script>
         /**
-         * FAST SIMULATOR 4.0 ENGINE
-         * Features: SVG Generation, Anti-Repeat Logic, Tech-Enhanced Items
+         * ULTIMATE GRADE 3 ACCELERATED ENGINE
+         * Features: SVG Clock (w/ Minutes), Anti-Repeat, Full Standards
          */
-
+        
         const Utils = {
             rInt: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
+            shuffle: (arr) => arr.sort(() => Math.random() - 0.5),
             
-            // Draw Analog Clock SVG
+            // --- SVG GRAPHICS GENERATORS ---
+            
+            // 1. CLOCK (Precise Minute Hands)
             drawClock: (h, m) => {
-                const mDeg = m * 6;
                 const hDeg = (h % 12) * 30 + (m * 0.5);
+                const mDeg = m * 6;
+                
+                // Generate 60 ticks
+                let ticks = '';
+                for(let i=0; i<60; i++) {
+                    const isHour = i % 5 === 0;
+                    const len = isHour ? 10 : 5;
+                    const width = isHour ? 2 : 1;
+                    const rot = i * 6;
+                    ticks += `<line x1="50" y1="5" x2="50" y2="${5+len}" stroke="black" stroke-width="${width}" transform="rotate(${rot} 50 50)" />`;
+                }
+
                 return `
-                <svg class="clock-svg" viewBox="0 0 100 100">
-                    <circle cx="50" cy="50" r="45" stroke="black" stroke-width="2" fill="white" />
-                    <text x="50" y="15" text-anchor="middle" font-size="8">12</text>
-                    <text x="85" y="52" text-anchor="middle" font-size="8">3</text>
-                    <text x="50" y="90" text-anchor="middle" font-size="8">6</text>
-                    <text x="15" y="52" text-anchor="middle" font-size="8">9</text>
-                    <line x1="50" y1="50" x2="50" y2="25" stroke="black" stroke-width="3" transform="rotate(${hDeg} 50 50)" stroke-linecap="round"/>
+                <svg width="200" height="200" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="48" stroke="black" stroke-width="2" fill="white"/>
+                    ${ticks}
+                    <text x="50" y="22" text-anchor="middle" font-size="8" font-weight="bold">12</text>
+                    <text x="82" y="53" text-anchor="middle" font-size="8" font-weight="bold">3</text>
+                    <text x="50" y="85" text-anchor="middle" font-size="8" font-weight="bold">6</text>
+                    <text x="18" y="53" text-anchor="middle" font-size="8" font-weight="bold">9</text>
+                    <line x1="50" y1="50" x2="50" y2="25" stroke="black" stroke-width="3.5" transform="rotate(${hDeg} 50 50)" stroke-linecap="round"/>
                     <line x1="50" y1="50" x2="50" y2="15" stroke="black" stroke-width="2" transform="rotate(${mDeg} 50 50)" stroke-linecap="round"/>
-                    <circle cx="50" cy="50" r="2" fill="black" />
+                    <circle cx="50" cy="50" r="3" fill="black"/>
                 </svg>`;
             },
 
-            // Draw Bar Graph
-            drawBarGraph: (data) => {
-                const max = Math.max(...data.map(d => d.val));
-                let html = `<div class="bar-graph">`;
-                data.forEach(d => {
-                    const h = (d.val / max) * 100; // percent height
-                    html += `
-                    <div class="bar-col" style="height:${h}%">
-                        ${d.val}
-                        <div class="bar-label">${d.label}</div>
-                    </div>`;
-                });
-                html += `</div>`;
-                return html;
+            // 2. NUMBER LINE (Fractions)
+            drawNumberLine: (num, den) => {
+                const step = 260 / den;
+                let ticks = '';
+                for(let i=0; i<=den; i++) {
+                    ticks += `<line x1="${20 + i*step}" y1="20" x2="${20 + i*step}" y2="35" stroke="black" stroke-width="2"/>`;
+                }
+                const ptX = 20 + (num/den)*260;
+
+                return `
+                <svg width="350" height="60" viewBox="0 0 300 60">
+                    <line x1="10" y1="28" x2="290" y2="28" stroke="black" stroke-width="2"/>
+                    <text x="15" y="55" font-size="12">0</text>
+                    <text x="285" y="55" font-size="12">1</text>
+                    ${ticks}
+                    <circle cx="${ptX}" cy="28" r="7" fill="#cd2026"/>
+                </svg>`;
             },
 
-            // Draw Pie Chart (CSS Conic Gradient)
-            drawPie: (p1, p2, p3) => {
-                const t = p1 + p2 + p3;
-                const d1 = (p1/t)*100;
-                const d2 = d1 + (p2/t)*100;
-                return `
-                <div style="display:flex; align-items:center;">
-                    <div class="pie-chart" style="background: conic-gradient(
-                        #005ea2 0% ${d1}%, 
-                        #e5a000 ${d1}% ${d2}%, 
-                        #cd2026 ${d2}% 100%
-                    );"></div>
-                    <div class="pie-legend">
-                        <div style="color:#005ea2">● Blue: ${p1} votes</div>
-                        <div style="color:#e5a000">● Yellow: ${p2} votes</div>
-                        <div style="color:#cd2026">● Red: ${p3} votes</div>
-                    </div>
-                </div>`;
+            // 3. BAR GRAPH
+            drawBarGraph: (data) => {
+                const max = Math.max(...data.map(d=>d.v));
+                let bars = '';
+                data.forEach((d, i) => {
+                    const h = (d.v/max) * 80;
+                    bars += `<rect x="${20 + i*50}" y="${100-h}" width="30" height="${h}" fill="#005ea2"/>`;
+                    bars += `<text x="${35 + i*50}" y="115" text-anchor="middle" font-size="10">${d.k}</text>`;
+                    bars += `<text x="${35 + i*50}" y="${95-h}" text-anchor="middle" font-size="10">${d.v}</text>`;
+                });
+                return `<svg width="250" height="130" viewBox="0 0 200 130">
+                    <line x1="10" y1="100" x2="190" y2="100" stroke="black"/>
+                    ${bars}
+                </svg>`;
             }
         };
 
-        class QuestionFactory {
+        // --- QUESTION GENERATOR (Anti-Repeat Logic) ---
+        class QuestionBank {
             constructor() {
-                this.usedIDs = []; // Anti-repeat memory
+                // Defines the available templates. 
+                // We use function generators to ensure unique numbers every time.
+                this.templates = {
+                    // NSO
+                    'NSO': [
+                        () => { // Rounding
+                            const n = Utils.rInt(100, 900);
+                            return { std: "MA.3.NSO.1.4", text: `Round <strong>${n}</strong> to the nearest 100.`, type: "equation", val: Math.round(n/100)*100, ald: "Level 3: Rounds whole numbers to the nearest 10 or 100." };
+                        },
+                        () => { // Place Value
+                            const base = Utils.rInt(1000, 9000);
+                            return { std: "MA.3.NSO.1.2", text: `What is the value of the digit <strong>${Math.floor(base/1000)}</strong> in the number ${base}?`, type: "radio", options: [{t:"1,000",c:false},{t:`${Math.floor(base/1000)*1000}`,c:true},{t:`${Math.floor(base/1000)*100}`,c:false}], ald: "Level 3: Composes/Decomposes 4-digit numbers." };
+                        },
+                        () => { // Addition
+                            const a = Utils.rInt(1000, 5000), b = Utils.rInt(1000, 4000);
+                            return { std: "MA.3.NSO.2.1", text: `Find the sum: ${a} + ${b}`, type: "equation", val: a+b, ald: "Level 3: Adds multi-digit whole numbers." };
+                        }
+                    ],
+                    // FR
+                    'FR': [
+                        () => { // Number Line
+                            const den = Utils.rInt(3, 8);
+                            const num = Utils.rInt(1, den-1);
+                            return { std: "MA.3.FR.2.1", text: "What fraction is shown on the number line?", visual: Utils.drawNumberLine(num, den), type: "radio", options: Utils.shuffle([{t:`${num}/${den}`,c:true},{t:`${den}/${num}`,c:false},{t:`1/${den}`,c:false},{t:`${num}/${den+1}`,c:false}]), ald: "Level 3: Identifies fractions on a number line." };
+                        },
+                        () => { // Equivalence
+                            return { std: "MA.3.FR.2.2", text: "Select <strong>ALL</strong> fractions equivalent to 1/3.", type: "check", options: [{t:"2/6",c:true},{t:"3/9",c:true},{t:"2/3",c:false},{t:"4/12",c:true}], ald: "Level 4: Identifies equivalent fractions." };
+                        }
+                    ],
+                    // AR
+                    'AR': [
+                        () => { // Missing Factor
+                            const a = Utils.rInt(4,9), b = Utils.rInt(4,9);
+                            return { std: "MA.3.AR.2.3", text: `Fill in the missing number: <br> ? × ${a} = ${a*b}`, type: "equation", val: b, ald: "Level 3: Determines unknown whole number in multiplication." };
+                        },
+                        () => { // Pattern
+                            const start = Utils.rInt(2,10), add = Utils.rInt(2,5);
+                            return { std: "MA.3.AR.3.2", text: `Identify the rule for the pattern: ${start}, ${start+add}, ${start+add*2}, ${start+add*3}...`, type: "radio", options: Utils.shuffle([{t:`Add ${add}`,c:true},{t:`Multiply by ${add}`,c:false},{t:`Add ${add+1}`,c:false}]), ald: "Level 3: Identifies numerical patterns." };
+                        }
+                    ],
+                    // M / Time
+                    'M': [
+                        () => { // Clock
+                            const h = Utils.rInt(1, 12);
+                            const m = Utils.rInt(1, 59); // ANY minute
+                            const mStr = m < 10 ? '0'+m : m;
+                            return { 
+                                std: "MA.3.M.2.1", 
+                                text: "What time is shown on the clock?", 
+                                visual: Utils.drawClock(h, m),
+                                type: "radio", 
+                                options: Utils.shuffle([
+                                    {t:`${h}:${mStr}`, c:true},
+                                    {t:`${h===1?12:h-1}:${mStr}`, c:false},
+                                    {t:`${h}:${m<10?m+'0':m+5}`, c:false}
+                                ]), 
+                                ald: "Level 3: Tells time to the nearest minute." 
+                            };
+                        }
+                    ],
+                    // DP
+                    'DP': [
+                        () => { // Bar Graph
+                            const v1=Utils.rInt(5,15), v2=Utils.rInt(5,15);
+                            return { 
+                                std: "MA.3.DP.1.1", 
+                                text: "How many total votes for A and B?", 
+                                visual: Utils.drawBarGraph([{k:'A',v:v1},{k:'B',v:v2},{k:'C',v:Utils.rInt(2,8)}]), 
+                                type: "equation", 
+                                val: v1+v2, 
+                                ald: "Level 3: Solves problems using bar graphs." 
+                            };
+                        }
+                    ],
+                    // GR
+                    'GR': [
+                        () => {
+                            return { std: "MA.3.GR.1.2", text: "Select <strong>ALL</strong> rectangles.", type: "check", options: [{t:"Square",c:true},{t:"Trapezoid",c:false},{t:"A shape with 4 right angles",c:true}], ald: "Level 3: Identifies quadrilaterals." };
+                        }
+                    ]
+                };
             }
 
-            getUniqueId(prefix) {
-                let id;
-                do { id = prefix + Utils.rInt(1, 10000); } while(this.usedIDs.includes(id));
-                this.usedIDs.push(id);
-                return id;
-            }
+            // Generate a session list
+            getQuestions(mode, domain) {
+                let list = [];
+                let usedSignatures = new Set(); // Prevent Repeats
 
-            /* --- GENERATOR 1: NSO (Number Sense) --- */
-            generateNSO() {
-                const type = Utils.rInt(1, 2);
+                // 1. Determine Source
+                let keys = (mode === 'sim') ? Object.keys(this.templates) : [domain];
                 
-                // Type 1: Rounding Multi-Select (Level 4)
-                if(type === 1) {
-                    const target = Utils.rInt(20, 80) * 10;
-                    return {
-                        id: this.getUniqueId('NSO'),
-                        standard: "MA.3.NSO.1.4 (Acc)",
-                        text: `Select <strong>ALL</strong> numbers that round to <strong>${target}</strong> when rounded to the nearest 10.`,
-                        type: "multiselect",
-                        visual: null,
-                        options: [
-                            { text: `${target - 4}`, correct: true },
-                            { text: `${target + 3}`, correct: true },
-                            { text: `${target - 6}`, correct: false },
-                            { text: `${target + 5}`, correct: false },
-                            { text: `${target + 1}`, correct: true }
-                        ],
-                        ald: "Level 4: Rounds whole numbers to the nearest 10 or 100 in context."
-                    };
-                }
+                // 2. Loop to fill questions
+                const targetCount = (mode === 'sim') ? 20 : 10;
                 
-                // Type 2: Composition (Level 4)
-                const thousands = Utils.rInt(2, 8);
-                const tens = Utils.rInt(2, 9);
-                return {
-                    id: this.getUniqueId('NSO'),
-                    standard: "MA.3.NSO.1.2",
-                    text: `A number has a <strong>${thousands}</strong> in the thousands place and a <strong>${tens}</strong> in the tens place. Zeros are used in all other places. What is the number?`,
-                    type: "radio",
-                    visual: null,
-                    options: [
-                        { text: `${thousands}0${tens}0`, correct: true },
-                        { text: `${thousands}${tens}00`, correct: false },
-                        { text: `${thousands}00${tens}`, correct: false },
-                        { text: `${thousands}0${tens}`, correct: false }
-                    ],
-                    ald: "Level 4: Composes and decomposes 4-digit numbers."
-                };
-            }
-
-            /* --- GENERATOR 2: DP (Data & Time - VISUALS!) --- */
-            generateDP() {
-                const type = Utils.rInt(1, 3);
-
-                // Type 1: Analog Clock (Level 3/4)
-                if (type === 1) {
-                    const h = Utils.rInt(1, 12);
-                    const m = Utils.rInt(0, 11) * 5; // multiple of 5 for clear reading
-                    const mStr = m === 0 ? "00" : (m < 10 ? "0"+m : m);
-                    return {
-                        id: this.getUniqueId('DP'),
-                        standard: "MA.3.M.2.1",
-                        text: "What time is shown on the clock?",
-                        type: "radio",
-                        visual: Utils.drawClock(h, m),
-                        options: [
-                            { text: `${h}:${mStr}`, correct: true },
-                            { text: `${h === 1 ? 12 : h-1}:${mStr}`, correct: false },
-                            { text: `${m === 0 ? 12 : m/5}:${h < 10 ? "0"+h : h}`, correct: false }, // confused hands
-                            { text: `${h}:${m === 0 ? "12" : m}`, correct: false }
-                        ],
-                        ald: "Level 3: Tells and writes time to the nearest minute using analog clocks."
-                    };
+                let attempts = 0;
+                while(list.length < targetCount && attempts < 1000) {
+                    attempts++;
+                    
+                    // Pick random domain from allowed keys
+                    const k = keys[Math.floor(Math.random() * keys.length)];
+                    const tmpls = this.templates[k];
+                    // Run random generator
+                    const qData = tmpls[Math.floor(Math.random() * tmpls.length)]();
+                    
+                    // 3. Anti-Repeat Check
+                    // We create a "signature" based on the text + answer
+                    const sig = qData.text + (qData.val || JSON.stringify(qData.options));
+                    
+                    if(!usedSignatures.has(sig)) {
+                        usedSignatures.add(sig);
+                        qData.id = list.length;
+                        list.push(qData);
+                    }
                 }
-
-                // Type 2: Bar Graph (Level 4 Analysis)
-                if (type === 2) {
-                    const d = [
-                        { label: 'Pizza', val: Utils.rInt(5, 15) },
-                        { label: 'Tacos', val: Utils.rInt(5, 15) },
-                        { label: 'Salad', val: Utils.rInt(2, 8) }
-                    ];
-                    const diff = Math.abs(d[0].val - d[1].val);
-                    return {
-                        id: this.getUniqueId('DP'),
-                        standard: "MA.3.DP.1.1",
-                        text: "Based on the bar graph below, how many more students voted for Pizza or Tacos (whichever is higher) than the other?",
-                        type: "equation",
-                        visual: Utils.drawBarGraph(d),
-                        correctValue: diff.toString(),
-                        ald: "Level 4: Interprets data in scaled bar graphs to solve one-step problems."
-                    };
-                }
-
-                // Type 3: Circle Graph (Acc/Grade 4 overlap)
-                const v1 = 10, v2 = 20, v3 = 10; // Fixed simplified ratios for rendering
-                return {
-                    id: this.getUniqueId('DP'),
-                    standard: "MA.3.DP.1.1 (Acc)",
-                    text: "The circle graph shows the results of a class vote. If 40 students voted in total, how many students voted for Yellow?",
-                    type: "radio",
-                    visual: Utils.drawPie(v1, v2, v3),
-                    options: [
-                        { text: "20 students", correct: true },
-                        { text: "10 students", correct: false },
-                        { text: "25 students", correct: false },
-                        { text: "15 students", correct: false }
-                    ],
-                    ald: "Level 4: Interprets data in circle graphs."
-                };
-            }
-
-            /* --- GENERATOR 3: FR (Fractions) --- */
-            generateFR() {
-                // Number Line Logic (Acc)
-                const num = Utils.rInt(1, 3);
-                const den = 4;
-                return {
-                    id: this.getUniqueId('FR'),
-                    standard: "MA.3.FR.2.1",
-                    text: `Which fraction is represented by the point on the number line? (Visual: Point is at mark ${num} of ${den})`,
-                    type: "radio",
-                    visual: `<svg width="300" height="50">
-                        <line x1="10" y1="25" x2="290" y2="25" stroke="black" stroke-width="2"/>
-                        <line x1="10" y1="20" x2="10" y2="30" stroke="black" stroke-width="2"/>
-                        <text x="5" y="45" font-size="12">0</text>
-                        <line x1="290" y1="20" x2="290" y2="30" stroke="black" stroke-width="2"/>
-                        <text x="285" y="45" font-size="12">1</text>
-                        <line x1="80" y1="22" x2="80" y2="28" stroke="black" />
-                        <line x1="150" y1="22" x2="150" y2="28" stroke="black" />
-                        <line x1="220" y1="22" x2="220" y2="28" stroke="black" />
-                        <circle cx="${10 + (280 * (num/den))}" cy="25" r="5" fill="red" />
-                    </svg>`,
-                    options: [
-                        { text: `${num}/${den}`, correct: true },
-                        { text: `${den}/${num}`, correct: false },
-                        { text: `${num}/${den+1}`, correct: false },
-                        { text: `${num+1}/${den}`, correct: false }
-                    ],
-                    ald: "Level 3: Identifies fractions on a number line."
-                };
-            }
-
-            /* --- GENERATOR 4: AR (Algebra) --- */
-            generateAR() {
-                const f1 = Utils.rInt(6, 9);
-                const f2 = Utils.rInt(6, 9);
-                const prod = f1 * f2;
-                return {
-                    id: this.getUniqueId('AR'),
-                    standard: "MA.3.AR.1.2",
-                    text: `Solve for the unknown <strong>n</strong>: <br><br> $$ ${prod} \\div n = ${f1} $$`,
-                    type: "equation",
-                    visual: null,
-                    correctValue: f2.toString(),
-                    ald: "Level 3: Solves one-step division problems."
-                };
-            }
-
-            /* --- GENERATOR 5: GR (Geometry) --- */
-            generateGR() {
-                return {
-                    id: this.getUniqueId('GR'),
-                    standard: "MA.3.GR.1.2",
-                    text: "Select <strong>ALL</strong> shapes that always have 4 right angles.",
-                    type: "multiselect",
-                    visual: null,
-                    options: [
-                        { text: "Rectangle", correct: true },
-                        { text: "Square", correct: true },
-                        { text: "Rhombus", correct: false },
-                        { text: "Trapezoid", correct: false },
-                        { text: "Parallelogram", correct: false }
-                    ],
-                    ald: "Level 3: Identifies attributes of quadrilaterals."
-                };
+                return list;
             }
         }
 
         // --- APP CONTROLLER ---
-        const app = {
-            factory: new QuestionFactory(),
+        const App = {
+            bank: new QuestionBank(),
             state: {
                 mode: null,
                 questions: [],
-                currentIndex: 0,
                 responses: {},
                 flags: [],
-                timer: 3600
+                idx: 0,
+                timer: 0
             },
 
             startSession: function(mode, domain) {
                 this.state.mode = mode;
-                this.state.questions = [];
+                this.state.questions = this.bank.getQuestions(mode, domain);
                 this.state.responses = {};
                 this.state.flags = [];
-                this.state.currentIndex = 0;
-                this.state.timer = 3600;
+                this.state.idx = 0;
 
-                const count = mode === 'sim' ? 15 : 5;
-                const domains = ['NSO','FR','AR','GR','DP'];
-
-                for(let i=0; i<count; i++) {
-                    const d = mode === 'practice' && domain ? domain : domains[Utils.rInt(0,4)];
-                    this.state.questions.push(this.factory[`generate${d}`]());
-                }
-
-                // Switch Screens
+                // UI Switch
                 document.getElementById('screen-home').classList.remove('active');
                 document.getElementById('screen-test').classList.add('active');
-                document.getElementById('test-footer').style.display = 'flex';
                 
-                // Start Timer
-                if(mode === 'sim') this.startTimer();
-                else document.getElementById('timer-display').innerText = "Practice";
+                // Mode Settings
+                const isSim = mode === 'sim';
+                document.getElementById('btn-check').style.display = isSim ? 'none' : 'inline-block';
+                document.getElementById('btn-next').style.display = isSim ? 'inline-block' : 'none';
+                
+                // Timer
+                this.state.timer = isSim ? 3600 : 0;
+                this.runTimer(isSim);
 
                 this.renderQ();
-                this.renderMap();
+                this.renderGrid();
             },
 
             renderQ: function() {
-                const q = this.state.questions[this.state.currentIndex];
-                const resp = this.state.responses[this.state.currentIndex];
+                const q = this.state.questions[this.state.idx];
+                const r = this.state.responses[this.state.idx];
 
-                document.getElementById('q-counter').innerText = `Question ${this.state.currentIndex + 1}`;
-                document.getElementById('q-standard').innerText = q.standard;
-                document.getElementById('q-content').innerHTML = q.text;
-                document.getElementById('feedback-area').style.display = 'none';
+                // Header
+                document.getElementById('q-counter').innerText = `Question ${this.state.idx + 1} of ${this.state.questions.length}`;
+                document.getElementById('q-std').innerText = q.std;
+                document.getElementById('q-text').innerHTML = q.text;
+                document.getElementById('feedback').style.display = 'none';
 
-                // Render Visuals
+                // Visual
                 const vBox = document.getElementById('q-visual');
-                if (q.visual) {
-                    vBox.style.display = 'flex';
-                    vBox.innerHTML = q.visual;
-                } else {
-                    vBox.style.display = 'none';
-                }
+                if(q.visual) { vBox.style.display = 'flex'; vBox.innerHTML = q.visual; }
+                else { vBox.style.display = 'none'; }
 
-                // Render Inputs
-                const iBox = document.getElementById('q-input-area');
+                // Input
+                const iBox = document.getElementById('q-input');
                 iBox.innerHTML = '';
 
-                if(q.type === 'radio' || q.type === 'multiselect') {
-                    q.options.forEach((opt, idx) => {
-                        const el = document.createElement('div');
-                        const isSel = q.type === 'radio' 
-                            ? resp === idx 
-                            : (resp || []).includes(idx);
+                if(q.type === 'radio' || q.type === 'check') {
+                    const grp = document.createElement('div');
+                    grp.className = 'options-group';
+                    q.options.forEach((opt, i) => {
+                        const row = document.createElement('div');
+                        const isSel = q.type === 'radio' ? (r === i) : (r && r.includes(i));
                         
-                        el.className = `option-item ${isSel ? 'selected' : ''}`;
-                        el.innerHTML = `<div class="${q.type === 'radio' ? 'radio-circle' : 'checkbox-box'}"></div> ${opt.text}`;
-                        el.onclick = () => this.handleInput(q, idx);
-                        iBox.appendChild(el);
+                        row.className = `option-row ${q.type} ${isSel ? 'selected' : ''}`;
+                        row.innerHTML = `<div class="bubble"></div> ${opt.t}`;
+                        row.onclick = () => {
+                            if(q.type === 'radio') this.save(i);
+                            else {
+                                let curr = this.state.responses[this.state.idx] || [];
+                                if(curr.includes(i)) curr = curr.filter(x=>x!==i);
+                                else curr.push(i);
+                                this.save(curr);
+                            }
+                        };
+                        grp.appendChild(row);
                     });
+                    iBox.appendChild(grp);
                 } else if (q.type === 'equation') {
                     const inp = document.createElement('input');
-                    inp.className = 'equation-input';
-                    inp.placeholder = "Type number here...";
-                    inp.value = resp || '';
-                    inp.oninput = (e) => {
-                        this.state.responses[this.state.currentIndex] = e.target.value;
-                        this.renderMap();
-                    };
+                    inp.className = 'eq-input';
+                    inp.placeholder = 'Type answer here...';
+                    inp.value = r || '';
+                    inp.oninput = (e) => this.save(e.target.value);
                     iBox.appendChild(inp);
                 }
             },
 
-            handleInput: function(q, idx) {
-                if(q.type === 'radio') {
-                    this.state.responses[this.state.currentIndex] = idx;
-                } else {
-                    const curr = this.state.responses[this.state.currentIndex] || [];
-                    if(curr.includes(idx)) this.state.responses[this.state.currentIndex] = curr.filter(x => x !== idx);
-                    else this.state.responses[this.state.currentIndex] = [...curr, idx];
-                }
-                this.renderQ();
-                this.renderMap();
+            save: function(val) {
+                this.state.responses[this.state.idx] = val;
+                if(this.state.mode !== 'sim') this.renderQ(); // Instant update for practice
+                this.renderGrid();
             },
 
-            renderMap: function() {
-                const map = document.getElementById('q-map');
-                map.innerHTML = '';
+            renderGrid: function() {
+                const grid = document.getElementById('nav-grid');
+                grid.innerHTML = '';
                 this.state.questions.forEach((q, i) => {
-                    const btn = document.createElement('div');
-                    const answered = this.state.responses[i] !== undefined && this.state.responses[i] !== "";
-                    const flagged = this.state.flags.includes(i);
-                    
-                    btn.style.cssText = `border:1px solid #ccc; padding:8px; text-align:center; cursor:pointer; background:${this.state.currentIndex===i ? '#333' : '#fff'}; color:${this.state.currentIndex===i?'#fff':'#000'};`;
-                    btn.innerText = (flagged ? "🚩" : "") + (answered ? "✔ " : "") + (i+1);
-                    btn.onclick = () => { this.state.currentIndex = i; this.renderQ(); this.renderMap(); };
-                    map.appendChild(btn);
+                    const el = document.createElement('div');
+                    const isAns = this.state.responses[i] !== undefined && this.state.responses[i] !== '';
+                    const isFlag = this.state.flags.includes(i);
+                    el.className = `grid-item ${i===this.state.idx ? 'active' : ''} ${isAns ? 'answered' : ''} ${isFlag ? 'flagged' : ''}`;
+                    el.innerText = i + 1;
+                    el.onclick = () => { this.state.idx = i; this.renderQ(); this.renderGrid(); };
+                    grid.appendChild(el);
                 });
             },
 
-            submitAnswer: function() {
-                if(this.state.mode === 'sim') {
-                    alert("Simulation Mode: Feedback is hidden until the end.");
-                    return;
-                }
-                
-                // Practice Mode Feedback
-                const q = this.state.questions[this.state.currentIndex];
-                const r = this.state.responses[this.state.currentIndex];
-                const fb = document.getElementById('feedback-area');
-                let correct = false;
+            check: function() {
+                const q = this.state.questions[this.state.idx];
+                const r = this.state.responses[this.state.idx];
+                const fb = document.getElementById('feedback');
+                let ok = false;
 
-                if(q.type === 'radio') correct = q.options[r]?.correct;
-                if(q.type === 'equation') correct = (r == q.correctValue);
-                if(q.type === 'multiselect') {
-                    const target = q.options.map((o,i)=>o.correct?i:null).filter(x=>x!==null);
-                    if(r && r.length === target.length && r.every(v=>target.includes(v))) correct = true;
+                if(q.type === 'radio') ok = q.options[r]?.c;
+                if(q.type === 'equation') ok = parseInt(r) === q.val;
+                if(q.type === 'check') {
+                    const needs = q.options.map((o,i)=>o.c?i:null).filter(x=>x!==null);
+                    if(r && r.length === needs.length && r.every(v=>needs.includes(v))) ok = true;
                 }
 
                 fb.style.display = 'block';
-                fb.className = `feedback-panel ${correct ? 'correct' : 'incorrect'}`;
-                fb.innerHTML = `<strong>${correct?'Correct!':'Incorrect.'}</strong><br>${q.ald}`;
+                fb.className = `feedback-box ${ok ? 'correct' : 'incorrect'}`;
+                fb.innerHTML = `<strong>${ok ? 'Correct!' : 'Incorrect'}</strong><br>${q.ald}`;
+                
+                if(ok) document.getElementById('btn-next').style.display = 'inline-block';
             },
 
-            nextQ: function() {
-                if(this.state.currentIndex < this.state.questions.length-1) {
-                    this.state.currentIndex++; this.renderQ(); this.renderMap();
+            nav: function(dir) {
+                const n = this.state.idx + dir;
+                if(n >= 0 && n < this.state.questions.length) {
+                    this.state.idx = n;
+                    this.renderQ();
+                    this.renderGrid();
+                    // Reset Practice Buttons
+                    if(this.state.mode !== 'sim') {
+                        document.getElementById('btn-next').style.display = 'none';
+                        document.getElementById('feedback').style.display = 'none';
+                    }
                 }
             },
-            prevQ: function() {
-                if(this.state.currentIndex > 0) {
-                    this.state.currentIndex--; this.renderQ(); this.renderMap();
-                }
-            },
+
             toggleFlag: function() {
-                const i = this.state.currentIndex;
+                const i = this.state.idx;
                 if(this.state.flags.includes(i)) this.state.flags = this.state.flags.filter(x=>x!==i);
                 else this.state.flags.push(i);
-                this.renderMap();
+                this.renderGrid();
             },
-            startTimer: function() {
-                const t = document.getElementById('timer-display');
-                setInterval(() => {
+
+            runTimer: function(isSim) {
+                if(!isSim) { document.getElementById('timer').innerText = "Practice"; return; }
+                const t = document.getElementById('timer');
+                const int = setInterval(() => {
                     this.state.timer--;
-                    const m = Math.floor(this.state.timer/60);
-                    const s = this.state.timer%60;
+                    const m = Math.floor(this.state.timer / 60);
+                    const s = this.state.timer % 60;
                     t.innerText = `${m}:${s<10?'0'+s:s}`;
+                    if(this.state.timer <= 0) clearInterval(int);
                 }, 1000);
             }
         };
+
     </script>
 </body>
 </html>
