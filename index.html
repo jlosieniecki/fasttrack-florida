@@ -2,408 +2,383 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FAST G3 Math - Infinite Practice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Florida FAST Math Simulator (Grade 3)</title>
     <style>
-        :root { --header: #2C3E50; --bg: #F5F7FA; --active: #00609C; --text: #333; --panel-border: #b5b5b5; }
-        
-        body { 
-            font-family: 'Segoe UI', 'Verdana', sans-serif; 
-            background: var(--bg); margin: 0; height: 100vh; 
-            display: flex; flex-direction: column; overflow: hidden; 
+        /* --- 1. CAMBIUM AUTHENTIC THEME --- */
+        :root {
+            --fast-bg: #f2f2f2;           /* Light grey background outside the card */
+            --fast-card-bg: #ffffff;      /* White question paper */
+            --fast-text: #000000;
+            --fast-blue: #005ea2;         /* The official selection blue */
+            --fast-hover: #e1f3f8;        /* Light blue hover state */
+            --fast-border: #000000;       /* High contrast borders */
+            --fast-grey-row: #f0f0f0;     /* Alternating table rows */
         }
 
-        /* --- LAYOUT --- */
-        .screen { display: none; height: 100%; width: 100%; flex-direction: column; }
-        .screen.active { display: flex; }
+        body {
+            font-family: 'Verdana', 'Arial', sans-serif; /* Standard testing fonts */
+            background-color: var(--fast-bg);
+            margin: 0;
+            padding-bottom: 100px; /* Space for the footer */
+            color: var(--fast-text);
+        }
 
-        /* --- SIDEBAR MENU --- */
-        .menu-container { display: flex; flex-direction: column; align-items: center; height: 100%; background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; padding: 20px; overflow-y: auto; }
-        .menu-card { background: white; padding: 25px; border-radius: 4px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); text-align: center; color: #333; width: 100%; max-width: 650px; margin-bottom: 50px; }
+        /* The "Paper" Area */
+        #question-card {
+            max-width: 900px;
+            margin: 40px auto;
+            background: var(--fast-card-bg);
+            padding: 50px;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+
+        /* Question Stem Text */
+        .question-stem {
+            font-size: 22px;
+            font-weight: normal; /* FAST uses normal weight, not bold, for stems */
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        /* --- 2. HOT TEXT STYLES --- */
+        .hot-text-container {
+            font-size: 24px;
+            line-height: 2.5;
+            padding: 20px;
+            border: 1px solid #ddd; /* Container box often used in tests */
+            border-radius: 4px;
+        }
+
+        .hot-spot {
+            padding: 6px 12px;
+            margin: 0 4px;
+            border: 2px solid transparent; /* Invisible border prevents jumping */
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .hot-spot:hover {
+            background-color: var(--fast-hover);
+            border-color: #bcd6ed;
+        }
+
+        .hot-spot.selected {
+            background-color: var(--fast-blue);
+            color: white;
+            border-color: var(--fast-blue);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* --- 3. TABLE MATCH STYLES --- */
+        .fast-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .fast-table th {
+            background-color: #fff;
+            border-bottom: 2px solid #000;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .fast-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ccc;
+            text-align: center;
+        }
+
+        /* Zebra Striping */
+        .fast-table tr:nth-child(even) { background-color: var(--fast-grey-row); }
+        .fast-table tr:nth-child(odd) { background-color: #fff; }
+
+        .fast-table .row-label {
+            text-align: left;
+            font-weight: bold;
+            padding-left: 20px;
+        }
+
+        /* Custom Radio Button scaling */
+        input[type="radio"].fast-radio {
+            width: 24px;
+            height: 24px;
+            accent-color: var(--fast-blue);
+            cursor: pointer;
+        }
+
+        /* --- 4. EQUATION EDITOR (KEYPAD) --- */
+        .equation-display {
+            width: 100%;
+            max-width: 400px;
+            height: 60px;
+            border: 2px solid #333;
+            font-size: 32px;
+            padding: 10px;
+            margin-bottom: 20px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 300px;
+        }
+
+        .keypad-btn {
+            padding: 15px;
+            font-size: 20px;
+            background: #f8f9fa;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+        }
         
-        details { width: 100%; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; background: #fff; }
-        summary { background: #f0f0f0; padding: 15px; cursor: pointer; font-weight: bold; text-align: left; display: flex; justify-content: space-between; align-items: center; }
-        details[open] summary { background: var(--active); color: white; }
+        .keypad-btn:active { background: #e2e6ea; }
+        .keypad-btn.action { background: #e1f3f8; border-color: #005ea2; color: #005ea2; }
+
+        /* --- 5. FOOTER BAR --- */
+        .fast-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: #e6e6e6;
+            border-top: 1px solid #b3b3b3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            box-sizing: border-box;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            font-size: 18px;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #aaa;
+        }
+
+        .btn-next {
+            background-color: var(--fast-blue);
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
         
-        .sub-btn { display: block; width: 100%; padding: 12px 15px; border: none; border-bottom: 1px solid #eee; background: #fff; text-align: left; cursor: pointer; font-size: 0.95em; padding-left: 20px; transition:0.2s; }
-        .sub-btn:hover { background: #eef6fc; padding-left: 30px; color: var(--active); font-weight: bold; }
-        
-        .main-btn { display: block; width: 100%; padding: 18px; margin-bottom: 25px; background: #eef6fc; border: 3px solid #003057; color: #003057; font-weight: bold; cursor: pointer; border-radius: 4px; text-align: center; font-size: 1.1em; }
+        .btn-back { background-color: white; color: #333; }
 
-        /* --- TEST INTERFACE --- */
-        .top-bar { background: #fff; border-bottom: 2px solid #000; padding: 0 20px; height: 60px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .tool-btn { background: transparent; border: 1px solid #666; color: #333; padding: 5px 12px; border-radius: 2px; cursor: pointer; font-weight: bold; font-size: 0.9em; margin-left: 8px; }
-
-        .main-stage { flex: 1; padding: 15px; overflow: hidden; display: flex; gap: 15px; height: 100%; position: relative; }
-        .pane { background: white; border: 1px solid var(--panel-border); overflow-y: auto; height: 100%; box-sizing: border-box; padding: 25px; border-radius: 4px; }
-        .left-pane { width: 45%; background: #FAFAFA; display: flex; align-items: center; justify-content: center; padding: 10px; border-right: 1px solid #ccc; }
-        .right-pane { width: 55%; }
-        /* Mobile Stack */
-        @media (max-width: 768px) { .main-stage { flex-direction: column; } .left-pane { width: 100%; height: 40%; border-bottom: 2px solid #999; border-right: none; } .right-pane { width: 100%; height: 60%; } }
-
-        /* --- QUESTION HEADER --- */
-        .std-meta { display: flex; justify-content: space-between; border-bottom: 2px solid #003057; padding-bottom: 8px; margin-bottom: 15px; font-size: 0.85em; color: #555; font-weight: bold; text-transform: uppercase; }
-        .q-text { font-size: 1.35em; line-height: 1.6; color: #000; margin-bottom: 25px; }
-
-        /* ITEM TYPES */
-        /* Hot Text */
-        .hot-container { line-height: 2.5; font-size: 1.3em; border: 1px solid #ccc; padding: 15px; background: #fff; border-radius: 4px; }
-        .hot-span { padding: 4px 8px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; margin: 0 3px; display:inline-block; }
-        .hot-span:hover { background: #eee; border-color: #bbb; }
-        .hot-span.selected { background: #fff2cc; border-color: var(--active); font-weight: bold; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-
-        /* Editing (Dropdowns) */
-        .edit-select { font-size: 1em; padding: 5px 10px; border: 2px solid #333; background: #eef; border-radius: 4px; margin: 0 5px; cursor: pointer; font-weight: bold; color: #000; }
-
-        /* Table Inputs */
-        .input-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 1em; }
-        .input-table th, .input-table td { border: 1px solid #999; padding: 12px; text-align: center; }
-        .input-table th { background: #f2f2f2; }
-        .table-input { width: 90%; padding: 8px; text-align: center; font-size: 1.1em; border: 2px solid #555; border-radius: 4px; }
-
-        /* Matching Table */
-        .match-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 1em; }
-        .match-table th, .match-table td { border: 1px solid #999; padding: 12px; text-align: center; }
-        .match-table th { background: #f2f2f2; }
-        .match-table td:first-child { text-align: left; font-weight: bold; background: #fafafa; }
-        .match-check { transform: scale(1.5); cursor: pointer; accent-color: var(--active); }
-
-        /* Equation Editor */
-        .eq-box { font-size: 1.5em; padding: 10px; width: 200px; text-align: center; border: 2px solid #333; border-radius: 5px; display: block; margin: 20px auto; font-family: monospace; }
-
-        /* Multiselect / MC */
-        .opt-row { display: flex; align-items: center; padding: 15px; border: 1px solid #ccc; margin-bottom: 10px; cursor: pointer; background: white; border-radius: 4px; transition: 0.1s; }
-        .opt-row:hover { background: #f9f9f9; border-color: #999; }
-        .opt-row.selected { background: #e6f3ff; border: 2px solid var(--active); font-weight: bold; }
-        .bubble { width: 20px; height: 20px; border: 2px solid #555; border-radius: 50%; margin-right: 15px; background: white; flex-shrink: 0; }
-        .bubble.sq { border-radius: 3px; }
-        .selected .bubble { background: var(--active); border-color: var(--active); }
-
-        /* Visuals */
-        svg { max-height: 280px; width: 100%; display: block; }
-        .graph-bar { cursor: pointer; transition: 0.2s; }
-        .graph-bar:hover { opacity: 0.8; }
-
-        /* --- NAV BAR --- */
-        .nav-bar { background: #f0f0f0; border-top: 1px solid #999; height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; flex-shrink: 0; }
-        .nav-btn { background: #fff; color: #333; border: 1px solid #999; padding: 10px 30px; font-weight: bold; font-size: 1.1em; cursor: pointer; min-width: 120px; border-radius: 4px; }
-        .nav-btn.primary { background: var(--active); color: white; border-color: var(--active); }
     </style>
 </head>
 <body>
 
-    <div id="screen-menu" class="screen active">
-        <div class="menu-container">
-            <h1 style="text-shadow: 0 2px 4px rgba(0,0,0,0.3); margin-bottom: 10px;">FAST G3 Math</h1>
-            <p style="margin-bottom: 30px; opacity: 0.9;">Domain-Specific • Infinite Variations</p>
-            <div class="menu-card">
-                <button class="main-btn" onclick="startSession('ALL', 40)">🚀 Start Full Coverage Mock (All Standards)</button>
-                
-                <h4 style="text-align:left; margin-bottom:15px; color:#555; text-transform:uppercase; border-bottom:2px solid #eee; padding-bottom:5px;">Practice by Domain</h4>
-                <div id="menu-links"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="screen-test" class="screen">
-        <div class="top-bar">
-            <div><strong>FAST Mathematics</strong> | Grade 3</div>
-            <div>
-                <button class="tool-btn" onclick="toggleZoom()">🔍 Zoom</button>
-                <button class="tool-btn" onclick="location.reload()" style="color:#D32F2F; border-color:#D32F2F;">Exit</button>
-            </div>
+    <div id="question-card">
         </div>
 
-        <div id="stage" class="main-stage">
-            </div>
-
-        <div class="nav-bar">
-            <button class="nav-btn" onclick="navQ(-1)">Back</button>
-            <div style="font-weight:bold; color:#555;">Item <span id="q-idx">1</span> of <span id="q-total">40</span></div>
-            <button class="nav-btn primary" onclick="navQ(1)" id="btn-next">Next</button>
-        </div>
+    <div class="fast-footer">
+        <button class="nav-btn btn-back" onclick="prevQuestion()">Back</button>
+        <div style="font-weight: bold; font-size: 18px;">Item <span id="q-num">1</span> of 3</div>
+        <button class="nav-btn btn-next" onclick="nextQuestion()">Next</button>
     </div>
 
     <script>
-        // --- 1. DATA & CONFIG ---
-        const DOMAINS = {
-            "NSO": "Number Sense & Additive Reasoning",
-            "AR": "Algebraic Reasoning",
-            "FR": "Fractions",
-            "M": "Measurement",
-            "GR": "Geometry",
-            "DP": "Data Analysis & Probability"
-        };
-        
-        // Full list of Grade 3 Standards from Blueprint
-        const STANDARDS_LIST = [
-            "MA.3.NSO.1.1", "MA.3.NSO.1.2", "MA.3.NSO.1.3", "MA.3.NSO.1.4", "MA.3.NSO.2.1", "MA.3.NSO.2.2", "MA.3.NSO.2.3", "MA.3.NSO.2.4",
-            "MA.3.AR.1.1", "MA.3.AR.1.2", "MA.3.AR.2.1", "MA.3.AR.2.2", "MA.3.AR.2.3", "MA.3.AR.3.1", "MA.3.AR.3.2", "MA.3.AR.3.3",
-            "MA.3.FR.1.1", "MA.3.FR.1.2", "MA.3.FR.1.3", "MA.3.FR.2.1", "MA.3.FR.2.2",
-            "MA.3.M.1.1", "MA.3.M.1.2", "MA.3.M.2.1", "MA.3.M.2.2",
-            "MA.3.GR.1.1", "MA.3.GR.1.2", "MA.3.GR.1.3", "MA.3.GR.2.1", "MA.3.GR.2.2", "MA.3.GR.2.3", "MA.3.GR.2.4",
-            "MA.3.DP.1.1", "MA.3.DP.1.2"
-        ];
+        // --- STATE MANAGEMENT ---
+        let currentQuestionIndex = 0;
+        const questions = [];
 
-        // --- 2. UTILS ---
-        const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-        const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
-        const getDomain = (std) => {
-            if(std.includes("NSO")) return DOMAINS.NSO;
-            if(std.includes("AR")) return DOMAINS.AR;
-            if(std.includes("FR")) return DOMAINS.FR;
-            if(std.includes("M")) return DOMAINS.M;
-            if(std.includes("GR")) return DOMAINS.GR;
-            if(std.includes("DP")) return DOMAINS.DP;
-            return "Mathematics";
-        };
+        // --- 1. GENERATE QUESTIONS (Authentic Logic) ---
 
-        // --- 3. VARIATION ENGINE (The "10+ Types" Generator) ---
-        // Instead of static items, we have a factory that generates items on fly
+        // MA.3.NSO.1.1 - Table Match
+        function generateTableMatch() {
+            const thousands = Math.floor(Math.random() * 9) + 1;
+            const ones = Math.floor(Math.random() * 9) + 1;
+            const fullNumber = (thousands * 1000) + ones; // e.g., 6004
+
+            return {
+                type: 'table_match',
+                standard: 'MA.3.NSO.1.1',
+                text: `The number is **${fullNumber.toLocaleString()}**. Match the value of the digits below.`,
+                contextNumber: fullNumber,
+                rows: [
+                    { label: `The value of the digit ${thousands}`, id: 'r1' },
+                    { label: `The value of the digit ${ones}`, id: 'r2' }
+                ],
+                columns: ["Thousands", "Hundreds", "Ones"]
+            };
+        }
+
+        // MA.3.NSO.1.2 - Hot Text
+        function generateHotText() {
+            const target = Math.floor(Math.random() * 800) + 100; // e.g., 482
+            
+            return {
+                type: 'hot_text',
+                standard: 'MA.3.NSO.1.2',
+                text: `Select the digit in the **tens** place.`,
+                content: target.toString() // "482"
+            };
+        }
+
+        // MA.3.FR.1.1 - Equation Editor
+        function generateEquation() {
+            return {
+                type: 'equation',
+                standard: 'MA.3.FR.1.1',
+                text: "What fraction represents the shaded part? Use the keypad to enter your answer.",
+                imagePlaceholder: "[ FRACTION IMAGE ]" // Placeholder for your SVG logic
+            };
+        }
+
+        // Initialize Test
+        questions.push(generateTableMatch());
+        questions.push(generateHotText());
+        questions.push(generateEquation());
         
-        const GENERATOR = {
-            createItem: (std) => {
-                const domain = getDomain(std);
-                const seed = Math.random(); // Used to pick variation type
+        // --- 2. RENDERERS ---
+
+        function renderQuestion(index) {
+            const q = questions[index];
+            const container = document.getElementById('question-card');
+            document.getElementById('q-num').innerText = index + 1;
+            
+            let html = `<div class="question-stem">${q.text}</div>`;
+
+            if (q.type === 'table_match') {
+                html += renderTableMatchHTML(q);
+            } else if (q.type === 'hot_text') {
+                html += renderHotTextHTML(q);
+            } else if (q.type === 'equation') {
+                html += renderEquationHTML(q);
+            }
+
+            container.innerHTML = html;
+        }
+
+        // HTML Generator: Table Match
+        function renderTableMatchHTML(q) {
+            return `
+                <div style="margin-bottom:20px; font-size:20px; background:#f9f9f9; padding:15px; border-left:4px solid var(--fast-blue);">
+                    Reference Number: <strong>${q.contextNumber}</strong>
+                </div>
+                <table class="fast-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            ${q.columns.map(col => `<th>${col}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${q.rows.map((row, rIdx) => `
+                            <tr>
+                                <td class="row-label">${row.label}</td>
+                                ${q.columns.map(col => `
+                                    <td>
+                                        <input type="radio" name="row_${rIdx}" class="fast-radio" value="${col}">
+                                    </td>
+                                `).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // HTML Generator: Hot Text
+        function renderHotTextHTML(q) {
+            // Split "482" into ["4", "8", "2"]
+            const digits = q.content.split('');
+            return `
+                <div class="hot-text-container">
+                    ${digits.map((digit, i) => `
+                        <span class="hot-spot" onclick="toggleHotSpot(this)">${digit}</span>
+                    `).join('')}
+                </div>
+                <p style="color:#666; font-size:14px; margin-top:20px;">* Click the correct digit to select it.</p>
+            `;
+        }
+
+        // HTML Generator: Equation Editor
+        function renderEquationHTML(q) {
+            return `
+                <div style="margin-bottom:20px; padding:20px; border:1px dashed #ccc; text-align:center; color:#888;">
+                    ${q.imagePlaceholder}
+                </div>
                 
-                // --- NSO VARIANTS ---
-                if(std.includes("NSO.1.1")) { // Value of Digits
-                    let n = rand(1000,9999);
-                    let digits = n.toString().split('');
-                    if(seed < 0.25) return { type:"HOT_TEXT", prompt:"Select the digit in the <b>hundreds</b> place.", data:{text:`Number: ${digits.join(' ')}`, chunks:digits, ans:[1]} };
-                    if(seed < 0.5) return { type:"HOT_TEXT", prompt:"Select the digit with a value of <b>1,000</b>.", data:{text:`Number: ${n}`, chunks:[n], ans:[0]} }; // Logic placeholder
-                    if(seed < 0.75) return { type:"MATCHING", prompt:"Match digits to values.", data:{rows:[digits[0], digits[3]], cols:["Thousands", "Ones"], ans:[0,1]} };
-                    return { type:"MULTI_SELECT", prompt:`Select all numbers with a <b>${digits[1]}</b> in the hundreds place.`, opts:[n.toLocaleString(), (n+100).toLocaleString(), (n-100).toLocaleString()], ans:[0] };
-                }
-                if(std.includes("NSO.1.4")) { // Rounding
-                    let n = rand(105, 994);
-                    if(seed < 0.3) return { type:"TABLE", prompt:`Round <b>${n}</b> to nearest 10 and 100.`, data:{rows:[n], cols:["10", "100"], ans:[[Math.round(n/10)*10, Math.round(n/100)*100]]} };
-                    if(seed < 0.6) return { type:"EDITING", prompt:`Complete the sentence.`, data:{sentence:`${n} rounded to the nearest 100 is [DROP1].`, drops:[{opts:[Math.round(n/100)*100, Math.floor(n/100)*100], ans:Math.round(n/100)*100}]} };
-                    return { type:"HOT_TEXT", prompt:`Select numbers that round to <b>${Math.round(n/100)*100}</b>.`, data:{text:`${n} ${n+20} ${n-50}`, chunks:[n, n+20, n-50], ans:[0]} };
-                }
-
-                // --- AR VARIANTS ---
-                if(std.includes("AR.1.1")) { // Distributive
-                    if(seed < 0.3) return { type:"MATCHING", prompt:"Match equivalent expressions.", data:{rows:["7x6"], cols:["(7x5)+(7x1)", "(7x3)+(7x3)"], ans:[0]} };
-                    if(seed < 0.6) return { type:"EDITING", prompt:"Complete the equation.", data:{sentence:"8 x 9 = (8 x [DROP1]) + (8 x 4)", drops:[{opts:["5","4"], ans:"5"}]} };
-                    return { type:"MULTI_SELECT", prompt:"Select all expressions equal to <b>6 x 7</b>.", opts:["(6x5)+(6x2)", "6x6 + 6", "40 + 2"], ans:[0,1,2] };
-                }
-                if(std.includes("AR.2.3")) { // Missing Factors
-                    let a=rand(4,9), b=rand(6,9);
-                    if(seed < 0.5) return { type:"EQUATION", prompt:`Find n: <b>${a*b} ÷ n = ${a}</b>`, ans:b.toString() };
-                    return { type:"EQUATION", prompt:`Find n: <b>n x ${a} = ${a*b}</b>`, ans:b.toString() };
-                }
-
-                // --- FR VARIANTS ---
-                if(std.includes("FR")) {
-                    let d = pick([4,6,8]), n = rand(1, d-1);
-                    if(seed < 0.4) return { type:"FRACTION", prompt:`Shade <b>${n}/${d}</b>.`, data:{den:d, ans:n} };
-                    if(seed < 0.7) return { type:"EDITING", prompt:"Compare fractions.", data:{sentence:`1/3 [DROP1] 1/6`, drops:[{opts:[">","<","="], ans:">"}]} };
-                    return { type:"HOT_TEXT", prompt:"Select the <b>numerator</b>.", data:{text:`${n} / ${d}`, chunks:[n, "/", d], ans:[0]} };
-                }
-
-                // --- GR VARIANTS ---
-                if(std.includes("GR.1.2")) { // Attributes
-                    if(seed < 0.5) return { type:"MULTI_SELECT", prompt:"Select <b>all</b> quadrilaterals.", opts:["Square", "Triangle", "Trapezoid"], ans:[0,2] };
-                    return { type:"MATCHING", prompt:"Match shape to sides.", data:{rows:["Triangle", "Square"], cols:["3 sides", "4 sides"], ans:[0,1]} };
-                }
-                if(std.includes("GR.2")) { // Area/Perim
-                    let l=rand(3,8), w=rand(2,5);
-                    if(seed < 0.5) return { type:"EQUATION", prompt:`Rectangle: L=${l}, W=${w}. Find Area.`, ans:(l*w).toString() };
-                    return { type:"TABLE", prompt:`Find Area and Perimeter for L=${l}, W=${w}.`, data:{rows:["Shape A"], cols:["Area", "Perimeter"], ans:[[l*w, 2*l+2*w]]} };
-                }
-
-                // --- DP VARIANTS ---
-                if(std.includes("DP")) {
-                    let v=[rand(2,10), rand(2,10), rand(2,10)];
-                    if(seed < 0.5) return { type:"GRAPHING", prompt:`Graph: A=${v[0]}, B=${v[1]}, C=${v[2]}`, data:{labels:["A","B","C"], max:12, step:1, ans:v} };
-                    return { type:"MULTI_SELECT", prompt:"Which categories have > 5?", opts:["A (8)", "B (3)", "C (6)"], ans:[0,2] };
-                }
-
-                // Fallback for others
-                return { type:"MULTI_SELECT", prompt:`(Generated for ${std}) Select true statement.`, opts:["True Statement", "False Statement"], ans:[0] };
-            }
-        };
-
-        // --- 4. RENDERERS & LOGIC ---
-        let queue=[], cur=0, resp={};
-
-        // BUILD MENU
-        const menu = document.getElementById('menu-links');
-        // Group standards by Domain for Clean Menu
-        const grouped = {};
-        STANDARDS_LIST.forEach(s => {
-            let d = s.split('.')[2]; // NSO, AR, etc
-            if(!grouped[d]) grouped[d] = [];
-            grouped[d].push(s);
-        });
-        
-        Object.keys(grouped).forEach(d => {
-            let html = `<details><summary>${d} (${DOMAINS[d] || d})</summary>`;
-            grouped[d].forEach(s => {
-                html += `<button class="sub-btn" onclick="startSession('${s}', 5)">${s}</button>`;
-            });
-            html += `</details>`;
-            menu.innerHTML += html;
-        });
-
-        // SESSION
-        function startSession(id, count) {
-            queue=[]; resp={}; cur=0;
-            let targetStds = (id==='ALL') ? STANDARDS_LIST : [id];
-            
-            // If ALL, ensure we hit every standard at least once
-            if(id === 'ALL') {
-                targetStds.forEach(std => {
-                    queue.push({ std: std, ...GENERATOR.createItem(std) });
-                });
-                // If count > 34, fill remainder randomly
-                while(queue.length < count) {
-                    let s = pick(targetStds);
-                    queue.push({ std: s, ...GENERATOR.createItem(s) });
-                }
-                // Shuffle for variety
-                queue.sort(() => Math.random() - 0.5);
-            } else {
-                for(let i=0; i<count; i++) queue.push({ std: id, ...GENERATOR.createItem(id) });
-            }
-
-            document.getElementById('screen-menu').classList.remove('active');
-            document.getElementById('screen-test').classList.add('active');
-            document.getElementById('q-total').innerText = queue.length;
-            render();
+                <div class="equation-display" id="eq-display"></div>
+                
+                <div class="keypad">
+                    <button class="keypad-btn" onclick="typeKey('1')">1</button>
+                    <button class="keypad-btn" onclick="typeKey('2')">2</button>
+                    <button class="keypad-btn" onclick="typeKey('3')">3</button>
+                    <button class="keypad-btn" onclick="typeKey('4')">4</button>
+                    <button class="keypad-btn" onclick="typeKey('5')">5</button>
+                    <button class="keypad-btn" onclick="typeKey('6')">6</button>
+                    <button class="keypad-btn" onclick="typeKey('7')">7</button>
+                    <button class="keypad-btn" onclick="typeKey('8')">8</button>
+                    <button class="keypad-btn" onclick="typeKey('9')">9</button>
+                    <button class="keypad-btn action" onclick="typeKey('/')">/</button>
+                    <button class="keypad-btn" onclick="typeKey('0')">0</button>
+                    <button class="keypad-btn action" onclick="backspace()">⌫</button>
+                </div>
+            `;
         }
 
-        function render() {
-            let item = queue[cur];
-            let ans = resp[cur];
-            let stage = document.getElementById('stage');
-            
-            // Split Layout Logic
-            let left="", right="";
-            let vis = "";
+        // --- 3. INTERACTION LOGIC ---
 
-            if(item.type === "GRAPHING") vis = SVG.graph(item.data, ans);
-            else if(item.type === "FRACTION") vis = SVG.pie(item.data.den, ans);
-            else if(item.type === "EQUATION") vis = `<div style="font-size:4em; text-align:center; padding:50px; color:#ccc">?</div>`;
-
-            if(vis) {
-                left = `<div class="pane left-pane">${vis}</div>`;
-                right = `<div class="pane right-pane">`;
-            } else {
-                right = `<div class="pane" style="width:100%">`;
-            }
-
-            // Header info
-            let domainName = getDomain(item.std);
-            right += `<div class="std-meta"><span>${domainName}</span><span>${item.std}</span></div>`;
-            right += `<div class="q-text">${item.prompt}</div>`;
-
-            // Interactions
-            if(item.type === "HOT_TEXT") {
-                right += `<div class="hot-container">`;
-                item.data.chunks.forEach((c,i)=>{
-                    let s = (ans&&ans.includes(i))?'selected':'';
-                    right += `<span class="hot-span ${s}" onclick="saveHot(${i})">${c}</span>`;
-                });
-                right += `</div>`;
-            }
-            else if(item.type === "EDITING") {
-                let s = item.data.sentence;
-                item.data.drops.forEach((d,i)=>{
-                    let v = (ans&&ans[i])?ans[i]:"";
-                    let sel = `<select class="edit-select" onchange="saveEdit(${i},this.value)"><option value="" disabled ${v===""?'selected':''}>Select...</option>`;
-                    d.opts.forEach(o=>sel+=`<option value="${o}" ${v==o?'selected':''}>${o}</option>`);
-                    sel+=`</select>`;
-                    s = s.replace(`[DROP${i+1}]`, sel);
-                });
-                right += `<div style="font-size:1.3em; line-height:2.0">${s}</div>`;
-            }
-            else if(item.type === "TABLE") {
-                right += `<table class="match-table"><thead><tr><th>Value</th>`;
-                item.data.cols.forEach(c=>right+=`<th>${c}</th>`);
-                right+=`</tr></thead><tbody>`;
-                item.data.rows.forEach((r,ri)=>{
-                    right+=`<tr><td>${r}</td>`;
-                    item.data.cols.forEach((c,ci)=>{
-                        let v = (ans&&ans[ri]&&ans[ri][ci])?ans[ri][ci]:"";
-                        right+=`<td><input class="table-input" value="${v}" onchange="saveTable(${ri},${ci},this.value)"></td>`;
-                    });
-                    right+=`</tr>`;
-                });
-                right+=`</tbody></table>`;
-            }
-            else if(item.type === "MATCHING") {
-                right += `<table class="match-table"><thead><tr><th></th>`;
-                item.data.cols.forEach(c=>right+=`<th>${c}</th>`);
-                right+=`</tr></thead><tbody>`;
-                item.data.rows.forEach((r,ri)=>{
-                    right+=`<tr><td>${r}</td>`;
-                    item.data.cols.forEach((c,ci)=>{
-                        let chk = (ans&&ans[ri]===ci)?'checked':'';
-                        right+=`<td><input type="radio" name="r${ri}" class="match-check" ${chk} onclick="saveMatch(${ri},${ci})"></td>`;
-                    });
-                    right+=`</tr>`;
-                });
-                right+=`</tbody></table>`;
-            }
-            else if(item.type === "MULTI_SELECT") {
-                item.opts.forEach((o,i)=>{
-                    let s = (ans&&ans.includes(i))?'selected':'';
-                    right += `<div class="opt-row ${s}" onclick="saveMulti(${i})"><div class="bubble ${s}"></div>${o}</div>`;
-                });
-            }
-            else if(item.type === "EQUATION") {
-                right += `<input type="text" class="eq-box" value="${ans||''}" oninput="saveEq(this.value)" placeholder="Answer">`;
-            }
-
-            right += `</div>`; // Close right pane
-            stage.innerHTML = left + right;
-            document.getElementById('q-idx').innerText = cur + 1;
-            document.getElementById('btn-next').innerText = (cur === queue.length-1) ? "Submit" : "Next";
+        // Hot Text Toggle
+        function toggleHotSpot(el) {
+            // For this specific question (single select), clear others first
+            document.querySelectorAll('.hot-spot').forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
         }
 
-        // --- SVG LOGIC ---
-        const SVG = {
-            pie: (d, sel) => {
-                let p="";
-                for(let i=0; i<d; i++){
-                    let s=(i*360/d-90)*Math.PI/180, e=((i+1)*360/d-90)*Math.PI/180;
-                    let x1=50+45*Math.cos(s), y1=50+45*Math.sin(s), x2=50+45*Math.cos(e), y2=50+45*Math.sin(e);
-                    let f = (sel||[]).includes(i) ? '#00609C' : 'white';
-                    p+=`<path d="M50,50 L${x1},${y1} A45,45 0 0,1 ${x2},${y2} Z" fill="${f}" stroke="#333" stroke-width="2" onclick="handlePie(${i})"/>`;
-                }
-                return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="white" stroke="#333" stroke-width="2"/>${p}</svg>`;
-            },
-            graph: (data, ans) => {
-                let b="";
-                data.labels.forEach((l,i)=>{
-                    let v = (ans&&ans[i]!==undefined)?ans[i]:0;
-                    let h = (v/data.max)*250;
-                    b+=`<rect x="${50+i*80}" y="${280-h}" width="50" height="${h}" fill="#003057" stroke="#333" class="graph-bar" onclick="handleGraph(${i}, ${data.step}, ${data.max})"/>`;
-                    b+=`<text x="${75+i*80}" y="300" text-anchor="middle" font-weight="bold">${l}</text>`;
-                    b+=`<text x="${75+i*80}" y="${270-h}" text-anchor="middle" fill="#003057" font-weight="bold">${v}</text>`;
-                    b+=`<rect x="${50+i*80}" y="20" width="50" height="260" fill="transparent" onclick="handleGraph(${i}, ${data.step}, ${data.max})"/>`;
-                });
-                return `<svg viewBox="0 0 400 320"><line x1="30" y1="280" x2="380" y2="280" stroke="#333" stroke-width="3"/><line x1="30" y1="20" x2="30" y2="280" stroke="#333" stroke-width="3"/>${b}</svg>`;
+        // Keypad Logic
+        let currentEqValue = "";
+        function typeKey(val) {
+            currentEqValue += val;
+            updateDisplay();
+        }
+        function backspace() {
+            currentEqValue = currentEqValue.slice(0, -1);
+            updateDisplay();
+        }
+        function updateDisplay() {
+            document.getElementById('eq-display').innerText = currentEqValue;
+        }
+
+        // Navigation
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                currentEqValue = ""; // Reset calculator
+                renderQuestion(currentQuestionIndex);
+            } else {
+                alert("End of Practice Test");
             }
-        };
+        }
 
-        // --- HANDLERS ---
-        window.saveHot = (i) => { let a=resp[cur]||[]; if(a.includes(i)) a=a.filter(x=>x!==i); else a=[i]; resp[cur]=a; render(); };
-        window.saveTable = (r,c,v) => { let a=resp[cur]||{}; if(!a[r])a[r]={}; a[r][c]=v; resp[cur]=a; };
-        window.saveEdit = (i,v) => { let a=resp[cur]||{}; a[i]=v; resp[cur]=a; };
-        window.saveMulti = (i) => { let a=resp[cur]||[]; if(a.includes(i)) a=a.filter(x=>x!==i); else a.push(i); resp[cur]=a; render(); };
-        window.saveMatch = (r,c) => { let a=resp[cur]||{}; a[r]=c; resp[cur]=a; };
-        window.handleGraph = (i,s,m) => { let a=resp[cur]||{}; let v=a[i]||0; v+=s; if(v>m) v=0; a[i]=v; resp[cur]=a; render(); };
-        window.handlePie = (i) => { let a=resp[cur]||[]; if(a.includes(i)) a=a.filter(x=>x!==i); else a.push(i); resp[cur]=a; render(); };
-        window.saveEq = (v) => { resp[cur]=v; };
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                currentEqValue = "";
+                renderQuestion(currentQuestionIndex);
+            }
+        }
 
-        window.navQ = (d) => {
-            if(cur+d >= 0 && cur+d < queue.length) { cur+=d; render(); }
-            else if(cur+d === queue.length) { alert("Test Completed!"); location.reload(); }
-        };
-        window.toggleZoom = () => { document.body.style.zoom = document.body.style.zoom==="1.2"?"1":"1.2"; };
+        // Start
+        renderQuestion(0);
 
     </script>
 </body>
