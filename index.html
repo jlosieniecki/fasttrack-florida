@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAST Grade 3 Accelerated | Master Simulator</title>
+    <title>FAST Grade 3 Accelerated | Master Simulator (Fixed)</title>
     <style>
         :root {
-            --primary: #004d40; /* FL B.E.S.T. Green/Teal */
-            --accent: #ff6f00;  /* FL Orange */
+            --primary: #004d40; /* FL B.E.S.T. Green */
+            --accent: #e65100;  /* FL Orange */
             --bg: #eceff1;
             --panel: #ffffff;
             --text: #263238;
@@ -16,29 +16,30 @@
 
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
-        /* --- SIDEBAR NAVIGATION --- */
-        .sidebar { width: 320px; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
-        .logo-area { padding: 20px; background: var(--primary); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        /* --- SIDEBAR --- */
+        .sidebar { width: 320px; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; height: 100vh; }
+        
+        .logo-area { padding: 20px; background: var(--primary); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex-shrink: 0; }
         .logo-area h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
-        .logo-area p { margin: 5px 0 0; font-size: 0.8rem; opacity: 0.8; }
         
         .sim-btn {
             margin: 15px; padding: 15px; background: var(--accent); color: white; text-align: center;
-            border-radius: 8px; font-weight: bold; cursor: pointer; border: 2px solid #e65100;
-            transition: transform 0.1s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px; font-weight: bold; cursor: pointer; border: 2px solid #ef6c00;
+            transition: transform 0.1s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); flex-shrink: 0;
         }
         .sim-btn:hover { transform: translateY(-2px); }
-        .sim-btn:active { transform: translateY(0); }
 
         .menu-scroll { flex: 1; overflow-y: auto; padding: 0 15px 20px; }
+        
         .menu-cat { 
             font-size: 0.75rem; text-transform: uppercase; color: #78909c; font-weight: 800; 
             margin: 20px 0 8px; border-bottom: 2px solid #eee; padding-bottom: 5px;
         }
+        
         .std-btn { 
-            display: block; width: 100%; text-align: left; padding: 10px 12px; margin-bottom: 6px; 
+            display: block; width: 100%; text-align: left; padding: 12px; margin-bottom: 6px; 
             background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; cursor: pointer; transition: 0.1s;
-            font-size: 0.9rem; position: relative;
+            font-size: 0.9rem;
         }
         .std-btn:hover { background: #e0f2f1; border-color: var(--primary); }
         .std-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
@@ -104,13 +105,12 @@
 
     <div class="sidebar">
         <div class="logo-area">
-            <h1>FAST Grade 3 Acc.</h1>
-            <p>Comprehensive Master File</p>
+            <h1>FAST Gr3 Acc.</h1>
+            <p>Master Simulator</p>
         </div>
         
         <div class="sim-btn" onclick="App.startSim()">
             🚀 Start Full Test Sim
-            <div style="font-size:0.75rem; font-weight:normal; margin-top:5px; opacity:0.9;">Random Mix of All Standards</div>
         </div>
 
         <div class="menu-scroll" id="menu">
@@ -125,9 +125,9 @@
             </div>
 
             <div class="q-text" id="q-prompt">
-                Welcome. Use the sidebar to either:<br>
-                1. <strong>Start Full Test Sim</strong> (Randomly tests all standards).<br>
-                2. <strong>Select a Specific Standard</strong> to practice that topic repeatedly.
+                <strong>Welcome!</strong><br><br>
+                1. <strong>Practice Mode:</strong> Click any standard in the left menu to drill that specific topic.<br>
+                2. <strong>Test Sim:</strong> Click the Orange button to get a random mix of all standards.
             </div>
 
             <div class="visual-stage" id="q-visual" style="display:none;"></div>
@@ -141,13 +141,12 @@
     </div>
 
     <script>
-        // --- 1. UTILITIES (Anti-Repeat, SVGs, Math) ---
+        // --- 1. UTILITIES ---
         const Utils = {
             rInt: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
             pick: (arr) => arr[Math.floor(Math.random() * arr.length)],
             shuffle: (arr) => arr.sort(() => Math.random() - 0.5),
 
-            // Smart Distractor Generator (Ensures unique options)
             genOptions: (correct, genFunc, count=3) => {
                 const opts = new Set([correct]);
                 let safety = 0;
@@ -164,7 +163,6 @@
                 clock: (h, m) => {
                     const hDeg = (h%12)*30 + m*0.5;
                     const mDeg = m*6;
-                    // Minute ticks
                     let ticks = '';
                     for(let i=0; i<60; i++) {
                         const isHr = i%5===0;
@@ -196,8 +194,8 @@
                         <text x="20" y="50" text-anchor="middle" font-size="12">0</text>
                         <line x1="280" y1="25" x2="280" y2="35" stroke="#333" stroke-width="2"/>
                         <text x="280" y="50" text-anchor="middle" font-size="12">1</text>
-                        <circle cx="${20 + (num/den)*260}" cy="30" r="6" fill="#ff6f00"/>
-                        <text x="${20 + (num/den)*260}" y="20" text-anchor="middle" font-weight="bold" fill="#ff6f00">?</text>
+                        <circle cx="${20 + (num/den)*260}" cy="30" r="6" fill="#e65100"/>
+                        <text x="${20 + (num/den)*260}" y="20" text-anchor="middle" font-weight="bold" fill="#e65100">?</text>
                     </svg>`;
                 },
                 symmetry: (type) => {
@@ -207,21 +205,21 @@
                 barGraph: () => {
                     return `<svg width="200" height="120" viewBox="0 0 200 120">
                         <line x1="20" y1="100" x2="180" y2="100" stroke="#333"/>
-                        <rect x="30" y="40" width="30" height="60" fill="#004d40"/><text x="45" y="115" text-anchor="middle" font-size="10">Pizza</text>
-                        <rect x="80" y="70" width="30" height="30" fill="#004d40"/><text x="95" y="115" text-anchor="middle" font-size="10">Salad</text>
-                        <rect x="130" y="20" width="30" height="80" fill="#004d40"/><text x="145" y="115" text-anchor="middle" font-size="10">Tacos</text>
+                        <rect x="30" y="40" width="30" height="60" fill="#004d40"/><text x="45" y="115" text-anchor="middle" font-size="10">Pizza (60)</text>
+                        <rect x="80" y="70" width="30" height="30" fill="#004d40"/><text x="95" y="115" text-anchor="middle" font-size="10">Salad (30)</text>
+                        <rect x="130" y="20" width="30" height="80" fill="#004d40"/><text x="145" y="115" text-anchor="middle" font-size="10">Tacos (80)</text>
                     </svg>`;
                 }
             }
         };
 
-        // --- 2. MASTER QUESTION BANK (All Standards) ---
+        // --- 2. MASTER QUESTION BANK (Complete) ---
         const Bank = {
             "Number Sense (NSO)": [
                 { id: "MA.3.NSO.1.1", desc: "Read/Write Numbers", gen: () => {
                     const n = Utils.rInt(1001,9999);
                     const forms = [
-                        {t: "Word Form", v: "Four thousand...", c: false}, // Simplified for demo
+                        {t: "Word Form", v: "Four thousand...", c: false}, 
                         {t: "Expanded Form", v: `${Math.floor(n/1000)*1000} + ${Math.floor((n%1000)/100)*100} + ${Math.floor((n%100)/10)*10} + ${n%10}`, c: true}
                     ];
                     return { text: `Select the correct <strong>Expanded Form</strong> for <strong>${n}</strong>.`, type: 'radio', options: Utils.genOptions(forms[1].v, ()=>`${Utils.rInt(1000,9000)} + ${Utils.rInt(100,900)}...`).map(x=>({t:x,c:x===forms[1].v})), fb: "Level 3: Read/Write numbers to 10,000." };
@@ -292,14 +290,19 @@
 
         // --- 3. APP CONTROLLER ---
         const App = {
-            mode: 'practice', // 'practice' or 'sim'
+            mode: 'practice', 
             currentQ: null,
             score: 0,
             
             init: function() {
                 const menu = document.getElementById('menu');
+                // FIX: Use createElement instead of innerHTML to preserve logic
                 for(const cat in Bank) {
-                    menu.innerHTML += `<div class="menu-cat">${cat}</div>`;
+                    const header = document.createElement('div');
+                    header.className = 'menu-cat';
+                    header.innerText = cat;
+                    menu.appendChild(header);
+
                     Bank[cat].forEach(std => {
                         const btn = document.createElement('div');
                         btn.className = 'std-btn';
@@ -316,7 +319,7 @@
                 document.getElementById('score-display').innerText = "Score: 0";
                 document.getElementById('q-badge').innerText = "Test Simulation Mode";
                 
-                // Collect all generators
+                // Flatten standards for random pick
                 this.allGens = [];
                 for(const cat in Bank) Bank[cat].forEach(s => this.allGens.push(s));
                 
@@ -324,7 +327,6 @@
             },
 
             nextSimQ: function() {
-                // Pick random standard
                 const std = Utils.pick(this.allGens);
                 this.loadQ(std.gen(), std.id);
             },
@@ -338,16 +340,16 @@
             loadQ: function(q, stdId) {
                 this.currentQ = q;
                 
-                // UI Reset
+                // UI Update
                 document.getElementById('q-badge').innerText = this.mode === 'sim' ? `Sim Mode: ${stdId}` : `Practice: ${stdId}`;
                 document.getElementById('q-prompt').innerHTML = q.text;
                 
-                // Visual
+                // Visuals
                 const v = document.getElementById('q-visual');
                 v.style.display = q.visual ? 'flex' : 'none';
                 v.innerHTML = q.visual || '';
                 
-                // Input
+                // Reset Input Area
                 const list = document.getElementById('q-options');
                 list.innerHTML = '';
                 const btnAction = document.getElementById('btn-action');
@@ -377,7 +379,10 @@
                     });
                 } else if (q.type === 'equation') {
                     list.innerHTML = `<input type="text" class="eq-input" id="user-eq" placeholder="Type answer...">`;
-                    document.getElementById('user-eq').addEventListener('input', (e) => btnAction.disabled = e.target.value === '');
+                    // Wait for DOM to append before attaching listener
+                    setTimeout(() => {
+                        document.getElementById('user-eq').addEventListener('input', (e) => btnAction.disabled = e.target.value === '');
+                    }, 0);
                 } else if (q.type === 'table') {
                     let html = `<table class="tei-table"><tr><th>In</th><th>Out</th></tr>`;
                     q.inputs.forEach((val, i) => {
@@ -386,7 +391,7 @@
                     });
                     html += `</table>`;
                     list.innerHTML = html;
-                    setTimeout(() => document.getElementById('tbl-in').addEventListener('input', () => btnAction.disabled = false), 100);
+                    setTimeout(() => document.getElementById('tbl-in').addEventListener('input', () => btnAction.disabled = false), 0);
                 }
             },
 
@@ -423,6 +428,7 @@
             }
         };
 
+        // Start
         App.init();
 
     </script>
