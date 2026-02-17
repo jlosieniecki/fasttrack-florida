@@ -7,20 +7,20 @@
     <style>
         /* --- 1. CAMBIUM AUTHENTIC THEME --- */
         :root {
-            --fast-bg: #f2f2f2;           /* Light grey background outside the card */
-            --fast-card-bg: #ffffff;      /* White question paper */
+            --fast-bg: #f2f2f2;           
+            --fast-card-bg: #ffffff;      
             --fast-text: #000000;
-            --fast-blue: #005ea2;         /* The official selection blue */
-            --fast-hover: #e1f3f8;        /* Light blue hover state */
-            --fast-border: #000000;       /* High contrast borders */
-            --fast-grey-row: #f0f0f0;     /* Alternating table rows */
+            --fast-blue: #005ea2;         
+            --fast-hover: #e1f3f8;        
+            --fast-border: #000000;       
+            --fast-grey-row: #f0f0f0;     
         }
 
         body {
-            font-family: 'Verdana', 'Arial', sans-serif; /* Standard testing fonts */
+            font-family: 'Verdana', 'Arial', sans-serif;
             background-color: var(--fast-bg);
             margin: 0;
-            padding-bottom: 100px; /* Space for the footer */
+            padding-bottom: 100px; /* Space for footer */
             color: var(--fast-text);
         }
 
@@ -35,27 +35,36 @@
             min-height: 400px;
         }
 
-        /* Question Stem Text */
         .question-stem {
             font-size: 22px;
-            font-weight: normal; /* FAST uses normal weight, not bold, for stems */
             margin-bottom: 30px;
             line-height: 1.6;
         }
 
-        /* --- 2. HOT TEXT STYLES --- */
+        /* --- 2. DYNAMIC IMAGES (FRACTIONS) --- */
+        .fraction-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 2px solid #000;
+            margin: 0 auto 20px auto;
+            /* This is handled by JS dynamically */
+            background: conic-gradient(var(--fast-blue) 0% 0%, white 0% 100%); 
+        }
+
+        /* --- 3. HOT TEXT STYLES --- */
         .hot-text-container {
             font-size: 24px;
             line-height: 2.5;
             padding: 20px;
-            border: 1px solid #ddd; /* Container box often used in tests */
+            border: 1px solid #ddd;
             border-radius: 4px;
         }
 
         .hot-spot {
             padding: 6px 12px;
             margin: 0 4px;
-            border: 2px solid transparent; /* Invisible border prevents jumping */
+            border: 2px solid transparent;
             border-radius: 4px;
             cursor: pointer;
             transition: background 0.2s;
@@ -70,10 +79,9 @@
             background-color: var(--fast-blue);
             color: white;
             border-color: var(--fast-blue);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* --- 3. TABLE MATCH STYLES --- */
+        /* --- 4. TABLE MATCH STYLES --- */
         .fast-table {
             width: 100%;
             border-collapse: collapse;
@@ -86,7 +94,6 @@
             border-bottom: 2px solid #000;
             padding: 15px;
             text-align: center;
-            font-weight: bold;
         }
 
         .fast-table td {
@@ -95,17 +102,9 @@
             text-align: center;
         }
 
-        /* Zebra Striping */
         .fast-table tr:nth-child(even) { background-color: var(--fast-grey-row); }
         .fast-table tr:nth-child(odd) { background-color: #fff; }
 
-        .fast-table .row-label {
-            text-align: left;
-            font-weight: bold;
-            padding-left: 20px;
-        }
-
-        /* Custom Radio Button scaling */
         input[type="radio"].fast-radio {
             width: 24px;
             height: 24px;
@@ -113,7 +112,7 @@
             cursor: pointer;
         }
 
-        /* --- 4. EQUATION EDITOR (KEYPAD) --- */
+        /* --- 5. EQUATION EDITOR (KEYPAD) --- */
         .equation-display {
             width: 100%;
             max-width: 400px;
@@ -146,7 +145,7 @@
         .keypad-btn:active { background: #e2e6ea; }
         .keypad-btn.action { background: #e1f3f8; border-color: #005ea2; color: #005ea2; }
 
-        /* --- 5. FOOTER BAR --- */
+        /* --- 6. FOOTER BAR --- */
         .fast-footer {
             position: fixed;
             bottom: 0;
@@ -171,14 +170,29 @@
             border: 1px solid #aaa;
         }
 
-        .btn-next {
-            background-color: var(--fast-blue);
-            color: white;
-            border: none;
-            font-weight: bold;
-        }
-        
+        .btn-next { background-color: var(--fast-blue); color: white; border: none; font-weight: bold; }
         .btn-back { background-color: white; color: #333; }
+
+        /* --- 7. REVIEW SCREEN --- */
+        .review-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .review-item {
+            border: 1px solid #ccc;
+            padding: 15px;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .review-item:hover { border-color: var(--fast-blue); background: #f0f8ff; }
+        .status-answered { color: var(--fast-blue); font-weight: bold; }
+        .status-unanswered { color: #d9534f; font-weight: bold; }
 
     </style>
 </head>
@@ -187,24 +201,27 @@
     <div id="question-card">
         </div>
 
-    <div class="fast-footer">
+    <div class="fast-footer" id="nav-controls">
         <button class="nav-btn btn-back" onclick="prevQuestion()">Back</button>
-        <div style="font-weight: bold; font-size: 18px;">Item <span id="q-num">1</span> of 3</div>
+        <div style="font-weight: bold; font-size: 18px;">
+            Item <span id="q-num">1</span> of <span id="q-total">3</span>
+        </div>
         <button class="nav-btn btn-next" onclick="nextQuestion()">Next</button>
     </div>
 
     <script>
         // --- STATE MANAGEMENT ---
         let currentQuestionIndex = 0;
-        const questions = [];
+        let questions = [];
+        let userAnswers = []; // Stores answers
 
-        // --- 1. GENERATE QUESTIONS (Authentic Logic) ---
+        // --- 1. GENERATE QUESTIONS ---
 
         // MA.3.NSO.1.1 - Table Match
         function generateTableMatch() {
             const thousands = Math.floor(Math.random() * 9) + 1;
             const ones = Math.floor(Math.random() * 9) + 1;
-            const fullNumber = (thousands * 1000) + ones; // e.g., 6004
+            const fullNumber = (thousands * 1000) + ones; 
 
             return {
                 type: 'table_match',
@@ -221,23 +238,26 @@
 
         // MA.3.NSO.1.2 - Hot Text
         function generateHotText() {
-            const target = Math.floor(Math.random() * 800) + 100; // e.g., 482
-            
+            const target = Math.floor(Math.random() * 800) + 100;
             return {
                 type: 'hot_text',
                 standard: 'MA.3.NSO.1.2',
                 text: `Select the digit in the **tens** place.`,
-                content: target.toString() // "482"
+                content: target.toString()
             };
         }
 
-        // MA.3.FR.1.1 - Equation Editor
+        // MA.3.FR.1.1 - Equation (Dynamic Image)
         function generateEquation() {
+            const denominator = [2, 3, 4, 6, 8][Math.floor(Math.random() * 5)];
+            const numerator = 1; // Simplest unit fraction for demo
+            
             return {
                 type: 'equation',
                 standard: 'MA.3.FR.1.1',
-                text: "What fraction represents the shaded part? Use the keypad to enter your answer.",
-                imagePlaceholder: "[ FRACTION IMAGE ]" // Placeholder for your SVG logic
+                text: "What fraction represents the shaded part? Use the keypad.",
+                num: numerator,
+                den: denominator
             };
         }
 
@@ -246,38 +266,47 @@
         questions.push(generateHotText());
         questions.push(generateEquation());
         
+        userAnswers = new Array(questions.length).fill(null);
+        document.getElementById('q-total').innerText = questions.length;
+
         // --- 2. RENDERERS ---
 
         function renderQuestion(index) {
+            currentQuestionIndex = index;
             const q = questions[index];
             const container = document.getElementById('question-card');
+            
+            // Show Footer
+            document.getElementById('nav-controls').style.display = 'flex';
             document.getElementById('q-num').innerText = index + 1;
             
             let html = `<div class="question-stem">${q.text}</div>`;
 
             if (q.type === 'table_match') {
-                html += renderTableMatchHTML(q);
+                html += renderTableMatchHTML(q, index);
             } else if (q.type === 'hot_text') {
-                html += renderHotTextHTML(q);
+                html += renderHotTextHTML(q, index);
             } else if (q.type === 'equation') {
-                html += renderEquationHTML(q);
+                html += renderEquationHTML(q, index);
             }
 
             container.innerHTML = html;
+            
+            // Restore keypad value if previously answered
+            if(q.type === 'equation') {
+                currentEqValue = userAnswers[index] || "";
+                document.getElementById('eq-display').innerText = currentEqValue;
+            }
         }
 
-        // HTML Generator: Table Match
-        function renderTableMatchHTML(q) {
+        function renderTableMatchHTML(q, index) {
             return `
                 <div style="margin-bottom:20px; font-size:20px; background:#f9f9f9; padding:15px; border-left:4px solid var(--fast-blue);">
                     Reference Number: <strong>${q.contextNumber}</strong>
                 </div>
                 <table class="fast-table">
                     <thead>
-                        <tr>
-                            <th></th>
-                            ${q.columns.map(col => `<th>${col}</th>`).join('')}
-                        </tr>
+                        <tr><th></th>${q.columns.map(col => `<th>${col}</th>`).join('')}</tr>
                     </thead>
                     <tbody>
                         ${q.rows.map((row, rIdx) => `
@@ -285,39 +314,44 @@
                                 <td class="row-label">${row.label}</td>
                                 ${q.columns.map(col => `
                                     <td>
-                                        <input type="radio" name="row_${rIdx}" class="fast-radio" value="${col}">
+                                        <input type="radio" 
+                                               name="row_${rIdx}" 
+                                               class="fast-radio" 
+                                               value="${col}"
+                                               ${userAnswers[index] && userAnswers[index][`row_${rIdx}`] === col ? 'checked' : ''}
+                                               onchange="saveTableAnswer(${index}, 'row_${rIdx}', '${col}')">
                                     </td>
                                 `).join('')}
                             </tr>
                         `).join('')}
                     </tbody>
-                </table>
-            `;
+                </table>`;
         }
 
-        // HTML Generator: Hot Text
-        function renderHotTextHTML(q) {
-            // Split "482" into ["4", "8", "2"]
+        function renderHotTextHTML(q, index) {
             const digits = q.content.split('');
             return `
                 <div class="hot-text-container">
                     ${digits.map((digit, i) => `
-                        <span class="hot-spot" onclick="toggleHotSpot(this)">${digit}</span>
+                        <span class="hot-spot ${userAnswers[index] === i ? 'selected' : ''}" 
+                              onclick="saveHotTextAnswer(${index}, this, ${i})">${digit}</span>
                     `).join('')}
-                </div>
-                <p style="color:#666; font-size:14px; margin-top:20px;">* Click the correct digit to select it.</p>
-            `;
+                </div>`;
         }
 
-        // HTML Generator: Equation Editor
-        function renderEquationHTML(q) {
+        function renderEquationHTML(q, index) {
+            // Dynamic Circle Generator using CSS Conic Gradient
+            const percentage = (q.num / q.den) * 100;
+            
             return `
-                <div style="margin-bottom:20px; padding:20px; border:1px dashed #ccc; text-align:center; color:#888;">
-                    ${q.imagePlaceholder}
+                <div style="text-align:center;">
+                    <div class="fraction-circle" 
+                         style="background: conic-gradient(var(--fast-blue) 0% ${percentage}%, white ${percentage}% 100%);">
+                    </div>
+                    <p style="color:#666; font-size:14px;">(Shaded part: ${q.num} out of ${q.den})</p>
                 </div>
-                
+
                 <div class="equation-display" id="eq-display"></div>
-                
                 <div class="keypad">
                     <button class="keypad-btn" onclick="typeKey('1')">1</button>
                     <button class="keypad-btn" onclick="typeKey('2')">2</button>
@@ -331,48 +365,89 @@
                     <button class="keypad-btn action" onclick="typeKey('/')">/</button>
                     <button class="keypad-btn" onclick="typeKey('0')">0</button>
                     <button class="keypad-btn action" onclick="backspace()">⌫</button>
+                </div>`;
+        }
+
+        // --- 3. REVIEW SCREEN LOGIC ---
+        function renderReviewScreen() {
+            const container = document.getElementById('question-card');
+            
+            // Hide normal footer
+            document.getElementById('nav-controls').style.display = 'none';
+
+            let html = `
+                <div style="border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
+                    <h2>Review Your Answers</h2>
+                    <p>Click any question to return to it.</p>
+                </div>
+                <div class="review-grid">
+                    ${questions.map((q, i) => `
+                        <div class="review-item" onclick="renderQuestion(${i})">
+                            <span>Question ${i+1}</span>
+                            <span class="${userAnswers[i] ? 'status-answered' : 'status-unanswered'}">
+                                ${userAnswers[i] ? 'Answered' : 'Unanswered'}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="margin-top: 40px; text-align: right;">
+                    <button class="nav-btn btn-next" style="font-size: 20px; padding: 15px 30px;" onclick="finishTest()">Submit Test</button>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function finishTest() {
+            document.getElementById('question-card').innerHTML = `
+                <div style="text-align:center; padding: 60px;">
+                    <h1 style="color: var(--fast-blue); font-size: 48px;">Test Submitted</h1>
+                    <p style="font-size: 20px;">Your answers have been recorded.</p>
+                    <button class="nav-btn btn-next" onclick="location.reload()" style="margin-top:20px;">Start New Test</button>
                 </div>
             `;
         }
 
-        // --- 3. INTERACTION LOGIC ---
+        // --- 4. INTERACTION ---
 
-        // Hot Text Toggle
-        function toggleHotSpot(el) {
-            // For this specific question (single select), clear others first
-            document.querySelectorAll('.hot-spot').forEach(s => s.classList.remove('selected'));
-            el.classList.add('selected');
+        function saveTableAnswer(qIndex, rowId, value) {
+            if (!userAnswers[qIndex]) userAnswers[qIndex] = {};
+            userAnswers[qIndex][rowId] = value;
         }
 
-        // Keypad Logic
+        function saveHotTextAnswer(qIndex, el, digitIndex) {
+            document.querySelectorAll('.hot-spot').forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
+            userAnswers[qIndex] = digitIndex;
+        }
+
         let currentEqValue = "";
         function typeKey(val) {
             currentEqValue += val;
             updateDisplay();
+            userAnswers[currentQuestionIndex] = currentEqValue;
         }
         function backspace() {
             currentEqValue = currentEqValue.slice(0, -1);
             updateDisplay();
+            userAnswers[currentQuestionIndex] = currentEqValue;
         }
         function updateDisplay() {
             document.getElementById('eq-display').innerText = currentEqValue;
         }
 
-        // Navigation
+        // --- 5. NAVIGATION ---
         function nextQuestion() {
             if (currentQuestionIndex < questions.length - 1) {
                 currentQuestionIndex++;
-                currentEqValue = ""; // Reset calculator
                 renderQuestion(currentQuestionIndex);
             } else {
-                alert("End of Practice Test");
+                renderReviewScreen();
             }
         }
 
         function prevQuestion() {
             if (currentQuestionIndex > 0) {
                 currentQuestionIndex--;
-                currentEqValue = "";
                 renderQuestion(currentQuestionIndex);
             }
         }
