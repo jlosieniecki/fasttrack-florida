@@ -3,439 +3,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAST Accelerated Math Simulator | Gold Edition</title>
+    <title>FAST Grade 3 Accelerated | Master Simulator</title>
     <style>
         :root {
-            --primary: #0f4c81; /* Classic Test Blue */
-            --bg: #f4f7f6;
-            --white: #ffffff;
-            --text: #333;
-            --border: #ccc;
-            --highlight: #e3f2fd;
+            --primary: #004d40; /* FL B.E.S.T. Green/Teal */
+            --accent: #ff6f00;  /* FL Orange */
+            --bg: #eceff1;
+            --panel: #ffffff;
+            --text: #263238;
+            --border: #cfd8dc;
         }
 
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; height: 100vh; display: flex; flex-direction: column; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
-        /* --- HEADER --- */
-        header { background: var(--white); border-bottom: 3px solid #000; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .title { font-weight: 800; font-size: 1.2rem; color: var(--primary); }
-        .status-bar { display: flex; gap: 20px; font-weight: 600; color: #555; }
+        /* --- SIDEBAR NAVIGATION --- */
+        .sidebar { width: 320px; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
+        .logo-area { padding: 20px; background: var(--primary); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .logo-area h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
+        .logo-area p { margin: 5px 0 0; font-size: 0.8rem; opacity: 0.8; }
+        
+        .sim-btn {
+            margin: 15px; padding: 15px; background: var(--accent); color: white; text-align: center;
+            border-radius: 8px; font-weight: bold; cursor: pointer; border: 2px solid #e65100;
+            transition: transform 0.1s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .sim-btn:hover { transform: translateY(-2px); }
+        .sim-btn:active { transform: translateY(0); }
 
-        /* --- LAYOUT --- */
-        .container { display: flex; flex: 1; overflow: hidden; }
-        .sidebar { width: 260px; background: #fff; border-right: 1px solid #ddd; overflow-y: auto; padding: 10px; }
-        .main-stage { flex: 1; padding: 40px; overflow-y: auto; display: flex; justify-content: center; }
-
-        /* --- MENU --- */
-        .menu-cat { font-size: 0.75rem; text-transform: uppercase; color: #888; font-weight: bold; margin: 15px 0 5px 10px; }
+        .menu-scroll { flex: 1; overflow-y: auto; padding: 0 15px 20px; }
+        .menu-cat { 
+            font-size: 0.75rem; text-transform: uppercase; color: #78909c; font-weight: 800; 
+            margin: 20px 0 8px; border-bottom: 2px solid #eee; padding-bottom: 5px;
+        }
         .std-btn { 
-            display: block; width: 100%; text-align: left; padding: 12px; margin-bottom: 5px; 
-            background: #fdfdfd; border: 1px solid #eee; border-radius: 6px; cursor: pointer; transition: 0.2s;
+            display: block; width: 100%; text-align: left; padding: 10px 12px; margin-bottom: 6px; 
+            background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; cursor: pointer; transition: 0.1s;
+            font-size: 0.9rem; position: relative;
         }
-        .std-btn:hover { background: #f0f0f0; border-color: #bbb; }
+        .std-btn:hover { background: #e0f2f1; border-color: var(--primary); }
         .std-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .std-btn small { display: block; font-size: 0.75rem; margin-top: 3px; opacity: 0.7; }
 
-        /* --- QUESTION CARD --- */
-        .card { background: white; width: 100%; max-width: 850px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 40px; }
+        /* --- MAIN STAGE --- */
+        .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 30px; }
         
-        .q-header { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
-        .badge { background: #eee; padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 0.9rem; }
-
-        .prompt { font-size: 1.3rem; margin-bottom: 25px; line-height: 1.5; }
-        
-        /* --- VISUALS --- */
-        .visual-box { background: #fafafa; border: 1px dashed #ccc; padding: 20px; margin-bottom: 25px; display: flex; justify-content: center; align-items: center; border-radius: 8px; }
-
-        /* --- INPUT AREAS --- */
-        .input-area { display: grid; gap: 15px; }
-
-        /* Radio/Checkbox Styles */
-        .choice-row { 
-            display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; 
-            border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: 0.1s; 
+        .q-container { 
+            background: white; padding: 40px; border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); max-width: 900px; margin: 0 auto; width: 100%; 
+            border-top: 6px solid var(--primary);
         }
-        .choice-row:hover { background: #f9f9f9; border-color: #bbb; }
-        .choice-row.selected { background: var(--highlight); border-color: var(--primary); border-width: 2px; }
         
-        .icon { width: 20px; height: 20px; border: 2px solid #555; margin-right: 15px; display: flex; justify-content: center; align-items: center; }
-        .radio .icon { border-radius: 50%; } 
+        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; }
+        .badge { background: #eceff1; color: #455a64; padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; border: 1px solid #cfd8dc; }
+        
+        .q-text { font-size: 1.35rem; line-height: 1.5; margin-bottom: 30px; color: #263238; }
+
+        /* --- VISUALS --- */
+        .visual-stage { 
+            background: #fafafa; border: 2px dashed #cfd8dc; border-radius: 8px; 
+            padding: 30px; margin-bottom: 30px; display: flex; justify-content: center; align-items: center; 
+        }
+
+        /* --- INPUTS --- */
+        .options-list { display: grid; gap: 12px; }
+        .opt-btn { 
+            display: flex; align-items: center; padding: 18px; border: 2px solid #e0e0e0; border-radius: 8px; 
+            background: white; cursor: pointer; font-size: 1.1rem; transition: 0.2s;
+        }
+        .opt-btn:hover { border-color: #b0bec5; background: #f5f5f5; }
+        .opt-btn.selected { border-color: var(--primary); background: #e0f2f1; box-shadow: inset 0 0 0 1px var(--primary); }
+        
+        .icon { width: 22px; height: 22px; border: 2px solid #546e7a; margin-right: 15px; display: flex; justify-content: center; align-items: center; }
+        .radio .icon { border-radius: 50%; }
         .check .icon { border-radius: 4px; }
-        .selected .icon { background: var(--primary); border-color: var(--primary); }
-        .selected .radio .icon::after { content:''; width:8px; height:8px; background:white; border-radius:50%; }
-        .selected .check .icon::after { content:'✔'; color:white; font-size:14px; }
+        .selected .radio .icon { border-color: var(--primary); }
+        .selected .radio .icon::after { content:''; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; }
+        .selected .check .icon::after { content:'✔'; color: var(--primary); font-size: 16px; font-weight: bold; }
 
-        /* Equation Editor */
-        .eq-input { width: 100%; padding: 15px; font-size: 1.5rem; border: 2px solid #333; border-radius: 6px; font-family: monospace; }
-
-        /* Table Input (TEI) */
-        .table-tei { border-collapse: collapse; margin: 0 auto; }
-        .table-tei td, .table-tei th { border: 1px solid #333; padding: 10px 20px; text-align: center; font-size: 1.1rem; }
-        .table-tei input { width: 60px; padding: 5px; font-size: 1.1rem; text-align: center; }
+        .eq-input { width: 100%; padding: 15px; font-size: 1.4rem; border: 2px solid #455a64; border-radius: 6px; }
+        
+        /* Table TEI */
+        .tei-table { border-collapse: collapse; margin: 0 auto; }
+        .tei-table td, .tei-table th { border: 1px solid #555; padding: 10px 20px; text-align: center; font-size: 1.1rem; }
+        .tei-table input { width: 80px; padding: 5px; font-size: 1.1rem; text-align: center; border: 2px solid #000; }
 
         /* --- FEEDBACK --- */
-        .feedback-panel { margin-top: 25px; padding: 20px; border-radius: 8px; display: none; }
-        .feedback-panel.correct { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
-        .feedback-panel.incorrect { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
+        .feedback { margin-top: 25px; padding: 20px; border-radius: 8px; display: none; }
+        .feedback.correct { background: #e8f5e9; color: #1b5e20; border: 1px solid #c8e6c9; }
+        .feedback.wrong { background: #ffebee; color: #b71c1c; border: 1px solid #ffcdd2; }
 
-        .btn-check { float: right; margin-top: 20px; padding: 12px 30px; background: var(--primary); color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; }
-        .btn-check:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-action { 
+            margin-top: 25px; padding: 12px 30px; background: var(--primary); color: white; border: none; 
+            border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; float: right; 
+        }
+        .btn-action:disabled { background: #b0bec5; cursor: not-allowed; }
 
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="title">FAST Accelerated Simulator (Gold Ed.)</div>
-        <div class="status-bar">
-            <span>Score: <span id="score">0</span></span>
+    <div class="sidebar">
+        <div class="logo-area">
+            <h1>FAST Grade 3 Acc.</h1>
+            <p>Comprehensive Master File</p>
         </div>
-    </header>
-
-    <div class="container">
-        <div class="sidebar" id="nav-menu">
-            <div style="padding:10px; font-size:0.9rem; color:#666;">Select a Standard:</div>
+        
+        <div class="sim-btn" onclick="App.startSim()">
+            🚀 Start Full Test Sim
+            <div style="font-size:0.75rem; font-weight:normal; margin-top:5px; opacity:0.9;">Random Mix of All Standards</div>
         </div>
 
-        <div class="main-stage">
-            <div class="card">
-                <div class="q-header">
-                    <span class="badge" id="q-std">Select Standard</span>
-                    <span style="font-size:0.85rem; color:#555;">Tech-Enhanced Item</span>
-                </div>
-
-                <div class="prompt" id="q-text">
-                    Choose a domain from the left to generate a unique, non-repeating question.
-                </div>
-
-                <div class="visual-box" id="q-visual" style="display:none;"></div>
-
-                <div class="input-area" id="q-input"></div>
-
-                <div class="feedback-panel" id="q-feedback"></div>
-
-                <button class="btn-check" id="btn-action" onclick="App.check()" disabled>Check Answer</button>
+        <div class="menu-scroll" id="menu">
             </div>
+    </div>
+
+    <div class="main">
+        <div class="q-container">
+            <div class="q-header">
+                <span class="badge" id="q-badge">Select a Standard or Start Sim</span>
+                <span style="color:#78909c; font-weight:600;" id="score-display">Score: 0</span>
+            </div>
+
+            <div class="q-text" id="q-prompt">
+                Welcome. Use the sidebar to either:<br>
+                1. <strong>Start Full Test Sim</strong> (Randomly tests all standards).<br>
+                2. <strong>Select a Specific Standard</strong> to practice that topic repeatedly.
+            </div>
+
+            <div class="visual-stage" id="q-visual" style="display:none;"></div>
+
+            <div class="options-list" id="q-options"></div>
+
+            <div class="feedback" id="q-feedback"></div>
+
+            <button class="btn-action" id="btn-action" onclick="App.check()" disabled>Check Answer</button>
         </div>
     </div>
 
     <script>
-        /**
-         * FAST GOLD EDITION ENGINE
-         * Features: Anti-Collision Answer Logic, Table Inputs, Advanced Generators
-         */
-
+        // --- 1. UTILITIES (Anti-Repeat, SVGs, Math) ---
         const Utils = {
             rInt: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
-            
-            // ⭐️ CORE FEATURE: Generate Unique Options
-            // Ensures answer choices A, B, C, D are never the same
-            generateOptions: (correctVal, generatorFunction, count = 3) => {
-                const options = new Set();
-                options.add(correctVal); // Add correct answer first
-                
-                let attempts = 0;
-                while(options.size < count + 1 && attempts < 50) {
-                    const distractor = generatorFunction();
-                    // Basic filter: Don't add if it's the correct answer or already exists
-                    if(distractor !== correctVal) {
-                        options.add(distractor);
-                    }
-                    attempts++;
+            pick: (arr) => arr[Math.floor(Math.random() * arr.length)],
+            shuffle: (arr) => arr.sort(() => Math.random() - 0.5),
+
+            // Smart Distractor Generator (Ensures unique options)
+            genOptions: (correct, genFunc, count=3) => {
+                const opts = new Set([correct]);
+                let safety = 0;
+                while(opts.size < count+1 && safety < 50) {
+                    const d = genFunc();
+                    if(d !== correct) opts.add(d);
+                    safety++;
                 }
-                // Convert to array and shuffle
-                return Array.from(options).sort(() => Math.random() - 0.5);
+                return Array.from(opts).sort(()=>Math.random()-0.5);
             },
 
-            // SVG: Area Model for Multiplication
-            drawAreaModel: (h, w) => {
-                return `<svg width="200" height="150" viewBox="0 0 200 150">
-                    <rect x="10" y="10" width="${w*10}" height="${h*10}" fill="#e3f2fd" stroke="#0f4c81" stroke-width="2"/>
-                    <text x="${10 + (w*5)}" y="140" text-anchor="middle">${w}</text>
-                    <text x="190" y="${10 + (h*5)}" text-anchor="middle">${h}</text>
-                    <text x="${10 + (w*5)}" y="${15 + (h*5)}" text-anchor="middle" font-size="20" fill="#0f4c81">?</text>
-                </svg>`;
+            // --- SVG DRAWER ---
+            svg: {
+                clock: (h, m) => {
+                    const hDeg = (h%12)*30 + m*0.5;
+                    const mDeg = m*6;
+                    // Minute ticks
+                    let ticks = '';
+                    for(let i=0; i<60; i++) {
+                        const isHr = i%5===0;
+                        ticks += `<line x1="50" y1="6" x2="50" y2="${isHr?10:7}" transform="rotate(${i*6} 50 50)" stroke="#333" stroke-width="${isHr?2:1}"/>`;
+                    }
+                    return `<svg width="180" height="180" viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="48" stroke="#333" stroke-width="2" fill="white"/>
+                        ${ticks}
+                        <text x="50" y="22" text-anchor="middle" font-size="8" font-weight="bold">12</text>
+                        <text x="82" y="53" text-anchor="middle" font-size="8" font-weight="bold">3</text>
+                        <text x="50" y="86" text-anchor="middle" font-size="8" font-weight="bold">6</text>
+                        <text x="18" y="53" text-anchor="middle" font-size="8" font-weight="bold">9</text>
+                        <line x1="50" y1="50" x2="50" y2="28" stroke="black" stroke-width="3" transform="rotate(${hDeg} 50 50)" stroke-linecap="round"/>
+                        <line x1="50" y1="50" x2="50" y2="15" stroke="#d32f2f" stroke-width="2" transform="rotate(${mDeg} 50 50)" stroke-linecap="round"/>
+                        <circle cx="50" cy="50" r="3" fill="#333"/>
+                    </svg>`;
+                },
+                rect: (w, h) => {
+                    return `<svg width="200" height="150" viewBox="0 0 200 150">
+                        <rect x="20" y="20" width="${w*15}" height="${h*15}" fill="#e0f2f1" stroke="#004d40" stroke-width="2"/>
+                        <text x="${20 + (w*15)/2}" y="15" text-anchor="middle">${w} ft</text>
+                        <text x="10" y="${20 + (h*15)/2}" text-anchor="middle">${h} ft</text>
+                    </svg>`;
+                },
+                fractionLine: (num, den) => {
+                     return `<svg width="300" height="60" viewBox="0 0 300 60">
+                        <line x1="20" y1="30" x2="280" y2="30" stroke="#333" stroke-width="2"/>
+                        <line x1="20" y1="25" x2="20" y2="35" stroke="#333" stroke-width="2"/>
+                        <text x="20" y="50" text-anchor="middle" font-size="12">0</text>
+                        <line x1="280" y1="25" x2="280" y2="35" stroke="#333" stroke-width="2"/>
+                        <text x="280" y="50" text-anchor="middle" font-size="12">1</text>
+                        <circle cx="${20 + (num/den)*260}" cy="30" r="6" fill="#ff6f00"/>
+                        <text x="${20 + (num/den)*260}" y="20" text-anchor="middle" font-weight="bold" fill="#ff6f00">?</text>
+                    </svg>`;
+                },
+                symmetry: (type) => {
+                    if(type === 'yes') return `<svg width="100" height="100" viewBox="0 0 100 100"><path d="M50 10 L80 90 L20 90 Z" fill="#e0f2f1" stroke="black"/><line x1="50" y1="0" x2="50" y2="100" stroke="red" stroke-dasharray="4"/></svg>`;
+                    return `<svg width="100" height="100" viewBox="0 0 100 100"><path d="M10 10 L80 10 L60 90 L10 90 Z" fill="#e0f2f1" stroke="black"/><line x1="45" y1="0" x2="45" y2="100" stroke="red" stroke-dasharray="4"/></svg>`;
+                },
+                barGraph: () => {
+                    return `<svg width="200" height="120" viewBox="0 0 200 120">
+                        <line x1="20" y1="100" x2="180" y2="100" stroke="#333"/>
+                        <rect x="30" y="40" width="30" height="60" fill="#004d40"/><text x="45" y="115" text-anchor="middle" font-size="10">Pizza</text>
+                        <rect x="80" y="70" width="30" height="30" fill="#004d40"/><text x="95" y="115" text-anchor="middle" font-size="10">Salad</text>
+                        <rect x="130" y="20" width="30" height="80" fill="#004d40"/><text x="145" y="115" text-anchor="middle" font-size="10">Tacos</text>
+                    </svg>`;
+                }
             }
         };
 
-        const QuestionBank = {
-            // --- NUMBER SENSE (NSO) ---
-            "NSO": [
-                {
-                    id: "MA.3.NSO.2.2",
-                    desc: "Multiplication Facts",
-                    gen: () => {
-                        const a = Utils.rInt(6, 9);
-                        const b = Utils.rInt(7, 9);
-                        const ans = a * b;
-                        
-                        // Generator for distractors (nearby multiples)
-                        const getDistractor = () => (a * Utils.rInt(4, 10));
-
-                        const opts = Utils.generateOptions(ans, getDistractor, 3).map(val => ({
-                            text: val.toString(), 
-                            correct: val === ans
-                        }));
-
-                        return {
-                            text: `Solve: <strong>${a} × ${b} = ?</strong>`,
-                            type: 'radio',
-                            options: opts,
-                            feedback: `Level 3: Explore multiplication of two whole numbers with products from 0 to 144.`
-                        };
-                    }
-                },
-                {
-                    id: "MA.3.NSO.2.4",
-                    desc: "Multiply 1-digit x 2-digit",
-                    gen: () => {
-                        const a = Utils.rInt(2, 5);
-                        const b = Utils.rInt(12, 25);
-                        const ans = a * b;
-                        
-                        // Smart Distractors: Common errors (forgetting to regroup)
-                        const getDistractor = () => {
-                            const errType = Utils.rInt(1,3);
-                            if(errType===1) return ans + 10;
-                            if(errType===2) return ans - a;
-                            return ans + Utils.rInt(1,5);
-                        };
-
-                        const opts = Utils.generateOptions(ans, getDistractor, 3).map(val => ({
-                            text: val.toString(), correct: val === ans
-                        }));
-
-                        return {
-                            text: `Find the product: <strong>${b} × ${a}</strong>`,
-                            type: 'radio',
-                            options: opts,
-                            feedback: "Level 3: Multiply a one-digit whole number by a two-digit whole number."
-                        };
-                    }
-                }
+        // --- 2. MASTER QUESTION BANK (All Standards) ---
+        const Bank = {
+            "Number Sense (NSO)": [
+                { id: "MA.3.NSO.1.1", desc: "Read/Write Numbers", gen: () => {
+                    const n = Utils.rInt(1001,9999);
+                    const forms = [
+                        {t: "Word Form", v: "Four thousand...", c: false}, // Simplified for demo
+                        {t: "Expanded Form", v: `${Math.floor(n/1000)*1000} + ${Math.floor((n%1000)/100)*100} + ${Math.floor((n%100)/10)*10} + ${n%10}`, c: true}
+                    ];
+                    return { text: `Select the correct <strong>Expanded Form</strong> for <strong>${n}</strong>.`, type: 'radio', options: Utils.genOptions(forms[1].v, ()=>`${Utils.rInt(1000,9000)} + ${Utils.rInt(100,900)}...`).map(x=>({t:x,c:x===forms[1].v})), fb: "Level 3: Read/Write numbers to 10,000." };
+                }},
+                { id: "MA.3.NSO.1.4", desc: "Rounding", gen: () => {
+                    const n = Utils.rInt(120, 880);
+                    const ans = Math.round(n/100)*100;
+                    return { text: `Round <strong>${n}</strong> to the nearest hundred.`, type: 'equation', ans: ans.toString(), fb: "Level 3: Round to nearest 10 or 100." };
+                }},
+                { id: "MA.3.NSO.2.2", desc: "Multiplication Facts", gen: () => {
+                    const a = Utils.rInt(6,9), b = Utils.rInt(7,9);
+                    return { text: `Solve: <strong>${a} × ${b}</strong>`, type: 'equation', ans: (a*b).toString(), fb: "Level 3: Recall multiplication facts." };
+                }},
+                { id: "MA.3.NSO.2.4", desc: "Mult: 1-digit x 2-digit", gen: () => {
+                    const a = Utils.rInt(2,5), b = Utils.rInt(12,25);
+                    return { text: `Solve: <strong>${b} × ${a}</strong>`, type: 'equation', ans: (a*b).toString(), fb: "Level 3: Multiply 1-digit by 2-digit numbers." };
+                }}
             ],
-
-            // --- ALGEBRAIC REASONING (AR) ---
-            "AR": [
-                {
-                    id: "MA.3.AR.1.1",
-                    desc: "Distributive Property",
-                    gen: () => {
-                        const a = Utils.rInt(3, 9);
-                        const b = Utils.rInt(11, 19);
-                        const tens = 10;
-                        const ones = b - 10;
-                        
-                        return {
-                            text: `Select the equation that uses the Distributive Property to solve <strong>${a} × ${b}</strong>.`,
-                            type: 'radio',
-                            options: [
-                                { text: `(${a} × 10) + (${a} × ${ones})`, correct: true },
-                                { text: `(${a} × 10) × (${a} × ${ones})`, correct: false },
-                                { text: `${a} + 10 + ${ones}`, correct: false },
-                                { text: `(${a} + 10) × (${a} + ${ones})`, correct: false }
-                            ].sort(()=>Math.random()-0.5),
-                            feedback: "Level 3: Apply the distributive property to multiply."
-                        };
-                    }
-                },
-                {
-                    id: "MA.3.AR.3.3",
-                    desc: "Number Patterns (Table TEI)",
-                    gen: () => {
-                        const rule = Utils.rInt(2, 5);
-                        const inputs = [3, 5, 8];
-                        const outputs = inputs.map(i => i * rule);
-                        
-                        return {
-                            text: `The table shows a multiplicative pattern. Use the rule <strong>"Multiply by ${rule}"</strong> to fill in the missing Output.`,
-                            type: 'table',
-                            data: { inputs: inputs, outputs: outputs, missingIdx: 2 }, // 3rd item missing
-                            answer: outputs[2],
-                            feedback: "Level 3: Identify and extend numerical patterns in a table."
-                        };
-                    }
-                }
+            "Algebraic Reasoning (AR)": [
+                { id: "MA.3.AR.1.1", desc: "Distributive Property", gen: () => {
+                    const a=Utils.rInt(3,9), b=Utils.rInt(12,19);
+                    const ones = b-10;
+                    return { text: `Which expression uses the Distributive Property for <strong>${a} × ${b}</strong>?`, type: 'radio', options: Utils.shuffle([{t:`(${a}×10) + (${a}×${ones})`,c:true},{t:`(${a}×10) × (${a}×${ones})`,c:false},{t:`${a} × (10 × ${ones})`,c:false}]), fb: "Level 3: Apply distributive property." };
+                }},
+                { id: "MA.3.AR.2.3", desc: "Missing Factors", gen: () => {
+                    const a=Utils.rInt(4,9), b=Utils.rInt(4,9);
+                    return { text: `Find the missing number: <br><strong>? × ${a} = ${a*b}</strong>`, type: 'equation', ans: b.toString(), fb: "Level 3: Determine unknown whole number." };
+                }},
+                { id: "MA.3.AR.3.3", desc: "Number Patterns (Table)", gen: () => {
+                    const rule = Utils.rInt(2,5);
+                    return { text: `The rule is <strong>Multiply by ${rule}</strong>. Fill in the missing output.`, type: 'table', inputs:[3,5,9], outputs:[3*rule, 5*rule, 9*rule], missing:2, ans: (9*rule).toString(), fb: "Level 3: Identify patterns in tables." };
+                }}
             ],
-
-            // --- FRACTIONS & DATA ---
-            "FR/DP": [
-                {
-                    id: "MA.3.FR.2.2",
-                    desc: "Equivalent Fractions",
-                    gen: () => {
-                        return {
-                            text: "Select <strong>ALL</strong> fractions that are equivalent to 1/2.",
-                            type: 'multi',
-                            options: [
-                                { text: "2/4", correct: true },
-                                { text: "3/6", correct: true },
-                                { text: "4/8", correct: true },
-                                { text: "2/3", correct: false },
-                                { text: "1/3", correct: false }
-                            ].sort(()=>Math.random()-0.5), // Simple shuffle here
-                            feedback: "Level 4: Identify equivalent fractions using area models or number lines."
-                        };
-                    }
-                },
-                {
-                    id: "MA.3.DP.1.1",
-                    desc: "Circle Graphs (Acc)",
-                    gen: () => {
-                        const total = 20;
-                        const v = 10; // Vanilla
-                        const c = 5;  // Choc
-                        const s = 5;  // Strawberry
-                        
-                        // Pie Chart CSS
-                        const css = `background: conic-gradient(
-                            #0f4c81 0% 50%, 
-                            #e3f2fd 50% 75%, 
-                            #ff6f00 75% 100%
-                        ); width:150px; height:150px; border-radius:50%;`;
-
-                        return {
-                            text: "The circle graph shows favorite ice cream flavors of 20 students.<br>Blue = Vanilla (10)<br>Light = Choc (5)<br>Orange = Straw (5)<br><br>How many students chose Vanilla?",
-                            type: 'equation',
-                            visual: `<div style="${css}"></div>`,
-                            answer: "10",
-                            feedback: "Level 4: Interpret data in circle graphs."
-                        };
-                    }
-                }
+            "Fractions (FR)": [
+                { id: "MA.3.FR.2.1", desc: "Fractions on Number Line", gen: () => {
+                    const den = 4, num = Utils.rInt(1,3);
+                    return { text: "What fraction is shown?", visual: Utils.svg.fractionLine(num,den), type: 'radio', options: Utils.genOptions(`${num}/${den}`, ()=>`${Utils.rInt(1,4)}/${Utils.rInt(2,5)}`).map(x=>({t:x,c:x===`${num}/${den}`})), fb: "Level 3: Identify fractions on number line." };
+                }},
+                { id: "MA.3.FR.2.2", desc: "Equivalent Fractions", gen: () => {
+                    return { text: "Select <strong>ALL</strong> fractions equal to 1/2.", type: 'multi', options: Utils.shuffle([{t:"2/4",c:true},{t:"3/6",c:true},{t:"1/3",c:false},{t:"4/8",c:true}]), fb: "Level 4: Identify equivalent fractions." };
+                }}
+            ],
+            "Geometry (GR)": [
+                { id: "MA.3.GR.1.3", desc: "Symmetry", gen: () => {
+                    const isSym = Math.random()>0.5;
+                    return { text: "Does the red line show a Line of Symmetry?", visual: Utils.svg.symmetry(isSym?'yes':'no'), type: 'radio', options: [{t:"Yes",c:isSym},{t:"No",c:!isSym}], fb: "Level 3: Identify lines of symmetry." };
+                }},
+                { id: "MA.3.GR.2.1", desc: "Area", gen: () => {
+                    const w=Utils.rInt(4,9), h=Utils.rInt(3,8);
+                    return { text: "Find the Area.", visual: Utils.svg.rect(w,h), type: 'equation', ans: (w*h).toString(), fb: "Level 3: Solve area problems." };
+                }}
+            ],
+            "Measurement (M)": [
+                { id: "MA.3.M.2.1", desc: "Telling Time", gen: () => {
+                    const h=Utils.rInt(1,12), m=Utils.rInt(10,55);
+                    return { text: "What time is shown?", visual: Utils.svg.clock(h,m), type: 'radio', options: Utils.genOptions(`${h}:${m}`, ()=>`${Utils.rInt(1,12)}:${Utils.rInt(10,59)}`).map(x=>({t:x,c:x===`${h}:${m}`})), fb: "Level 3: Tell time to nearest minute." };
+                }},
+                { id: "MA.3.M.2.2", desc: "Elapsed Time", gen: () => {
+                    return { text: "Start: 2:15 PM. Duration: 45 min. End time?", type: 'radio', options: [{t:"3:00 PM",c:true},{t:"2:50 PM",c:false},{t:"3:15 PM",c:false}], fb: "Level 4: Solve elapsed time problems." };
+                }}
+            ],
+            "Data (DP)": [
+                { id: "MA.3.DP.1.1", desc: "Interpreting Graphs", gen: () => {
+                    return { text: "Based on the graph, how many more people chose Tacos (80) than Pizza (60)?", visual: Utils.svg.barGraph(), type: 'equation', ans: "20", fb: "Level 3: Solve problems using bar graphs." };
+                }}
             ]
         };
 
-        // --- APP ENGINE ---
+        // --- 3. APP CONTROLLER ---
         const App = {
+            mode: 'practice', // 'practice' or 'sim'
             currentQ: null,
             score: 0,
-
+            
             init: function() {
-                const nav = document.getElementById('nav-menu');
-                for(const cat in QuestionBank) {
-                    nav.innerHTML += `<div class="menu-cat">${cat}</div>`;
-                    QuestionBank[cat].forEach(std => {
+                const menu = document.getElementById('menu');
+                for(const cat in Bank) {
+                    menu.innerHTML += `<div class="menu-cat">${cat}</div>`;
+                    Bank[cat].forEach(std => {
                         const btn = document.createElement('div');
                         btn.className = 'std-btn';
-                        btn.innerHTML = `${std.id} <br><small>${std.desc}</small>`;
-                        btn.onclick = () => {
-                            document.querySelectorAll('.std-btn').forEach(b => b.classList.remove('active'));
-                            btn.classList.add('active');
-                            this.loadQ(std);
-                        };
-                        nav.appendChild(btn);
+                        btn.innerHTML = `<strong>${std.id}</strong><small>${std.desc}</small>`;
+                        btn.onclick = () => App.loadPractice(std);
+                        menu.appendChild(btn);
                     });
                 }
             },
 
-            loadQ: function(stdObj) {
-                this.currentQ = stdObj.gen();
-                const q = this.currentQ;
-
-                // UI Reset
-                document.getElementById('q-std').innerText = stdObj.id;
-                document.getElementById('q-text').innerHTML = q.text;
-                document.getElementById('q-visual').style.display = q.visual ? 'flex' : 'none';
-                if(q.visual) document.getElementById('q-visual').innerHTML = q.visual;
+            startSim: function() {
+                this.mode = 'sim';
+                this.score = 0;
+                document.getElementById('score-display').innerText = "Score: 0";
+                document.getElementById('q-badge').innerText = "Test Simulation Mode";
                 
-                const inputArea = document.getElementById('q-input');
-                inputArea.innerHTML = '';
-                document.getElementById('q-feedback').style.display = 'none';
-                document.getElementById('btn-action').disabled = true;
-                document.getElementById('btn-action').innerText = "Check Answer";
-                document.getElementById('btn-action').onclick = () => App.check();
+                // Collect all generators
+                this.allGens = [];
+                for(const cat in Bank) Bank[cat].forEach(s => this.allGens.push(s));
+                
+                this.nextSimQ();
+            },
 
-                // RENDER INPUTS BASED ON TYPE
+            nextSimQ: function() {
+                // Pick random standard
+                const std = Utils.pick(this.allGens);
+                this.loadQ(std.gen(), std.id);
+            },
+
+            loadPractice: function(std) {
+                this.mode = 'practice';
+                this.currentStd = std;
+                this.loadQ(std.gen(), std.id);
+            },
+
+            loadQ: function(q, stdId) {
+                this.currentQ = q;
+                
+                // UI Reset
+                document.getElementById('q-badge').innerText = this.mode === 'sim' ? `Sim Mode: ${stdId}` : `Practice: ${stdId}`;
+                document.getElementById('q-prompt').innerHTML = q.text;
+                
+                // Visual
+                const v = document.getElementById('q-visual');
+                v.style.display = q.visual ? 'flex' : 'none';
+                v.innerHTML = q.visual || '';
+                
+                // Input
+                const list = document.getElementById('q-options');
+                list.innerHTML = '';
+                const btnAction = document.getElementById('btn-action');
+                btnAction.innerText = "Check Answer";
+                btnAction.disabled = true;
+                btnAction.onclick = () => App.check();
+                
+                document.getElementById('q-feedback').style.display = 'none';
+
+                // Render Inputs
                 if(q.type === 'radio' || q.type === 'multi') {
-                    q.options.forEach((opt, idx) => {
-                        const el = document.createElement('div');
-                        el.className = `choice-row ${q.type === 'radio' ? 'radio' : 'check'}`;
-                        el.innerHTML = `<div class="icon"></div> ${opt.text}`;
-                        el.onclick = () => {
+                    q.options.forEach((opt, i) => {
+                        const btn = document.createElement('div');
+                        btn.className = `opt-btn ${q.type}`;
+                        btn.innerHTML = `<div class="icon"></div> ${opt.t}`;
+                        btn.onclick = () => {
                             if(q.type === 'radio') {
-                                document.querySelectorAll('.choice-row').forEach(r => r.classList.remove('selected'));
-                                el.classList.add('selected');
-                                App.selection = idx;
+                                document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));
+                                btn.classList.add('selected');
+                                App.selection = i;
                             } else {
-                                el.classList.toggle('selected');
-                                // Multi logic handled in check
+                                btn.classList.toggle('selected');
                             }
-                            document.getElementById('btn-action').disabled = false;
+                            btnAction.disabled = false;
                         };
-                        inputArea.appendChild(el);
+                        list.appendChild(btn);
                     });
-                } 
-                else if (q.type === 'equation') {
-                    inputArea.innerHTML = `<input type="text" class="eq-input" id="user-eq" placeholder="Type answer...">`;
-                    document.getElementById('user-eq').addEventListener('input', (e) => {
-                        document.getElementById('btn-action').disabled = e.target.value === '';
-                    });
-                }
-                else if (q.type === 'table') {
-                    let html = `<table class="table-tei"><tr><th>Input</th><th>Output</th></tr>`;
-                    q.data.inputs.forEach((val, i) => {
-                        const out = i === q.data.missingIdx ? `<input type="number" id="tbl-input">` : q.data.outputs[i];
-                        html += `<tr><td>${val}</td><td>${out}</td></tr>`;
+                } else if (q.type === 'equation') {
+                    list.innerHTML = `<input type="text" class="eq-input" id="user-eq" placeholder="Type answer...">`;
+                    document.getElementById('user-eq').addEventListener('input', (e) => btnAction.disabled = e.target.value === '');
+                } else if (q.type === 'table') {
+                    let html = `<table class="tei-table"><tr><th>In</th><th>Out</th></tr>`;
+                    q.inputs.forEach((val, i) => {
+                        const cell = i === q.missing ? `<input type="number" id="tbl-in">` : q.outputs[i];
+                        html += `<tr><td>${val}</td><td>${cell}</td></tr>`;
                     });
                     html += `</table>`;
-                    inputArea.innerHTML = html;
-                    setTimeout(() => {
-                        document.getElementById('tbl-input').addEventListener('input', () => {
-                             document.getElementById('btn-action').disabled = false;
-                        });
-                    }, 100);
+                    list.innerHTML = html;
+                    setTimeout(() => document.getElementById('tbl-in').addEventListener('input', () => btnAction.disabled = false), 100);
                 }
             },
 
             check: function() {
                 const q = this.currentQ;
-                let isCorrect = false;
-
-                if(q.type === 'radio') isCorrect = q.options[this.selection].correct;
+                let isCorr = false;
                 
+                if(q.type === 'radio') isCorr = q.options[this.selection].c;
                 if(q.type === 'multi') {
-                    // Get all selected indices
-                    const rows = document.querySelectorAll('.choice-row');
-                    const selectedIdxs = [];
-                    rows.forEach((r, i) => { if(r.classList.contains('selected')) selectedIdxs.push(i); });
-                    
-                    const correctIdxs = q.options.map((o,i) => o.correct ? i : null).filter(i=>i!==null);
-                    // Check exact match arrays
-                    if(selectedIdxs.length === correctIdxs.length && selectedIdxs.every(v => correctIdxs.includes(v))) {
-                        isCorrect = true;
-                    }
+                    const sel = [];
+                    document.querySelectorAll('.opt-btn').forEach((b,i) => { if(b.classList.contains('selected')) sel.push(i); });
+                    const cor = q.options.map((o,i)=>o.c?i:null).filter(x=>x!==null);
+                    if(sel.length===cor.length && sel.every(v=>cor.includes(v))) isCorr = true;
                 }
+                if(q.type === 'equation') isCorr = document.getElementById('user-eq').value.trim() === q.ans;
+                if(q.type === 'table') isCorr = document.getElementById('tbl-in').value.trim() === q.ans;
 
-                if(q.type === 'equation') {
-                    const val = document.getElementById('user-eq').value.trim();
-                    isCorrect = val === q.answer;
-                }
-
-                if(q.type === 'table') {
-                    const val = document.getElementById('tbl-input').value;
-                    isCorrect = parseInt(val) === q.answer;
-                }
-
-                // Show Feedback
                 const fb = document.getElementById('q-feedback');
                 fb.style.display = 'block';
-                fb.className = `feedback-panel ${isCorrect ? 'correct' : 'incorrect'}`;
-                fb.innerHTML = `<strong>${isCorrect ? 'Correct!' : 'Incorrect.'}</strong><br>${q.feedback}`;
+                fb.className = `feedback ${isCorr ? 'correct' : 'wrong'}`;
+                fb.innerHTML = `<strong>${isCorr ? 'Correct!' : 'Incorrect.'}</strong><br>${q.fb}`;
 
-                if(isCorrect) {
+                if(isCorr) {
                     this.score += 10;
-                    document.getElementById('score').innerText = this.score;
+                    document.getElementById('score-display').innerText = `Score: ${this.score}`;
                 }
 
-                // Change Button to Next
                 const btn = document.getElementById('btn-action');
                 btn.innerText = "Next Question";
-                // find current standard object to reload
-                // For sim, we just reload the same generator type
                 btn.onclick = () => {
-                     // Hacky reload of same question type for demo
-                     const activeBtn = document.querySelector('.std-btn.active');
-                     if(activeBtn) activeBtn.click();
+                    if(this.mode === 'sim') this.nextSimQ();
+                    else this.loadPractice(this.currentStd);
                 };
             }
         };
