@@ -1,246 +1,335 @@
-                    <summary>🍕 Fractions (FR)</summary>
-                    <button class="sub-btn" onclick="startTest('MA.3.FR.1.1', 5)">FR.1.1: Represent Fractions</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.FR.1.2', 5)">FR.1.2: Number Lines (Lv 4)</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.FR.1.3', 5)">FR.1.3: Whole Numbers</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.FR.2.1', 5)">FR.2.1: Comparing Fractions</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.FR.2.2', 5)">FR.2.2: Equivalent Fractions</button>
-                </details>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FAST Grade 3 - Official Blue</title>
+    <style>
+        /* --- RESET & BASICS --- */
+        body { margin: 0; padding: 0; font-family: 'Arial', sans-serif; background-color: #f0f0f0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        button { cursor: pointer; border: none; outline: none; }
+        
+        /* --- COLORS (Hardcoded for Safety) --- */
+        .bg-blue { background-color: #003057; color: white; } /* FL Deep Blue */
+        .bg-light { background-color: #ffffff; color: #333; }
+        .text-blue { color: #003057; font-weight: bold; }
+        
+        /* --- SCREENS --- */
+        .screen { display: none; height: 100%; width: 100%; flex-direction: column; }
+        .screen.active { display: flex; }
 
-                <details>
-                    <summary>🧠 Algebraic Reasoning (AR)</summary>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.1.1', 5)">AR.1.1: Distributive Property</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.1.2', 5)">AR.1.2: Multi-Step Problems (Lv 5)</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.2.1', 5)">AR.2.1: Inverse Operations</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.2.2', 5)">AR.2.2: Interpreting Equations</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.2.3', 5)">AR.2.3: Missing Factors</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.3.1', 5)">AR.3.1: Number Patterns</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.3.2', 5)">AR.3.2: Pattern Rules</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.AR.3.3', 5)">AR.3.3: Input/Output Tables</button>
-                </details>
+        /* --- MENU SCREEN --- */
+        .menu-header { padding: 20px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .menu-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        .menu-card { background: white; width: 100%; max-width: 600px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden; margin-bottom: 20px; }
+        .card-header { background: #00609C; color: white; padding: 15px; font-size: 1.1em; font-weight: bold; }
+        .card-content { padding: 15px; }
 
-                <details>
-                    <summary>📐 Geometry (GR)</summary>
-                    <button class="sub-btn" onclick="startTest('MA.3.GR.1.1', 5)">GR.1.1: Points, Lines, Rays</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.GR.1.2', 5)">GR.1.2: Quad Attributes (Lv 4)</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.GR.1.3', 5)">GR.1.3: Symmetry</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.1', 5)">GR.2.1: Area (Tiling)</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.2', 5)">GR.2.2: Area (Formula)</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.3', 5)">GR.2.3: Perimeter</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.GR.2.4', 5)">GR.2.4: Area vs Perimeter (Lv 5)</button>
-                </details>
+        .btn-main { width: 100%; padding: 15px; font-size: 1.1em; font-weight: bold; color: white; background: #003057; border-radius: 5px; margin-bottom: 15px; border: 2px solid #003057; }
+        .btn-main:hover { background: #004a80; }
 
-                <details>
-                    <summary>📊 Data & Measurement (M/DP)</summary>
-                    <button class="sub-btn" onclick="startTest('MA.3.M.1.1', 5)">M.1.1: Measurement Conversions</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.M.1.2', 5)">M.1.2: Mass & Volume</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.M.2.1', 5)">M.2.1: Telling Time</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.M.2.2', 5)">M.2.2: Elapsed Time (Lv 4)</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.DP.1.1', 5)">DP.1.1: Scaled Graphs</button>
-                    <button class="sub-btn" onclick="startTest('MA.3.DP.1.2', 5)">DP.1.2: Interpreting Data</button>
-                </details>
+        .btn-sub { width: 100%; padding: 12px; text-align: left; background: white; border-bottom: 1px solid #eee; color: #444; font-size: 0.95em; }
+        .btn-sub:hover { background: #eef6ff; color: #00609C; font-weight: bold; }
+
+        /* --- TEST SCREEN --- */
+        .top-bar { height: 50px; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; background: #fff; border-bottom: 2px solid #003057; }
+        
+        .main-stage { flex: 1; display: flex; overflow: hidden; background: #e9e9e9; padding: 10px; }
+        .split-container { display: flex; width: 100%; height: 100%; gap: 10px; }
+        
+        .pane { background: white; border-radius: 5px; border: 1px solid #ccc; overflow-y: auto; padding: 20px; }
+        .pane-left { width: 40%; display: flex; justify-content: center; align-items: center; background: #fdfdfd; }
+        .pane-right { width: 60%; }
+        
+        /* Mobile Stack */
+        @media (max-width: 700px) {
+            .split-container { flex-direction: column; }
+            .pane-left { width: 100%; height: 35%; border-bottom: 2px solid #003057; }
+            .pane-right { width: 100%; height: 65%; }
+        }
+
+        .nav-bar { height: 60px; background: #ddd; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-top: 1px solid #999; }
+        .btn-nav { padding: 10px 25px; font-weight: bold; border-radius: 4px; border: 1px solid #555; background: white; }
+        .btn-nav.primary { background: #003057; color: white; border-color: #003057; }
+
+        /* --- ITEM STYLES --- */
+        .q-tag { display: inline-block; background: #eee; padding: 4px 8px; font-size: 0.8em; border-radius: 3px; margin-bottom: 10px; color: #555; }
+        .prompt { font-size: 1.3em; margin-bottom: 20px; line-height: 1.5; }
+
+        /* Rounding Table */
+        .round-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .round-table th { background: #003057; color: white; padding: 10px; }
+        .round-table td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+        .table-input { width: 90%; padding: 8px; font-size: 1.1em; text-align: center; border: 2px solid #555; border-radius: 4px; }
+
+        /* Hot Text */
+        .hot-box { font-size: 1.4em; padding: 20px; border: 2px dashed #ccc; background: #fff; line-height: 2.2; border-radius: 5px; }
+        .hot-word { padding: 5px 8px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; margin: 0 2px; }
+        .hot-word:hover { background: #eee; }
+        .hot-word.selected { background: #fff2cc; border-color: #003057; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        /* Graphing */
+        svg { width: 100%; max-height: 300px; display: block; }
+        .bar { cursor: pointer; transition: 0.2s; }
+        .bar:hover { opacity: 0.8; }
+
+        /* Multiselect */
+        .opt-row { display: flex; align-items: center; padding: 15px; border: 1px solid #ccc; margin-bottom: 8px; background: white; cursor: pointer; border-radius: 4px; }
+        .opt-row.selected { background: #e3f2fd; border: 2px solid #003057; }
+        .chk { width: 20px; height: 20px; border: 2px solid #555; margin-right: 15px; background: white; }
+        .selected .chk { background: #003057; border-color: #003057; }
+
+        /* Editing */
+        .drop-select { font-size: 1em; padding: 5px; border: 2px solid #003057; background: #eef; font-weight: bold; border-radius: 4px; }
+
+        /* Eq Editor */
+        .eq-input { font-size: 1.5em; padding: 10px; width: 150px; text-align: center; border: 2px solid #000; border-radius: 5px; display: block; margin: 10px auto; }
+    </style>
+</head>
+<body>
+
+    <div id="screen-menu" class="screen active">
+        <div class="menu-header bg-blue">
+            <h1>FAST G3 Mathematics</h1>
+            <p>Official Item Types • High Contrast</p>
+        </div>
+        <div class="menu-body">
+            <div class="menu-card">
+                <div class="card-header">Start Assessment</div>
+                <div class="card-content">
+                    <button class="btn-main" onclick="startSession('ALL', 40)">🚀 Full Mock Exam (40 Items)</button>
+                    <p style="text-align:center; color:#666; margin-bottom:10px;">- OR SELECT SKILL -</p>
+                    
+                    <button class="btn-sub" onclick="startSession('MA.3.NSO.1.4', 5)">🔢 Rounding (Multi-Part Table)</button>
+                    <button class="btn-sub" onclick="startSession('MA.3.NSO.1.1', 5)">🔢 Place Value (Hot Text)</button>
+                    <button class="btn-sub" onclick="startSession('MA.3.NSO.1.2', 5)">🔢 Composition (Editing)</button>
+                    <button class="btn-sub" onclick="startSession('MA.3.FR.1.1', 5)">🍕 Fraction Models</button>
+                    <button class="btn-sub" onclick="startSession('MA.3.AR.1.1', 5)">🧠 Properties (Matching)</button>
+                    <button class="btn-sub" onclick="startSession('MA.3.DP.1.1', 5)">📊 Graphing (Interactive)</button>
+                    <button class="btn-sub" onclick="startSession('MA.3.GR.1.2', 5)">📐 Geometry (Multiselect)</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="screen-test" class="screen">
         <div class="top-bar">
-            <div><strong>FAST Simulator</strong> | Level 4/5 Mode</div>
-            <div>
-                <button class="tool-btn" onclick="toggleZoom()">🔍 Zoom</button>
-                <button class="tool-btn" style="color:#D32F2F; border-color:#D32F2F;" onclick="location.reload()">Exit</button>
-            </div>
+            <span class="text-blue">FAST Grade 3</span>
+            <button onclick="location.reload()" style="background:none; border:1px solid #333; padding:5px 10px; border-radius:4px;">EXIT</button>
         </div>
 
-        <div id="stage" class="main-stage"></div>
+        <div class="main-stage">
+            <div id="split-view" class="split-container">
+                </div>
+        </div>
 
         <div class="nav-bar">
-            <button class="nav-btn" onclick="prevQ()">Back</button>
-            <div style="font-weight:bold; color:#555;">Item <span id="q-idx">1</span> of <span id="q-total">40</span></div>
-            <button class="nav-btn primary" onclick="nextQ()" id="btn-next">Next</button>
-        </div>
-    </div>
-
-    <div id="screen-report" class="screen">
-        <div class="menu-container" style="background: #f4f4f4; color: #333; justify-content: center;">
-            <div class="menu-card">
-                <h2>Performance Report</h2>
-                <div id="final-badge" class="level-badge l3">Calculating...</div>
-                <div id="report-grid" style="text-align:left; margin-top:20px;"></div>
-                <button class="main-btn" style="margin-top:30px;" onclick="location.reload()">Return to Menu</button>
-            </div>
+            <button class="btn-nav" onclick="navQ(-1)">BACK</button>
+            <div style="font-weight:bold; font-size:1.2em;">Item <span id="cur-idx">1</span> / <span id="total-idx">40</span></div>
+            <button class="btn-nav primary" onclick="navQ(1)" id="btn-next">NEXT</button>
         </div>
     </div>
 
     <script>
-        // --- VISUAL DRAWING FUNCTIONS ---
-        function drawRect(l, w, missingSide=false) {
-            let max = Math.max(l, w);
-            let scale = 220 / max;
-            let svgW = l * scale;
-            let svgH = w * scale;
-            let x = (300 - svgW) / 2;
-            let y = (250 - svgH) / 2;
-            let labelL = missingSide === 'L' ? "?" : l + ' ft';
-            let labelW = missingSide === 'W' ? "?" : w + ' ft';
-
-            return `<svg viewBox="0 0 300 250">
-                <rect x="${x}" y="${y}" width="${svgW}" height="${svgH}" fill="#EAEAEA" stroke="#333" stroke-width="3"/>
-                <text x="${150}" y="${y - 10}" text-anchor="middle" font-weight="bold" font-size="16">${labelL}</text>
-                <text x="${x - 15}" y="${125}" text-anchor="middle" font-weight="bold" font-size="16" transform="rotate(-90, ${x-15}, 125)">${labelW}</text>
-            </svg>`;
-        }
-
-        function drawClock(h, m, title="") {
-            let hAng = ((h % 12) * 30 + (m / 2)) * (Math.PI / 180) - (Math.PI / 2);
-            let mAng = (m * 6) * (Math.PI / 180) - (Math.PI / 2);
-            let ticks = "";
-            for(let i=0; i<12; i++){
-                let ang = (i*30-90)*Math.PI/180;
-                ticks += `<line x1="${50+38*Math.cos(ang)}" y1="${50+38*Math.sin(ang)}" x2="${50+44*Math.cos(ang)}" y2="${50+44*Math.sin(ang)}" stroke="#333" stroke-width="2"/>`;
+        // --- 1. HELPERS ---
+        const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        
+        // --- 2. SVG DRAWING ---
+        const SVG = {
+            pie: (d, sel) => {
+                let p="";
+                for(let i=0; i<d; i++){
+                    let s=(i*360/d-90)*Math.PI/180, e=((i+1)*360/d-90)*Math.PI/180;
+                    let x1=50+45*Math.cos(s), y1=50+45*Math.sin(s), x2=50+45*Math.cos(e), y2=50+45*Math.sin(e);
+                    let f = (sel||[]).includes(i) ? '#003057' : 'white';
+                    p+=`<path d="M50,50 L${x1},${y1} A45,45 0 0,1 ${x2},${y2} Z" fill="${f}" stroke="#333" stroke-width="2" onclick="handlePie(${i})"/>`;
+                }
+                return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="white" stroke="#333" stroke-width="2"/>${p}</svg>`;
+            },
+            graph: (data, ans) => {
+                let b="";
+                data.labels.forEach((l,i)=>{
+                    let v = (ans&&ans[i]!==undefined)?ans[i]:0;
+                    let h = (v/data.max)*250;
+                    b+=`<rect x="${50+i*80}" y="${280-h}" width="50" height="${h}" fill="#003057" stroke="#333" class="bar"/>`;
+                    b+=`<text x="${75+i*80}" y="300" text-anchor="middle" font-weight="bold">${l}</text>`;
+                    b+=`<text x="${75+i*80}" y="${270-h}" text-anchor="middle" fill="#003057" font-weight="bold">${v}</text>`;
+                    b+=`<rect x="${50+i*80}" y="20" width="50" height="260" fill="transparent" onclick="handleGraph(${i}, ${data.step}, ${data.max})"/>`;
+                });
+                return `<svg viewBox="0 0 400 320"><line x1="30" y1="280" x2="380" y2="280" stroke="#333" stroke-width="3"/><line x1="30" y1="20" x2="30" y2="280" stroke="#333" stroke-width="3"/>${b}</svg>`;
             }
-
-            return `<svg viewBox="0 0 100 120">
-                <text x="50" y="15" text-anchor="middle" font-weight="bold" font-size="12">${title}</text>
-                <circle cx="50" cy="70" r="45" fill="white" stroke="#333" stroke-width="3"/>
-                ${ticks}
-                <line x1="50" y1="70" x2="${50 + 24 * Math.cos(hAng)}" y2="${70 + 24 * Math.sin(hAng)}" stroke="black" stroke-width="4" stroke-linecap="round"/>
-                <line x1="50" y1="70" x2="${50 + 36 * Math.cos(mAng)}" y2="${70 + 36 * Math.sin(mAng)}" stroke="#00609C" stroke-width="3" stroke-linecap="round"/>
-                <circle cx="50" cy="70" r="3" fill="#333"/>
-            </svg>`;
-        }
-
-        function drawPie(d, n, interactive=false) {
-             let path = "";
-            for(let i=0; i<n; i++) {
-                let start = (i * 360 / d - 90) * Math.PI/180;
-                let end = ((i+1) * 360 / d - 90) * Math.PI/180;
-                let x1=50+45*Math.cos(start), y1=50+45*Math.sin(start);
-                let x2=50+45*Math.cos(end), y2=50+45*Math.sin(end);
-                path += `M50,50 L${x1},${y1} A45,45 0 0,1 ${x2},${y2} Z `;
-            }
-            let lines = "";
-            for(let i=0; i<d; i++) {
-                let ang = (i*360/d - 90) * Math.PI/180;
-                lines += `<line x1="50" y1="50" x2="${50+45*Math.cos(ang)}" y2="${50+45*Math.sin(ang)}" stroke="#333" stroke-width="2"/>`;
-            }
-            return `<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="white" stroke="#333" stroke-width="2"/><path d="${path}" fill="#00609C" stroke="#333"/>${lines}</svg>`;
-        }
-
-        // --- MASTER DATA: LEVEL 4/5 VARIATIONS ---
-        const STANDARDS = {
-            // NSO
-            "MA.3.NSO.1.1": [
-                () => { let n=1000+Math.floor(Math.random()*8000); return {id:`NSO11A`, cat:"NSO.1.1", type:"choice", layout:"full", text:`A student writes <b>${n}</b> in expanded form. Which expression correctly represents the value of the hundreds digit?`, opts:[(Math.floor((n%1000)/100)*100).toString(), Math.floor((n%1000)/100).toString(), (Math.floor(n/1000)*1000).toString()], ans:(Math.floor((n%1000)/100)*100).toString()} },
-                () => { let n=Math.floor(Math.random()*9000); return {id:`NSO11B`, cat:"NSO.1.1", type:"multi-select", layout:"full", text:`Select <b>all</b> ways to represent <b>${n.toLocaleString()}</b>.`, opts:[`${Math.floor(n/1000)} thousands, ${n%1000} ones`, `${n} ones`, `${Math.floor(n/100)} hundreds`, `${Math.floor(n/10)} tens`], ans:[0,1,3]} }
-            ],
-            "MA.3.NSO.1.2": [
-                () => { return {id:`NSO12A`, cat:"NSO.1.2", type:"choice", layout:"full", text:`Analyze this decomposition: <b>2,300 = 1 thousand + 13 hundreds</b>. Is it correct?`, opts:["Yes, because 1,000 + 1,300 = 2,300.", "No, because you cannot have 13 hundreds."], ans:"Yes, because 1,000 + 1,300 = 2,300."} },
-                () => { let n=3500; return {id:`NSO12B`, cat:"NSO.1.2", type:"input", layout:"full", text:`3,500 = 2 thousands + ? hundreds`, ans:"15"} }
-            ],
-            "MA.3.NSO.1.3": [
-                () => { let a=Math.floor(Math.random()*9000); return {id:`NSO13A`, cat:"NSO.1.3", type:"inline", layout:"full", text:`Compare ${a} and ${a+10}.`, sentence:[{text:`${a}`},{type:"select",opts:[">","<","="],ans:"<"},{text:`${a+10}`}]} }
-            ],
-            "MA.3.NSO.1.4": [
-                () => { let n=Math.floor(Math.random()*800)+100; return {id:`NSO14A`, cat:"NSO.1.4", type:"input", layout:"full", text:`Round <b>${n}</b> to the nearest 100.`, ans:(Math.round(n/100)*100).toString()} }
-            ],
-            "MA.3.NSO.2.1": [
-                 () => { let a=Math.floor(Math.random()*4000)+1000; return {id:`NSO21A`, cat:"NSO.2.1", type:"input", layout:"full", text:`${a} + 2,345 = ?`, ans:(a+2345).toString()} }
-            ],
-            "MA.3.NSO.2.2": [
-                 () => { return {id:`NSO22A`, cat:"NSO.2.2", type:"choice", layout:"full", text:`Which equation is related to 56 ÷ 8 = 7?`, opts:["7 × 8 = 56", "56 + 8 = 64", "8 + 7 = 15"], ans:"7 × 8 = 56"} }
-            ],
-            "MA.3.NSO.2.3": [ () => ({id:`NSO23A`, cat:"NSO.2.3", type:"choice", layout:"full", text:"Which property explains why 4x5 = 5x4?", opts:["Commutative", "Associative", "Distributive"], ans:"Commutative"}) ],
-            "MA.3.NSO.2.4": [ () => ({id:`NSO24A`, cat:"NSO.2.4", type:"input", layout:"full", text:"63 ÷ 9 = ?", ans:"7"}) ],
-
-            // AR
-            "MA.3.AR.1.1": [ () => ({id:`AR11A`, cat:"AR.1.1", type:"choice", layout:"full", text:"Apply Distributive Property: 8 x 7", opts:["(8x5) + (8x2)", "8 + 7", "8 x 5 + 2"], ans:"(8x5) + (8x2)"}) ],
-            "MA.3.AR.1.2": [ 
-                () => { return {id:`AR12A`, cat:"AR.1.2", type:"choice", layout:"full", text:`Mia buys 3 packs of 6 pencils. She gives 5 to a friend. Which equation finds how many are left?`, opts:["(3 × 6) − 5 = 13", "(3 + 6) − 5 = 4", "3 × 6 + 5 = 23"], ans:"(3 × 6) − 5 = 13"} }
-            ],
-            "MA.3.AR.2.1": [ () => ({id:`AR21A`, cat:"AR.2.1", type:"input", layout:"full", text:"24 ÷ 3 = ?", ans:"8"}) ],
-            "MA.3.AR.2.2": [ () => ({id:`AR22A`, cat:"AR.2.2", type:"choice", layout:"full", text:"Which situation matches 4 x 5?", opts:["4 bags with 5 apples each", "4 apples and 5 oranges"], ans:"4 bags with 5 apples each"}) ],
-            "MA.3.AR.2.3": [ () => ({id:`AR23A`, cat:"AR.2.3", type:"input", layout:"full", text:"42 ÷ ? = 6", ans:"7"}) ],
-            "MA.3.AR.3.1": [ () => ({id:`AR31A`, cat:"AR.3.1", type:"choice", layout:"full", text:"2, 5, 8, 11... Rule?", opts:["Add 3", "Multiply 2"], ans:"Add 3"}) ],
-            "MA.3.AR.3.2": [ () => ({id:`AR32A`, cat:"AR.3.2", type:"choice", layout:"full", text:"Multiples of 2 are always:", opts:["Even", "Odd"], ans:"Even"}) ],
-            "MA.3.AR.3.3": [ () => ({id:`AR33A`, cat:"AR.3.3", type:"input", layout:"full", text:"Rule: +6. In: 5, Out: ?", ans:"11"}) ],
-
-            // FR
-            "MA.3.FR.1.1": [
-                () => { let d=[4,6,8][Math.floor(Math.random()*3)]; return {id:`FR11A`, cat:"FR.1.1", type:"choice", layout:"split", visual:drawPie(d,1), text:"What fraction is shaded?", opts:[`1/${d}`, `1/${d+1}`], ans:`1/${d}`} }
-            ],
-            "MA.3.FR.1.2": [ () => ({id:`FR12A`, cat:"FR.1.2", type:"choice", layout:"full", text:"Where is 3/4 on number line?", opts:["Between 0 and 1", "Between 1 and 2"], ans:"Between 0 and 1"}) ],
-            "MA.3.FR.1.3": [ () => ({id:`FR13A`, cat:"FR.1.3", type:"input", layout:"full", text:"Fraction for 3 wholes?", ans:"3/1"}) ],
-            "MA.3.FR.2.1": [ () => ({id:`FR21A`, cat:"FR.2.1", type:"choice", layout:"full", text:"Which is larger?", opts:["1/3", "1/6"], ans:"1/3"}) ],
-            "MA.3.FR.2.2": [ () => ({id:`FR22A`, cat:"FR.2.2", type:"choice", layout:"full", text:"Equivalent to 1/2?", opts:["2/4", "2/5"], ans:"2/4"}) ],
-
-            // GR
-            "MA.3.GR.1.1": [ () => ({id:`GR11A`, cat:"GR.1.1", type:"choice", layout:"full", text:"Line with 1 endpoint?", opts:["Ray", "Line Segment"], ans:"Ray"}) ],
-            "MA.3.GR.1.2": [ () => ({id:`GR12A`, cat:"GR.1.2", type:"multi-select", layout:"full", text:"Select Rectangles.", opts:["Square", "Trapezoid"], ans:[0]}) ],
-            "MA.3.GR.1.3": [ () => ({id:`GR13A`, cat:"GR.1.3", type:"input", layout:"full", text:"Lines of symmetry in Square?", ans:"4"}) ],
-            "MA.3.GR.2.1": [ () => ({id:`GR21A`, cat:"GR.2.1", type:"choice", layout:"split", visual:drawRect(3,2), text:"Area?", opts:["6", "5"], ans:"6"}) ],
-            "MA.3.GR.2.2": [ () => ({id:`GR22A`, cat:"GR.2.2", type:"input", layout:"full", text:"Rect: 5x6. Area?", ans:"30"}) ],
-            "MA.3.GR.2.3": [ () => ({id:`GR23A`, cat:"GR.2.3", type:"input", layout:"split", visual:drawRect(5,4), text:"Perimeter?", ans:"18"}) ],
-            "MA.3.GR.2.4": [ () => ({id:`GR24A`, cat:"GR.2.4", type:"choice", layout:"full", text:"Same Area, Diff Perimeter?", opts:["Possible", "Impossible"], ans:"Possible"}) ],
-
-            // M & DP
-            "MA.3.M.1.1": [ () => ({id:`M11A`, cat:"M.1.1", type:"input", layout:"full", text:"3 ft = ? in", ans:"36"}) ],
-            "MA.3.M.1.2": [ () => ({id:`M12A`, cat:"M.1.2", type:"input", layout:"full", text:"2000g = ? kg", ans:"2"}) ],
-            "MA.3.M.2.1": [
-                () => { let h=Math.floor(Math.random()*11)+1; return {id:`M21A`, cat:"M.2.1", type:"choice", layout:"split", visual:drawClock(h,30), text:"Time?", opts:[`${h}:30`, `${h+1}:30`], ans:`${h}:30`} }
-            ],
-            "MA.3.M.2.2": [ () => ({id:`M22A`, cat:"M.2.2", type:"input", layout:"full", text:"Start 2:00. End 2:45. Mins?", ans:"45"}) ],
-            "MA.3.DP.1.1": [ () => ({id:`DP11A`, cat:"DP.1.1", type:"choice", layout:"full", text:"Graph Scale is 5. Bar is at 20.", opts:["Value is 20", "Value is 4"], ans:"Value is 20"}) ],
-            "MA.3.DP.1.2": [ () => ({id:`DP12A`, cat:"DP.1.2", type:"choice", layout:"full", text:"Most people liked:", opts:["Pizza", "Salad"], ans:"Pizza"}) ]
         };
 
-        // --- SESSION LOGIC ---
-        let queue = [], curIdx = 0, answers = [];
-        let sessionHistory = new Set(); 
+        // --- 3. QUESTION GENERATORS ---
+        const ENGINE = {
+            "MA.3.NSO.1.4": () => { // ROUNDING TABLE
+                const n = rand(1235, 8864);
+                return {
+                    id: "NSO14", cat: "MA.3.NSO.1.4", type: "TABLE",
+                    prompt: `Round <b>${n.toLocaleString()}</b> to the nearest 10, 100, and 1,000.`,
+                    data: { rows:[n.toLocaleString()], cols:["Nearest 10", "Nearest 100", "Nearest 1,000"], ans:[[Math.round(n/10)*10, Math.round(n/100)*100, Math.round(n/1000)*1000]] }
+                };
+            },
+            "MA.3.NSO.1.1": () => { // HOT TEXT
+                const n = rand(1000,9999); const d = n.toString().split('');
+                return {
+                    id: "NSO11", cat: "MA.3.NSO.1.1", type: "HOT_TEXT",
+                    prompt: `Select the digit in the <b>hundreds</b> place.`,
+                    data: { text: `The number is ${d[0]},${d[1]}${d[2]}${d[3]}`, chunks: d, ans: [1] }
+                };
+            },
+            "MA.3.NSO.1.2": () => { // EDITING
+                const n = rand(2100, 8900);
+                return {
+                    id: "NSO12", cat: "MA.3.NSO.1.2", type: "EDITING",
+                    prompt: `Complete the sentence for <b>${n.toLocaleString()}</b>.`,
+                    data: {
+                        sentence: `${n} is composed of [DROP1] thousands and [DROP2] hundreds.`,
+                        drops: [{opts:[Math.floor(n/1000), Math.floor(n/1000)-1]}, {opts:[Math.floor((n%1000)/100), Math.floor((n%1000)/100)+10]}]
+                    }
+                };
+            },
+            "MA.3.DP.1.1": () => { // GRAPHING
+                const v=[rand(2,10), rand(2,10), rand(2,10)];
+                return {
+                    id: "DP11", cat: "MA.3.DP.1.1", type: "GRAPHING", layout: "split",
+                    prompt: `Create a bar graph:<br><b>Red: ${v[0]}, Blue: ${v[1]}, Green: ${v[2]}</b>`,
+                    data: { labels: ["Red", "Blue", "Green"], max: 12, step: 1, ans: v }
+                };
+            },
+            "MA.3.FR.1.1": () => { // FRACTION
+                const d=pick([4,6,8]); const n=rand(1, d-1);
+                return {
+                    id: "FR11", cat: "MA.3.FR.1.1", type: "FRACTION", layout: "split",
+                    prompt: `Click to shade <b>${n}/${d}</b>.`,
+                    data: { den: d, ans: n }
+                };
+            },
+            "MA.3.AR.1.1": () => ({ // MATCHING
+                id: "AR11", cat: "MA.3.AR.1.1", type: "MATCHING",
+                prompt: "Match the equivalent expressions.",
+                data: { rows: ["6 x 7", "6 x 4"], cols: ["(6x5)+(6x2)", "(6x2)+(6x2)"] }
+            }),
+            "MA.3.GR.1.2": () => ({ // MULTISELECT
+                id: "GR12", cat: "MA.3.GR.1.2", type: "MULTISELECT",
+                prompt: "Select <b>all</b> quadrilaterals.",
+                opts: ["Square", "Triangle", "Trapezoid", "Circle", "Rhombus"]
+            }),
+            "AUTO": (id) => ({ // FALLBACK
+                id: "AUTO", cat: id, type: "MULTISELECT", prompt: `Level 4 Question for ${id}`, opts: ["Option A", "Option B"]
+            })
+        };
 
-        function startTest(mode, count) {
-            queue = []; answers = [];
-            sessionHistory.clear();
-            
-            let attempts = 0;
-            // Generate Queue
-            while(queue.length < count && attempts < 400) {
-                attempts++;
-                let keys = Object.keys(STANDARDS);
-                if(mode !== 'ALL') keys = keys.filter(k => k.includes(mode));
-                
-                if(keys.length === 0) { alert("Standard not found in database."); return; }
-                
-                let k = keys[Math.floor(Math.random()*keys.length)];
-                let gens = STANDARDS[k];
-                let q = gens[Math.floor(Math.random()*gens.length)]();
+        // --- 4. SESSION LOGIC ---
+        let queue=[], cur=0, resp={};
 
-                queue.push(q);
+        function startSession(id, count) {
+            queue=[]; resp={}; cur=0;
+            let keys = (id==='ALL') ? Object.keys(ENGINE).filter(k=>k!=='AUTO') : [id];
+            for(let i=0; i<count; i++) {
+                let k = pick(keys);
+                queue.push( (ENGINE[k]||(()=>ENGINE.AUTO(k)))() );
             }
-
-            if(queue.length === 0) { alert("No questions found!"); return; }
-
-            curIdx = 0;
-            document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+            document.getElementById('screen-menu').classList.remove('active');
             document.getElementById('screen-test').classList.add('active');
-            renderQ();
+            document.getElementById('total-idx').innerText = queue.length;
+            render();
         }
 
-        function renderQ() {
-            const q = queue[curIdx];
-            const stage = document.getElementById('stage');
-            const ans = answers[curIdx] || {};
+        function render() {
+            let item = queue[cur];
+            let ans = resp[cur];
+            let sv = document.getElementById('split-view');
+            
+            // Generate Visual (Left Pane if Split)
+            let vis = "";
+            if(item.type === "GRAPHING") vis = SVG.graph(item.data, ans);
+            else if(item.type === "FRACTION") vis = SVG.pie(item.data.den, ans);
+            else if(item.type === "EQUATION") vis = `<div style="font-size:3em;text-align:center;padding:40px">?</div>`;
 
-            let left = q.layout === 'split' ? `<div class="left-pane">${q.visual}</div>` : "";
-            let rStyle = q.layout === 'full' ? "width:100%" : "width:55%";
+            let left = vis ? `<div class="pane pane-left">${vis}</div>` : "";
+            let rightClass = vis ? "pane pane-right" : "pane";
+            let rightStyle = vis ? "" : "width:100%";
 
-            let html = "";
-            if(q.type === 'choice') {
-                q.opts.forEach(o => {
-                    let sel = ans === o ? 'selected' : '';
-                    html += `<div class="opt-row ${sel}" onclick="save('${o}')"><div class="bubble"></div>${o}</div>`;
+            // Generate Interaction (Right Pane)
+            let interact = `<div class="q-tag">${item.cat}</div><div class="prompt">${item.prompt}</div>`;
+            
+            if(item.type === "TABLE") {
+                interact += `<table class="round-table"><thead><tr><th>Number</th>`;
+                item.data.cols.forEach(c => interact+=`<th>${c}</th>`);
+                interact += `</tr></thead><tbody>`;
+                item.data.rows.forEach((r, ri) => {
+                    interact+=`<tr><td>${r}</td>`;
+                    item.data.cols.forEach((c, ci) => {
+                        let v = (ans&&ans[ri]&&ans[ri][ci])?ans[ri][ci]:"";
+                        interact+=`<td><input class="table-input" value="${v}" onchange="saveTable(${ri},${ci},this.value)"></td>`;
+                    });
+                    interact+=`</tr>`;
                 });
-            } 
-            else if(q.type === 'multi-select') {
-                q.opts.forEach((o, i) => {
-                    let arr = answers[curIdx] || [];
-                    let sel = arr.includes(i) ? 'selected'
+                interact += `</tbody></table>`;
+            }
+            else if(item.type === "HOT_TEXT") {
+                interact += `<div class="hot-box">The number is `;
+                item.data.chunks.forEach((c,i)=>{
+                    let s = (ans&&ans.includes(i))?'selected':'';
+                    interact += `<span class="hot-word ${s}" onclick="saveHot(${i})">${c}</span>`;
+                });
+                interact += `</div>`;
+            }
+            else if(item.type === "EDITING") {
+                let s = item.data.sentence;
+                item.data.drops.forEach((d,i)=>{
+                    let v = (ans&&ans[i])?ans[i]:"";
+                    let sel = `<select class="drop-select" onchange="saveEdit(${i},this.value)"><option value="" disabled ${v===""?'selected':''}>Select...</option>`;
+                    d.opts.forEach(o=>sel+=`<option value="${o}" ${v==o?'selected':''}>${o}</option>`);
+                    sel+=`</select>`;
+                    s = s.replace(`[DROP${i+1}]`, sel);
+                });
+                interact += `<div style="font-size:1.3em; line-height:2.0">${s}</div>`;
+            }
+            else if(item.type === "MULTISELECT") {
+                item.opts.forEach((o,i)=>{
+                    let s = (ans&&ans.includes(i))?'selected':'';
+                    interact += `<div class="opt-row ${s}" onclick="saveMulti(${i})"><div class="chk ${s}"></div>${o}</div>`;
+                });
+            }
+            else if(item.type === "MATCHING") {
+                interact += `<table class="round-table"><thead><tr><th></th>`;
+                item.data.cols.forEach(c=>interact+=`<th>${c}</th>`);
+                interact+=`</tr></thead><tbody>`;
+                item.data.rows.forEach((r,ri)=>{
+                    interact+=`<tr><td><b>${r}</b></td>`;
+                    item.data.cols.forEach((c,ci)=>{
+                        let chk = (ans&&ans[ri]===ci)?'checked':'';
+                        interact+=`<td><input type="radio" name="r${ri}" style="transform:scale(1.5)" ${chk} onclick="saveMatch(${ri},${ci})"></td>`;
+                    });
+                    interact+=`</tr>`;
+                });
+                interact+=`</tbody></table>`;
+            }
+            else if(item.type === "GRAPHING") interact += `<p>Click the columns on the left.</p>`;
+            else if(item.type === "FRACTION") interact += `<p>Click the pie slices on the left.</p>`;
+
+            sv.innerHTML = left + `<div class="${rightClass}" style="${rightStyle}">${interact}</div>`;
+            document.getElementById('cur-idx').innerText = cur + 1;
+            document.getElementById('btn-next').innerText = (cur === queue.length-1) ? "Submit" : "Next";
+        }
+
+        // --- SAVERS ---
+        window.saveTable = (r,c,v) => { let a=resp[cur]||{}; if(!a[r])a[r]={}; a[r][c]=v; resp[cur]=a; };
+        window.saveHot = (i) => { let a=resp[cur]||[]; if(a.includes(i)) a=a.filter(x=>x!==i); else a=[i]; resp[cur]=a; render(); };
+        window.saveEdit = (i,v) => { let a=resp[cur]||{}; a[i]=v; resp[cur]=a; };
+        window.saveMulti = (i) => { let a=resp[cur]||[]; if(a.includes(i)) a=a.filter(x=>x!==i); else a.push(i); resp[cur]=a; render(); };
+        window.saveMatch = (r,c) => { let a=resp[cur]||{}; a[r]=c; resp[cur]=a; };
+        window.handleGraph = (i,s,m) => { let a=resp[cur]||{}; let v=a[i]||0; v+=s; if(v>m) v=0; a[i]=v; resp[cur]=a; render(); };
+        window.handlePie = (i) => { let a=resp[cur]||[]; if(a.includes(i)) a=a.filter(x=>x!==i); else a.push(i); resp[cur]=a; render(); };
+
+        window.navQ = (d) => {
+            if(cur+d >= 0 && cur+d < queue.length) { cur+=d; render(); }
+            else if(cur+d === queue.length) { alert("Done!"); location.reload(); }
+        };
+    </script>
+</body>
+</html>
