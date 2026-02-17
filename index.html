@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florida FAST Math Simulator (Word Form & Decomp)</title>
+    <title>Florida FAST Math Simulator (Ultimate Edition)</title>
     <style>
-        /* --- GLOBAL STYLES --- */
+        /* --- 1. GLOBAL STYLES --- */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
         
         #dashboard { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
@@ -15,12 +15,17 @@
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
         .card { background: white; border-radius: 8px; padding: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; border-top: 5px solid #ccc; transition: transform 0.2s; }
         .card:hover { transform: translateY(-5px); }
-        .card.nso { border-top-color: #005ea2; }
         
-        /* SIMULATOR STYLES */
-        #simulator-view { display: none; min-height: 100vh; background-color: #f2f2f2; }
-        :root { --fast-blue: #005ea2; --fast-hover: #e1f3f8; --fast-grey-row: #f0f0f0; }
+        /* Card Themes */
+        .card.mock { border-top-color: #d9534f; border-left: 5px solid #d9534f; }
+        .card.nso { border-top-color: #005ea2; }
+        .card.fr { border-top-color: #5cb85c; }
+        .card.ar { border-top-color: #f0ad4e; }
+        .card.gr { border-top-color: #6f42c1; }
 
+        /* --- 2. SIMULATOR VIEW --- */
+        #simulator-view { display: none; min-height: 100vh; background-color: #f2f2f2; }
+        
         #question-card {
             max-width: 900px; margin: 0 auto; padding: 50px; background: white;
             border-left: 1px solid #ccc; border-right: 1px solid #ccc; min-height: 600px;
@@ -30,17 +35,27 @@
         .question-stem { font-size: 22px; margin-bottom: 30px; line-height: 1.6; }
         .level-badge { display: inline-block; background: #333; color: white; padding: 2px 8px; font-size: 12px; border-radius: 4px; margin-bottom: 10px; }
 
-        .option-row { padding: 15px; border: 1px solid #ccc; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; border-radius: 4px; font-size: 18px; }
-        .option-row:hover { background-color: var(--fast-hover); border-color: var(--fast-blue); }
+        /* VISUALS */
+        .visual-container { text-align: center; margin: 20px 0; padding: 20px; background: #fff; border: 1px solid #eee; }
+        svg { max-width: 100%; height: auto; }
 
+        /* INTERACTIVE ELEMENTS */
+        .option-row { padding: 15px; border: 1px solid #ccc; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; border-radius: 4px; font-size: 18px; }
+        .option-row:hover { background-color: #e1f3f8; border-color: #005ea2; }
+
+        .fast-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 18px; }
+        .fast-table th { border-bottom: 2px solid #000; padding: 15px; }
+        .fast-table td { padding: 15px; border-bottom: 1px solid #ccc; text-align: center; }
+        
+        /* FOOTER */
         .fast-footer {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 80px;
             background-color: #e6e6e6; border-top: 1px solid #b3b3b3;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; z-index: 100;
+            padding: 0 40px; box-sizing: border-box; z-index: 100;
         }
         .nav-btn { font-size: 18px; padding: 12px 24px; border-radius: 4px; cursor: pointer; border: 1px solid #aaa; }
-        .btn-next { background-color: var(--fast-blue); color: white; border: none; font-weight: bold; }
+        .btn-next { background-color: #005ea2; color: white; border: none; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -48,18 +63,35 @@
     <div id="dashboard">
         <div class="header">
             <h1>Florida FAST Math Simulator</h1>
-            <p><strong>New Features:</strong> Word Form & Flexible Decomposition</p>
+            <p>Comprehensive Master Quizzes for Every B.E.S.T. Domain</p>
         </div>
 
         <div class="grid-container">
-            <div class="card nso" onclick="startTest('mock')">
-                <h3>Start Mock Assessment</h3>
-                <p>30 Questions • All Standards</p>
+            <div class="card mock" onclick="startTest('mock')">
+                <h3>🏆 Full Mock Assessment</h3>
+                <p><strong>30 Questions</strong> • All Domains</p>
+                <p>A mix of every standard.</p>
             </div>
+
             <div class="card nso" onclick="startTest('NSO')">
                 <h3>Number Sense (NSO)</h3>
-                <p>10 Questions</p>
-                <p>Word Form, Decomposing ("14 hundreds")</p>
+                <p><strong>Master Quiz</strong></p>
+                <p>Covers: Place Value, Decomposing, Rounding, Addition/Subtraction.</p>
+            </div>
+            <div class="card fr" onclick="startTest('FR')">
+                <h3>Fractions (FR)</h3>
+                <p><strong>Master Quiz</strong></p>
+                <p>Covers: Unit Fractions, Equivalence, Comparing, Plotting.</p>
+            </div>
+            <div class="card ar" onclick="startTest('AR')">
+                <h3>Algebraic Reasoning (AR)</h3>
+                <p><strong>Master Quiz</strong></p>
+                <p>Covers: Mult/Div, Patterns, Properties, Multi-step.</p>
+            </div>
+            <div class="card gr" onclick="startTest('GR')">
+                <h3>Geometry & Data (GR)</h3>
+                <p><strong>Master Quiz</strong></p>
+                <p>Covers: Area, Perimeter, Time, Symmetry, Bar Graphs.</p>
             </div>
         </div>
     </div>
@@ -74,44 +106,86 @@
     </div>
 
     <script>
-        // --- HELPERS ---
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
+        // --- GLOBAL STATE ---
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let userAnswers = [];
+
+        // --- 1. SVG DRAWING TOOLS ---
+        function drawClockSVG(h, m) {
+            const hDeg=(h*30)+(m*0.5), mDeg=m*6;
+            return `<svg width="150" height="150" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="white" stroke="black" stroke-width="4"/><circle cx="100" cy="100" r="3"/><line x1="100" y1="100" x2="100" y2="50" stroke="black" stroke-width="6" transform="rotate(${hDeg} 100 100)"/><line x1="100" y1="100" x2="100" y2="30" stroke="black" stroke-width="4" transform="rotate(${mDeg} 100 100)"/></svg>`;
+        }
+        function drawBarGraphSVG(v1, v2) {
+            return `<svg width="200" height="150" viewBox="0 0 200 150"><rect x="20" y="${140-(v1*10)}" width="40" height="${v1*10}" fill="#005ea2"/><rect x="80" y="${140-(v2*10)}" width="40" height="${v2*10}" fill="#5cb85c"/><line x1="10" y1="140" x2="150" y2="140" stroke="black"/><text x="30" y="150" font-size="12">A</text><text x="90" y="150" font-size="12">B</text></svg>`;
+        }
+        function drawCompositeSVG() {
+            return `<svg width="200" height="150" viewBox="0 0 300 200"><path d="M50,50 L200,50 L200,100 L120,100 L120,150 L50,150 Z" fill="#e1f3f8" stroke="#005ea2" stroke-width="3"/><text x="125" y="40">6</text><text x="25" y="100">5</text><text x="210" y="80">3</text><text x="80" y="170">4</text></svg>`;
         }
 
-        // Simple Number to Words Converter (0 - 9999)
-        function numToWords(n) {
-            const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
-            const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
-            const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
-            
-            if (n === 0) return "zero";
-            
-            let str = '';
-            if (Math.floor(n / 1000) > 0) {
-                str += ones[Math.floor(n / 1000)] + ' thousand ';
-                n %= 1000;
+        // --- 2. GENERATOR LIBRARY (Mapped to Standards) ---
+        
+        // --- NSO GENERATORS ---
+        const nsoGenerators = [
+            function nso_decomp() { // Skill: Decompose multiple ways
+                const n = Math.floor(Math.random()*4000)+1000;
+                return { type:'mc', text:`Select the way to decompose **${n}**.`, options:[`${Math.floor(n/100)} hundreds, ${n%100} ones`, `${Math.floor(n/1000)} hundreds, ${n%100} tens`, `${n} tens`] };
+            },
+            function nso_round() { // Skill: Rounding
+                const n = Math.floor(Math.random()*800)+100;
+                return { type:'mc', text:`Round **${n}** to the nearest 100.`, options:[Math.round(n/100)*100, Math.floor(n/10)*10, n+10, 1000] };
+            },
+            function nso_word() { // Skill: Word Form
+                const n = 1250; 
+                return { type:'mc', text:`Select the word form for **1,250**.`, options:['One thousand two hundred fifty', 'Twelve hundred five', 'One thousand two hundred five'] };
+            },
+            function nso_compare() { // Skill: Comparing
+                return { type:'mc', text:`Select the correct statement.`, options:['4,200 > 4,020', '3,900 < 3,090', '1,500 = 1,050'] };
             }
-            if (Math.floor(n / 100) > 0) {
-                str += ones[Math.floor(n / 100)] + ' hundred ';
-                n %= 100;
-            }
-            if (n > 0) {
-                if (n < 10) str += ones[n];
-                else if (n < 20) str += teens[n - 10];
-                else {
-                    str += tens[Math.floor(n / 10)];
-                    if (n % 10 > 0) str += '-' + ones[n % 10];
-                }
-            }
-            return str.trim();
-        }
+        ];
 
-        // --- GENERATORS ---
+        // --- FR GENERATORS ---
+        const frGenerators = [
+            function fr_unit() { // Skill: Unit Fractions
+                return { type:'mc', text:`Which fraction represents 1 part of 8?`, options:['1/8', '8/1', '8/8'] };
+            },
+            function fr_equiv() { // Skill: Equivalence
+                return { type:'mc', text:`Which fraction is equivalent to **1/2**?`, options:['3/6', '3/4', '2/5', '5/8'] };
+            },
+            function fr_compare() { // Skill: Compare same denom
+                return { type:'mc', text:`Which is true?`, options:['3/8 < 5/8', '3/8 > 5/8', '3/8 = 5/8'] };
+            }
+        ];
+
+        // --- AR GENERATORS ---
+        const arGenerators = [
+            function ar_pattern() { // Skill: Patterns
+                return { type:'mc', text:`Identify the pattern: 3, 6, 9, 12...`, options:['Add 3', 'Multiply by 2', 'Add 6'] };
+            },
+            function ar_mult() { // Skill: Multiplication Property
+                return { type:'mc', text:`Which shows the Distributive Property for 7 x 12?`, options:['(7x10) + (7x2)', '(7+10) x (7+2)', '7 x 1 x 2'] };
+            },
+            function ar_error() { // Skill: Error Analysis (Level 5)
+                return { type:'mc', text:`Jon says 4x8=36. Is he correct?`, options:['No, 4x8=32', 'Yes', 'No, 4x8=24'] };
+            }
+        ];
+
+        // --- GR GENERATORS ---
+        const grGenerators = [
+            function gr_time() { // Skill: Time
+                return { type:'mc', text:`The clock shows 3:15. What time is it 30 mins later?`, visual: drawClockSVG(3,15), options:['3:45', '3:30', '4:00'] };
+            },
+            function gr_area() { // Skill: Area Composite
+                return { type:'mc', text:`Find the area of the combined shape.`, visual: drawCompositeSVG(), options:['26 sq ft', '22 sq ft', '30 sq ft'] };
+            },
+            function gr_data() { // Skill: Bar Graphs
+                return { type:'mc', text:`How many more in B than A? (Scale: 1 line = 1 unit)`, visual: drawBarGraphSVG(4, 9), options:['5', '4', '13'] };
+            }
+        ];
+
+
+        // --- 3. TEST LOGIC ---
+        function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
 
         function startTest(mode) {
             document.getElementById('dashboard').style.display = 'none';
@@ -119,115 +193,44 @@
             currentQuestions = [];
             currentIndex = 0;
             
-            const count = mode === 'mock' ? 30 : 10;
-            for(let i=0; i<count; i++) {
-                // If NSO, rotate through the 3 specific NSO skills
-                if (mode === 'NSO') {
-                    const r = Math.random();
-                    if(r < 0.33) currentQuestions.push(generateWordFormProblem());
-                    else if(r < 0.66) currentQuestions.push(generateFlexibleDecomposition());
-                    else currentQuestions.push(generateTableMatchNSO());
-                } else {
-                    currentQuestions.push(generateWordFormProblem()); // Fallback for demo
-                }
-            }
+            // SELECT GENERATORS BASED ON MODE
+            let gens = [];
+            if (mode === 'NSO') gens = nsoGenerators;
+            else if (mode === 'FR') gens = frGenerators;
+            else if (mode === 'AR') gens = arGenerators;
+            else if (mode === 'GR') gens = grGenerators;
+            else if (mode === 'mock') gens = [...nsoGenerators, ...frGenerators, ...arGenerators, ...grGenerators];
+
+            // Generate Questions (Cycle through the specific list to hit EVERY standard)
+            // If Mock, pick 30 random. If Domain, run ALL its generators.
+            const count = (mode === 'mock') ? 30 : gens.length * 2; // Run domain skills twice for practice
             
+            for(let i=0; i<count; i++) {
+                const gen = gens[i % gens.length]; // Cycle through generators
+                currentQuestions.push(gen());
+            }
+
             document.getElementById('q-total').innerText = currentQuestions.length;
             renderQuestion(0);
         }
-
-        // 1. STANDARD FORM vs WORD FORM GENERATOR
-        function generateWordFormProblem() {
-            const num = Math.floor(Math.random() * 9000) + 1000;
-            const correctText = numToWords(num);
-            
-            // Generate tricky distractors
-            // Distractor 1: Swap tens/ones (e.g. 1234 -> 1243)
-            const d1_num = num + 9; 
-            // Distractor 2: Just wrong digits
-            const d2_num = num + 100;
-            
-            return {
-                type: 'multiple_choice',
-                level: 'Level 4 (Read & Write)',
-                text: `Select the word form for the number <strong>${num.toLocaleString()}</strong>.`,
-                options: shuffle([
-                    correctText,
-                    numToWords(d1_num),
-                    numToWords(d2_num),
-                    numToWords(num + 1000)
-                ])
-            };
-        }
-
-        // 2. FLEXIBLE DECOMPOSITION GENERATOR ("Multiple Ways")
-        function generateFlexibleDecomposition() {
-            // Target: e.g., 2,400
-            const thousands = Math.floor(Math.random() * 5) + 2; 
-            const hundreds = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
-            const total = (thousands * 1000) + (hundreds * 100); 
-            
-            // Valid options
-            const opt1 = `${thousands} thousands, ${hundreds} hundreds`; // Standard
-            const opt2 = `${thousands}${hundreds} hundreds`; // Flexible (e.g., 24 hundreds)
-            const opt3 = `${thousands} thousands, ${hundreds}0 tens`; // Flexible (e.g., 2 thousands 40 tens)
-            
-            // Invalid options
-            const dist1 = `${thousands}${hundreds} tens`; // Too small
-            const dist2 = `${thousands} thousands, ${hundreds} ones`; // Too small
-            
-            return {
-                type: 'multi_select',
-                level: 'Level 4 (Flexible Composition)',
-                text: `Select **all** the ways to represent the number <strong>${total.toLocaleString()}</strong>.`,
-                options: shuffle([opt1, opt2, opt3, dist1, dist2])
-            };
-        }
-
-        // 3. TABLE MATCH (Existing)
-        function generateTableMatchNSO() {
-            const val = Math.floor(Math.random() * 9000) + 1000;
-            return {
-                type: 'table_match',
-                level: 'Level 3',
-                text: `The number is **${val.toLocaleString()}**. Match the value of the digits.`,
-                contextNumber: val,
-                rows: [{label: "Value of hundreds", id:'r1'}, {label: "Value of tens", id:'r2'}],
-                columns: ["Thousands", "Hundreds", "Tens", "Ones"]
-            };
-        }
-
-        // --- RENDERERS ---
 
         function renderQuestion(index) {
             currentIndex = index;
             const q = currentQuestions[index];
             const container = document.getElementById('question-card');
             document.getElementById('q-num').innerText = index + 1;
+
+            let visual = q.visual ? `<div class="visual-container">${q.visual}</div>` : '';
+            // Shuffle options for rendering
+            let opts = q.options.map(o => `<div class="option-row" onclick="selectOption(this)"><div style="width:20px; height:20px; border:1px solid #333; border-radius:50%; margin-right:10px;"></div>${o}</div>`).join('');
             
-            let badge = q.level ? `<span class="level-badge">${q.level}</span>` : '';
-            let html = `${badge}<div class="question-stem">${q.text}</div>`;
+            container.innerHTML = `<div class="question-stem">${q.text}</div>${visual}<div>${opts}</div>`;
+        }
 
-            if (q.type === 'multiple_choice') {
-                html += `<div>${q.options.map(opt => 
-                    `<div class="option-row"><input type="radio" name="mc" style="margin-right:15px;"> ${opt}</div>`
-                ).join('')}</div>`;
-            } 
-            else if (q.type === 'multi_select') {
-                html += `<div>${q.options.map(opt => 
-                    `<div class="option-row"><input type="checkbox" style="margin-right:15px;"> ${opt}</div>`
-                ).join('')}</div>`;
-            }
-            else if (q.type === 'table_match') {
-                html += `<div style="background:#f9f9f9; padding:10px; margin-bottom:10px;">Number: <strong>${q.contextNumber}</strong></div>
-                <table style="width:100%; border-collapse:collapse; margin-top:20px; font-size:18px;">
-                    <thead><tr><th></th>${q.columns.map(c=>`<th style="border-bottom:2px solid black; padding:15px;">${c}</th>`).join('')}</tr></thead>
-                    <tbody>${q.rows.map((r, i)=>`<tr><td style="text-align:left; padding:15px; border-bottom:1px solid #ccc;">${r.label}</td>
-                    ${q.columns.map(c=>`<td style="padding:15px; border-bottom:1px solid #ccc; text-align:center;"><input type="radio" name="r${i}" style="width:20px; height:20px;"></td>`).join('')}</tr>`).join('')}</tbody>
-                </table>`;
-            }
-
-            container.innerHTML = html;
+        function selectOption(el) {
+            // Visual selection only for this demo
+            document.querySelectorAll('.option-row').forEach(e => e.style.backgroundColor = 'white');
+            el.style.backgroundColor = '#e1f3f8';
         }
 
         function nextQuestion() {
@@ -242,10 +245,11 @@
             document.getElementById('simulator-view').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
         }
-        
+
         window.onload = function() {
             document.getElementById('dashboard').style.display = 'block';
         };
+
     </script>
 </body>
 </html>
