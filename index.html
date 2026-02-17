@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florida FAST Math Simulator (B.E.S.T. Aligned)</title>
+    <title>Florida FAST Math Simulator (Visual Upgrade)</title>
     <style>
         /* --- 1. GLOBAL & DASHBOARD STYLES --- */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f4f7f6; color: #333; }
@@ -36,18 +36,18 @@
         .question-stem { font-size: 22px; margin-bottom: 30px; line-height: 1.6; }
         .level-badge { display: inline-block; background: #333; color: white; padding: 2px 8px; font-size: 12px; border-radius: 4px; margin-bottom: 10px; }
 
+        /* VISUALS (SVGs) */
+        .visual-container { text-align: center; margin: 20px 0; padding: 20px; background: #fff; border: 1px solid #eee; }
+        svg { max-width: 100%; height: auto; }
+
         /* Question Types */
         .fast-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 18px; }
         .fast-table th { border-bottom: 2px solid #000; padding: 15px; }
         .fast-table td { padding: 15px; border-bottom: 1px solid #ccc; text-align: center; }
         .fast-table tr:nth-child(even) { background-color: var(--fast-grey-row); }
 
-        .hot-spot { padding: 6px 12px; margin: 0 4px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; }
-        .hot-spot:hover { background-color: var(--fast-hover); border-color: #bcd6ed; }
-        .hot-spot.selected { background-color: var(--fast-blue); color: white; border-color: var(--fast-blue); }
-
-        .option-row { padding: 15px; border: 1px solid #ccc; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; }
-        .option-row:hover { background-color: var(--fast-hover); }
+        .option-row { padding: 15px; border: 1px solid #ccc; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; border-radius: 4px; }
+        .option-row:hover { background-color: var(--fast-hover); border-color: var(--fast-blue); }
 
         /* Footer */
         .fast-footer {
@@ -72,7 +72,7 @@
             <div class="card mock" onclick="startTest('mock')">
                 <h3>Start Mock Assessment</h3>
                 <p><strong>30 Questions</strong> • Mixed Levels</p>
-                <p>Includes Error Analysis & Multi-step</p>
+                <p>Includes Error Analysis & Visuals</p>
             </div>
             <div class="card nso" onclick="startTest('NSO')">
                 <h3>Number Sense (NSO)</h3>
@@ -92,7 +92,7 @@
             <div class="card gr" onclick="startTest('GR')">
                 <h3>Geometry & Measure (GR/M)</h3>
                 <p>10 Questions</p>
-                <p>Time, Area, Symmetry</p>
+                <p>Clocks, Area, Symmetry</p>
             </div>
         </div>
     </div>
@@ -112,7 +112,51 @@
         let currentIndex = 0;
         let userAnswers = [];
 
-        // --- 1. GENERATOR HUB ---
+        // --- 1. SVG DRAWING FUNCTIONS (THE VISUALS) ---
+        
+        function drawClockSVG(hour, minute) {
+            const hDeg = (hour * 30) + (minute * 0.5);
+            const mDeg = minute * 6;
+            return `
+            <svg width="200" height="200" viewBox="0 0 200 200">
+                <circle cx="100" cy="100" r="90" fill="white" stroke="black" stroke-width="4"/>
+                <circle cx="100" cy="100" r="3" fill="black"/>
+                ${[12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((n, i) => {
+                    const angle = (n * 30 - 90) * (Math.PI / 180);
+                    const x = 100 + 75 * Math.cos(angle);
+                    const y = 100 + 75 * Math.sin(angle);
+                    return `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-size="16" font-family="Arial">${n}</text>`;
+                }).join('')}
+                <line x1="100" y1="100" x2="100" y2="50" stroke="black" stroke-width="6" transform="rotate(${hDeg} 100 100)" stroke-linecap="round"/>
+                <line x1="100" y1="100" x2="100" y2="30" stroke="black" stroke-width="4" transform="rotate(${mDeg} 100 100)" stroke-linecap="round"/>
+            </svg>`;
+        }
+
+        function drawCompositeSVG() {
+            // L-Shaped Garden
+            return `
+            <svg width="300" height="200" viewBox="0 0 300 200">
+                <path d="M50,50 L200,50 L200,100 L120,100 L120,150 L50,150 Z" fill="#e1f3f8" stroke="#005ea2" stroke-width="3"/>
+                <text x="125" y="40" font-size="16">6 ft</text>
+                <text x="25" y="100" font-size="16">5 ft</text>
+                <text x="210" y="80" font-size="16">3 ft</text>
+                <text x="80" y="170" font-size="16">4 ft</text>
+            </svg>`;
+        }
+
+        function drawShapeSVG(type) {
+            if (type === 'Trapezoid') {
+                return `<svg width="80" height="60" viewBox="0 0 100 80"><polygon points="20,60 80,60 60,20 40,20" fill="none" stroke="black" stroke-width="2"/></svg>`;
+            } else if (type === 'Rectangle') {
+                return `<svg width="80" height="60" viewBox="0 0 100 80"><rect x="10" y="20" width="80" height="40" fill="none" stroke="black" stroke-width="2"/></svg>`;
+            } else if (type === 'Triangle') {
+                return `<svg width="80" height="60" viewBox="0 0 100 80"><polygon points="10,60 90,60 30,10" fill="none" stroke="black" stroke-width="2"/></svg>`;
+            } else {
+                return `<svg width="80" height="60" viewBox="0 0 100 80"><circle cx="50" cy="40" r="30" fill="none" stroke="black" stroke-width="2"/></svg>`;
+            }
+        }
+
+        // --- 2. GENERATOR LOGIC ---
         
         function startTest(mode) {
             document.getElementById('dashboard').style.display = 'none';
@@ -124,10 +168,8 @@
             
             for(let i=0; i<count; i++) {
                 if (mode === 'mock') {
-                    // Random mix of domains
                     const types = ['NSO', 'FR', 'AR', 'GR'];
-                    const type = types[Math.floor(Math.random() * types.length)];
-                    currentQuestions.push(generateQuestionByDomain(type));
+                    currentQuestions.push(generateQuestionByDomain(types[Math.floor(Math.random() * types.length)]));
                 } else {
                     currentQuestions.push(generateQuestionByDomain(mode));
                 }
@@ -139,8 +181,7 @@
         }
 
         function generateQuestionByDomain(domain) {
-            // Weights logic: Mix Level 3 (Basic) and Level 5 (Error Analysis)
-            const isLevel5 = Math.random() > 0.7; // 30% chance of Level 5 challenge
+            const isLevel5 = Math.random() > 0.7; 
 
             if (domain === 'NSO') {
                 return isLevel5 ? generateLevel5Comparing() : generateTableMatchNSO();
@@ -157,9 +198,8 @@
             return generateTableMatchNSO();
         }
 
-        // --- 2. SPECIFIC GENERATORS (ALIGNED TO ALDs) ---
+        // --- SPECIFIC GENERATORS ---
 
-        // Level 3/4: Place Value
         function generateTableMatchNSO() {
             const val = Math.floor(Math.random() * 9000) + 1000;
             return {
@@ -171,7 +211,6 @@
             };
         }
 
-        // Level 5: Comparing with Symbols & Error Logic
         function generateLevel5Comparing() {
             return {
                 type: 'multiple_choice',
@@ -179,69 +218,66 @@
                 text: "Select the statement that correctly compares the numbers.",
                 options: [
                     "4,052 > 4,502 because 5 tens is greater than 0 tens.",
-                    "4,052 < 4,502 because 0 hundreds is less than 5 hundreds.", // Correct
+                    "4,052 < 4,502 because 0 hundreds is less than 5 hundreds.",
                     "4,052 = 4,502 because they use the same digits.",
                     "4,052 > 4,502 because 4 thousands is equal to 4 thousands."
                 ]
             };
         }
 
-        // Level 3: Measurement (Time)
         function generateTimeProblem() {
-            // Simulating "Using analog clocks tell time to nearest minute"
             const hour = Math.floor(Math.random() * 12) + 1;
-            const min = Math.floor(Math.random() * 59);
-            const minStr = min < 10 ? '0'+min : min;
+            const min = [0, 15, 30, 45][Math.floor(Math.random() * 4)]; // Simplified minutes for demo
+            const minStr = min === 0 ? "00" : min;
             return {
                 type: 'multiple_choice',
                 level: 'Level 3',
-                text: `A clock shows the hour hand past the ${hour} and the minute hand pointing exactly to ${min} minutes. What time is it?`,
+                text: `What time is shown on the clock?`,
+                visual: drawClockSVG(hour, min),
                 options: [
                     `${hour}:${minStr}`,
                     `${hour+1}:${minStr}`,
                     `${min}:${hour}`,
-                    `${hour}:${min < 50 ? min+10 : '05'}`
+                    `${hour === 12 ? 1 : hour+1}:00`
                 ]
             };
         }
 
-        // Level 4: Area of Composite Figures
         function generateAreaProblem() {
             return {
                 type: 'multiple_choice',
                 level: 'Level 4',
-                text: "A garden is made of two rectangles. One is 4 ft by 5 ft. The other is 3 ft by 6 ft. What is the total area?",
-                image: "", // Placeholder for tag
-                options: [
-                    "38 sq ft", // (4x5)+(3x6) = 20+18 = 38
-                    "18 sq ft",
-                    "20 sq ft",
-                    "42 sq ft"
-                ]
+                text: "A garden is made of two rectangles shown below. What is the total area?",
+                visual: drawCompositeSVG(),
+                options: ["38 sq ft", "18 sq ft", "20 sq ft", "42 sq ft"]
             };
         }
 
-        // Level 4: Symmetry
         function generateSymmetryProblem() {
             return {
                 type: 'graphic_select',
                 level: 'Level 4',
-                text: "Which figure appears to have exactly two lines of symmetry?",
-                options: ["Rectangle", "Trapezoid", "Scalene Triangle", "Circle"]
+                text: "Which figure appears to have exactly one line of symmetry?",
+                // Options now have 'shape' property for drawing
+                options: [
+                    {text: "Rectangle", shape: "Rectangle"}, 
+                    {text: "Trapezoid", shape: "Trapezoid"}, 
+                    {text: "Scalene", shape: "Triangle"}, 
+                    {text: "Circle", shape: "Circle"}
+                ]
             };
         }
 
-        // Level 5: Error Analysis (Algebra)
         function generateErrorAnalysisAR() {
             return {
                 type: 'multiple_choice',
                 level: 'Level 5 (Exemplary)',
-                text: "Jon solved the equation: <strong>4 × 8 = ?</strong><br>He said: 'I know 4 × 4 = 16, so I just doubled 16 to get 32.'<br><br>Is Jon correct, and why?",
+                text: "Jon solved: <strong>4 × 8 = ?</strong><br>He said: 'I know 4 × 4 = 16, so I just doubled 16 to get 32.'<br>Is Jon correct?",
                 options: [
                     "Yes, because 8 is double 4, so the product doubles.",
                     "No, because he should have added 4, not doubled.",
                     "No, because he should have multiplied 16 by 4.",
-                    "Yes, because 4 + 8 = 12 and 16 + 16 = 32."
+                    "Yes, because 4 + 8 = 12."
                 ]
             };
         }
@@ -268,23 +304,24 @@
             currentIndex = index;
             const q = currentQuestions[index];
             const container = document.getElementById('question-card');
-            
             document.getElementById('q-num').innerText = index + 1;
             
             let badge = q.level ? `<span class="level-badge">${q.level}</span>` : '';
-            let html = `${badge}<div class="question-stem">${q.text}</div>`;
+            // If the question has a visual (like clock/area), inject it here
+            let visual = q.visual ? `<div class="visual-container">${q.visual}</div>` : '';
+            
+            let html = `${badge}<div class="question-stem">${q.text}</div>${visual}`;
 
-            if (q.type === 'table_match') html += renderTableMatch(q, index);
-            else if (q.type === 'multiple_choice') html += renderMultipleChoice(q, index);
-            else if (q.type === 'multi_select') html += renderMultiSelect(q, index);
-            else if (q.type === 'equation') html += renderEquation(q, index);
-            else if (q.type === 'graphic_select') html += renderGraphicSelect(q, index);
+            if (q.type === 'table_match') html += renderTableMatch(q);
+            else if (q.type === 'multiple_choice') html += renderMultipleChoice(q);
+            else if (q.type === 'multi_select') html += renderMultiSelect(q);
+            else if (q.type === 'equation') html += renderEquation(q);
+            else if (q.type === 'graphic_select') html += renderGraphicSelect(q);
 
             container.innerHTML = html;
         }
 
-        // Render Functions
-        function renderTableMatch(q, index) {
+        function renderTableMatch(q) {
             return `<div style="background:#f9f9f9; padding:10px; margin-bottom:10px;">Number: <strong>${q.contextNumber}</strong></div>
             <table class="fast-table">
                 <thead><tr><th></th>${q.columns.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
@@ -293,28 +330,29 @@
             </table>`;
         }
 
-        function renderMultipleChoice(q, index) {
-            return `<div>${q.options.map((opt, i)=>`
+        function renderMultipleChoice(q) {
+            return `<div>${q.options.map(opt=>`
                 <div class="option-row"><input type="radio" name="mc" style="margin-right:15px;"> ${opt}</div>
             `).join('')}</div>`;
         }
 
-        function renderMultiSelect(q, index) {
+        function renderMultiSelect(q) {
             return `<div>${q.options.map(opt=>`
                 <div class="option-row"><input type="checkbox" style="margin-right:15px;"> ${opt}</div>
             `).join('')}</div>`;
         }
         
-        function renderGraphicSelect(q, index) {
-            return `<div style="display:flex; gap:20px;">${q.options.map(opt=>`
-                <div style="border:1px solid #ccc; padding:20px; border-radius:8px; cursor:pointer; text-align:center; min-width:100px;">
-                    <div style="font-weight:bold;">${opt}</div>
-                    <div style="font-size:12px; color:#666;">(Shape Image)</div>
+        function renderGraphicSelect(q) {
+            // Updated to use the shape SVGs
+            return `<div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:20px;">${q.options.map(opt=>`
+                <div style="border:1px solid #ccc; padding:20px; border-radius:8px; cursor:pointer; text-align:center;">
+                    ${drawShapeSVG(opt.shape)}
+                    <div style="font-weight:bold; margin-top:10px;">${opt.text}</div>
                 </div>
             `).join('')}</div>`;
         }
 
-        function renderEquation(q, index) {
+        function renderEquation(q) {
             return `<div style="text-align:center; margin-bottom:20px;">
                 <div style="width:100px; height:100px; border-radius:50%; border:2px solid black; margin:0 auto; background:conic-gradient(#005ea2 0% 25%, white 25% 100%);"></div>
             </div>
@@ -335,7 +373,6 @@
             document.getElementById('dashboard').style.display = 'block';
         }
 
-        // Start on Dashboard
         window.onload = function() {
             document.getElementById('dashboard').style.display = 'block';
             document.getElementById('simulator-view').style.display = 'none';
