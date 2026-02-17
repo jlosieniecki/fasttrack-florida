@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAST Grade 3 Accelerated | Master Simulator (Fixed)</title>
+    <title>FAST Grade 3 Accelerated | Final Cumulative Master</title>
     <style>
         :root {
             --primary: #004d40; /* FL B.E.S.T. Green */
@@ -12,6 +12,7 @@
             --panel: #ffffff;
             --text: #263238;
             --border: #cfd8dc;
+            --highlight: #e0f7fa;
         }
 
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
@@ -72,7 +73,7 @@
             background: white; cursor: pointer; font-size: 1.1rem; transition: 0.2s;
         }
         .opt-btn:hover { border-color: #b0bec5; background: #f5f5f5; }
-        .opt-btn.selected { border-color: var(--primary); background: #e0f2f1; box-shadow: inset 0 0 0 1px var(--primary); }
+        .opt-btn.selected { border-color: var(--primary); background: var(--highlight); box-shadow: inset 0 0 0 1px var(--primary); }
         
         .icon { width: 22px; height: 22px; border: 2px solid #546e7a; margin-right: 15px; display: flex; justify-content: center; align-items: center; }
         .radio .icon { border-radius: 50%; }
@@ -86,7 +87,7 @@
         /* Table TEI */
         .tei-table { border-collapse: collapse; margin: 0 auto; }
         .tei-table td, .tei-table th { border: 1px solid #555; padding: 10px 20px; text-align: center; font-size: 1.1rem; }
-        .tei-table input { width: 80px; padding: 5px; font-size: 1.1rem; text-align: center; border: 2px solid #000; }
+        .tei-table input { width: 100px; padding: 5px; font-size: 1.1rem; text-align: center; border: 2px solid #000; }
 
         /* --- FEEDBACK --- */
         .feedback { margin-top: 25px; padding: 20px; border-radius: 8px; display: none; }
@@ -105,8 +106,8 @@
 
     <div class="sidebar">
         <div class="logo-area">
-            <h1>FAST Gr3 Acc.</h1>
-            <p>Master Simulator</p>
+            <h1>FAST Grade 3 Acc.</h1>
+            <p>Final Master File</p>
         </div>
         
         <div class="sim-btn" onclick="App.startSim()">
@@ -120,14 +121,13 @@
     <div class="main">
         <div class="q-container">
             <div class="q-header">
-                <span class="badge" id="q-badge">Select a Standard or Start Sim</span>
+                <span class="badge" id="q-badge">Select a Standard</span>
                 <span style="color:#78909c; font-weight:600;" id="score-display">Score: 0</span>
             </div>
 
             <div class="q-text" id="q-prompt">
-                <strong>Welcome!</strong><br><br>
-                1. <strong>Practice Mode:</strong> Click any standard in the left menu to drill that specific topic.<br>
-                2. <strong>Test Sim:</strong> Click the Orange button to get a random mix of all standards.
+                <strong>Welcome to the Master Simulator.</strong><br>
+                Includes: 0-144 Multiplication, Word Form, Complex Symmetry, and Smart Distractors.
             </div>
 
             <div class="visual-stage" id="q-visual" style="display:none;"></div>
@@ -147,18 +147,36 @@
             pick: (arr) => arr[Math.floor(Math.random() * arr.length)],
             shuffle: (arr) => arr.sort(() => Math.random() - 0.5),
 
-            genOptions: (correct, genFunc, count=3) => {
-                const opts = new Set([correct]);
-                let safety = 0;
-                while(opts.size < count+1 && safety < 50) {
-                    const d = genFunc();
-                    if(d !== correct) opts.add(d);
-                    safety++;
-                }
-                return Array.from(opts).sort(()=>Math.random()-0.5);
+            // Number to Words Converter (for Harder Number Sense)
+            numToWords: (n) => {
+                const ones = ['','one','two','three','four','five','six','seven','eight','nine'];
+                const teens = ['ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+                const tens = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+                
+                if (n === 0) return 'zero';
+                let str = '';
+                if (n >= 1000) { str += ones[Math.floor(n/1000)] + ' thousand '; n %= 1000; }
+                if (n >= 100) { str += ones[Math.floor(n/100)] + ' hundred '; n %= 100; }
+                if (n >= 20) { str += tens[Math.floor(n/10)] + (n%10!==0?' ':'') + ones[n%10]; }
+                else if (n >= 10) { str += teens[n-10]; }
+                else if (n > 0) { str += ones[n]; }
+                return str.trim();
             },
 
-            // --- SVG DRAWER ---
+            // Expanded Form String Generator
+            expandedForm: (n) => {
+                const s = n.toString();
+                let parts = [];
+                for(let i=0; i<s.length; i++) {
+                    const digit = parseInt(s[i]);
+                    if(digit > 0) {
+                        parts.push(digit * Math.pow(10, s.length - 1 - i));
+                    }
+                }
+                return parts.join(' + ');
+            },
+
+            // --- ADVANCED SVG DRAWER ---
             svg: {
                 clock: (h, m) => {
                     const hDeg = (h%12)*30 + m*0.5;
@@ -198,9 +216,34 @@
                         <text x="${20 + (num/den)*260}" y="20" text-anchor="middle" font-weight="bold" fill="#e65100">?</text>
                     </svg>`;
                 },
-                symmetry: (type) => {
-                    if(type === 'yes') return `<svg width="100" height="100" viewBox="0 0 100 100"><path d="M50 10 L80 90 L20 90 Z" fill="#e0f2f1" stroke="black"/><line x1="50" y1="0" x2="50" y2="100" stroke="red" stroke-dasharray="4"/></svg>`;
-                    return `<svg width="100" height="100" viewBox="0 0 100 100"><path d="M10 10 L80 10 L60 90 L10 90 Z" fill="#e0f2f1" stroke="black"/><line x1="45" y1="0" x2="45" y2="100" stroke="red" stroke-dasharray="4"/></svg>`;
+                // NEW: Advanced Symmetry Shapes
+                symmetry: (type, isSymmetric) => {
+                    let path = "";
+                    let line = "";
+                    const dash = isSymmetric ? "4,4" : "0"; 
+                    
+                    if (type === 'arrow') {
+                        // Vertical Arrow
+                        path = "M50 10 L80 40 L60 40 L60 90 L40 90 L40 40 L20 40 Z";
+                        // If symmetric, line is vertical center. If not, line is horizontal.
+                        if (isSymmetric) line = `<line x1="50" y1="0" x2="50" y2="100" stroke="red" stroke-width="2" stroke-dasharray="4"/>`;
+                        else line = `<line x1="10" y1="50" x2="90" y2="50" stroke="red" stroke-width="2" stroke-dasharray="4"/>`;
+                    } else if (type === 'rect') {
+                        // Rectangle
+                        path = "M20 30 H80 V70 H20 Z";
+                        // If symmetric, vertical center. If not, diagonal (common trick).
+                        if (isSymmetric) line = `<line x1="50" y1="20" x2="50" y2="80" stroke="red" stroke-width="2" stroke-dasharray="4"/>`;
+                        else line = `<line x1="20" y1="30" x2="80" y2="70" stroke="red" stroke-width="2" stroke-dasharray="4"/>`;
+                    } else if (type === 'kite') {
+                         path = "M50 10 L80 40 L50 90 L20 40 Z";
+                         if (isSymmetric) line = `<line x1="50" y1="0" x2="50" y2="100" stroke="red" stroke-width="2" stroke-dasharray="4"/>`;
+                         else line = `<line x1="10" y1="40" x2="90" y2="40" stroke="red" stroke-width="2" stroke-dasharray="4"/>`;
+                    }
+                    
+                    return `<svg width="100" height="100" viewBox="0 0 100 100">
+                        <path d="${path}" fill="#e0f2f1" stroke="black" stroke-width="2"/>
+                        ${line}
+                    </svg>`;
                 },
                 barGraph: () => {
                     return `<svg width="200" height="120" viewBox="0 0 200 120">
@@ -213,25 +256,54 @@
             }
         };
 
-        // --- 2. MASTER QUESTION BANK (Complete) ---
+        // --- 2. MASTER QUESTION BANK (All Upgrades) ---
         const Bank = {
             "Number Sense (NSO)": [
-                { id: "MA.3.NSO.1.1", desc: "Read/Write Numbers", gen: () => {
+                { id: "MA.3.NSO.1.1", desc: "Read/Write Numbers (Forms)", gen: () => {
                     const n = Utils.rInt(1001,9999);
-                    const forms = [
-                        {t: "Word Form", v: "Four thousand...", c: false}, 
-                        {t: "Expanded Form", v: `${Math.floor(n/1000)*1000} + ${Math.floor((n%1000)/100)*100} + ${Math.floor((n%100)/10)*10} + ${n%10}`, c: true}
-                    ];
-                    return { text: `Select the correct <strong>Expanded Form</strong> for <strong>${n}</strong>.`, type: 'radio', options: Utils.genOptions(forms[1].v, ()=>`${Utils.rInt(1000,9000)} + ${Utils.rInt(100,900)}...`).map(x=>({t:x,c:x===forms[1].v})), fb: "Level 3: Read/Write numbers to 10,000." };
+                    const mode = Math.random() > 0.5 ? 'Word' : 'Expanded';
+                    
+                    if (mode === 'Word') {
+                        const correct = Utils.numToWords(n);
+                        // Smart Distractors: Change hundred to thousand, or mix digits
+                        const dist1 = Utils.numToWords(n + 100);
+                        const dist2 = Utils.numToWords(n).replace("hundred", "thousand");
+                        const options = Utils.shuffle([{t: correct, c: true}, {t: dist1, c: false}, {t: dist2, c: false}]);
+                        return { text: `Select the correct <strong>Word Form</strong> for <strong>${n}</strong>.`, type: 'radio', options: options, fb: "Level 3: Read/Write numbers to 10,000 using standard, expanded, and word form." };
+                    } else {
+                        const correct = Utils.expandedForm(n);
+                        // Smart Distractors: Face value error (4052 -> 4000 + 50 + 2 instead of 500, or 4+0+5+2)
+                        const d1 = `${Math.floor(n/1000)*1000} + ${Math.floor((n%1000)/100)*10} + ${n%10}`; // Place Value Error
+                        const d2 = `${Math.floor(n/1000)} + ${Math.floor((n%1000)/100)} + ${Math.floor((n%100)/10)} + ${n%10}`; // Face Value Error
+                        const options = Utils.shuffle([{t: correct, c: true}, {t: d1, c: false}, {t: d2, c: false}]);
+                        return { text: `Select the correct <strong>Expanded Form</strong> for <strong>${n}</strong>.`, type: 'radio', options: options, fb: "Level 3: Decompose 4-digit numbers." };
+                    }
                 }},
                 { id: "MA.3.NSO.1.4", desc: "Rounding", gen: () => {
                     const n = Utils.rInt(120, 880);
                     const ans = Math.round(n/100)*100;
                     return { text: `Round <strong>${n}</strong> to the nearest hundred.`, type: 'equation', ans: ans.toString(), fb: "Level 3: Round to nearest 10 or 100." };
                 }},
-                { id: "MA.3.NSO.2.2", desc: "Multiplication Facts", gen: () => {
-                    const a = Utils.rInt(6,9), b = Utils.rInt(7,9);
-                    return { text: `Solve: <strong>${a} × ${b}</strong>`, type: 'equation', ans: (a*b).toString(), fb: "Level 3: Recall multiplication facts." };
+                { id: "MA.3.NSO.2.2", desc: "Mult. Facts (0-144) & Division", gen: () => {
+                    const type = Utils.rInt(1, 2); 
+                    if (type === 1) { // Multiplication 0-144
+                        const a = Utils.rInt(6,12), b = Utils.rInt(6,12);
+                        return { text: `Solve: <strong>${a} × ${b}</strong>`, type: 'equation', ans: (a*b).toString(), fb: "Level 3: Multiply two whole numbers from 0 to 12." };
+                    } else { // Related Division
+                        const a = Utils.rInt(4, 12), b = Utils.rInt(4, 12);
+                        const prod = a * b;
+                        return { text: `Solve: <strong>${prod} ÷ ${a} = ?</strong>`, type: 'equation', ans: b.toString(), fb: "Level 3: Divide using related multiplication facts." };
+                    }
+                }},
+                { id: "MA.3.NSO.2.3", desc: "Mult by Multiples of 10/100", gen: () => {
+                    const base = Utils.rInt(2, 9);
+                    const mult = Math.random() > 0.5 ? Utils.rInt(1, 9) * 10 : Utils.rInt(1, 9) * 100;
+                    // Distractors: wrong number of zeros, or arithmetic error
+                    const corr = base * mult;
+                    const d1 = base * (mult / 10);
+                    const d2 = base * mult + 10;
+                    const options = Utils.shuffle([{t: corr, c:true}, {t: d1, c:false}, {t: d2, c:false}]);
+                    return { text: `Solve: <strong>${base} × ${mult}</strong>`, type: 'radio', options: options, fb: "Level 3: Multiply one-digit numbers by multiples of 10 or 100." };
                 }},
                 { id: "MA.3.NSO.2.4", desc: "Mult: 1-digit x 2-digit", gen: () => {
                     const a = Utils.rInt(2,5), b = Utils.rInt(12,25);
@@ -256,16 +328,24 @@
             "Fractions (FR)": [
                 { id: "MA.3.FR.2.1", desc: "Fractions on Number Line", gen: () => {
                     const den = 4, num = Utils.rInt(1,3);
-                    return { text: "What fraction is shown?", visual: Utils.svg.fractionLine(num,den), type: 'radio', options: Utils.genOptions(`${num}/${den}`, ()=>`${Utils.rInt(1,4)}/${Utils.rInt(2,5)}`).map(x=>({t:x,c:x===`${num}/${den}`})), fb: "Level 3: Identify fractions on number line." };
+                    // Generate unique options
+                    const opts = new Set([`${num}/${den}`]);
+                    while(opts.size < 3) opts.add(`${Utils.rInt(1,3)}/${Utils.rInt(2,5)}`);
+                    const options = Array.from(opts).map(x => ({t:x, c:x===`${num}/${den}`})).sort(()=>Math.random()-0.5);
+                    
+                    return { text: "What fraction is shown?", visual: Utils.svg.fractionLine(num,den), type: 'radio', options: options, fb: "Level 3: Identify fractions on number line." };
                 }},
                 { id: "MA.3.FR.2.2", desc: "Equivalent Fractions", gen: () => {
                     return { text: "Select <strong>ALL</strong> fractions equal to 1/2.", type: 'multi', options: Utils.shuffle([{t:"2/4",c:true},{t:"3/6",c:true},{t:"1/3",c:false},{t:"4/8",c:true}]), fb: "Level 4: Identify equivalent fractions." };
                 }}
             ],
             "Geometry (GR)": [
-                { id: "MA.3.GR.1.3", desc: "Symmetry", gen: () => {
-                    const isSym = Math.random()>0.5;
-                    return { text: "Does the red line show a Line of Symmetry?", visual: Utils.svg.symmetry(isSym?'yes':'no'), type: 'radio', options: [{t:"Yes",c:isSym},{t:"No",c:!isSym}], fb: "Level 3: Identify lines of symmetry." };
+                { id: "MA.3.GR.1.3", desc: "Symmetry (Upgraded)", gen: () => {
+                    const types = ['arrow', 'rect', 'kite'];
+                    const type = Utils.pick(types);
+                    const isSym = Math.random() > 0.5;
+                    
+                    return { text: `Does the red line show a <strong>Line of Symmetry</strong> for this shape?`, visual: Utils.svg.symmetry(type, isSym), type: 'radio', options: [{t:"Yes",c:isSym},{t:"No",c:!isSym}], fb: "Level 3: Identify lines of symmetry in 2D figures." };
                 }},
                 { id: "MA.3.GR.2.1", desc: "Area", gen: () => {
                     const w=Utils.rInt(4,9), h=Utils.rInt(3,8);
@@ -275,7 +355,13 @@
             "Measurement (M)": [
                 { id: "MA.3.M.2.1", desc: "Telling Time", gen: () => {
                     const h=Utils.rInt(1,12), m=Utils.rInt(10,55);
-                    return { text: "What time is shown?", visual: Utils.svg.clock(h,m), type: 'radio', options: Utils.genOptions(`${h}:${m}`, ()=>`${Utils.rInt(1,12)}:${Utils.rInt(10,59)}`).map(x=>({t:x,c:x===`${h}:${m}`})), fb: "Level 3: Tell time to nearest minute." };
+                    // Generate distractors manually to be safe
+                    const options = Utils.shuffle([
+                        {t:`${h}:${m}`, c:true},
+                        {t:`${h}:${m-5}`, c:false},
+                        {t:`${h+1}:${m}`, c:false}
+                    ]);
+                    return { text: "What time is shown?", visual: Utils.svg.clock(h,m), type: 'radio', options: options, fb: "Level 3: Tell time to nearest minute." };
                 }},
                 { id: "MA.3.M.2.2", desc: "Elapsed Time", gen: () => {
                     return { text: "Start: 2:15 PM. Duration: 45 min. End time?", type: 'radio', options: [{t:"3:00 PM",c:true},{t:"2:50 PM",c:false},{t:"3:15 PM",c:false}], fb: "Level 4: Solve elapsed time problems." };
@@ -296,7 +382,6 @@
             
             init: function() {
                 const menu = document.getElementById('menu');
-                // FIX: Use createElement instead of innerHTML to preserve logic
                 for(const cat in Bank) {
                     const header = document.createElement('div');
                     header.className = 'menu-cat';
@@ -379,7 +464,6 @@
                     });
                 } else if (q.type === 'equation') {
                     list.innerHTML = `<input type="text" class="eq-input" id="user-eq" placeholder="Type answer...">`;
-                    // Wait for DOM to append before attaching listener
                     setTimeout(() => {
                         document.getElementById('user-eq').addEventListener('input', (e) => btnAction.disabled = e.target.value === '');
                     }, 0);
