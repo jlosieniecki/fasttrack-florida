@@ -1,132 +1,112 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAST Grade 3 Master Simulator</title>
+    <title>FAST Gr3 Master | Scenario Engine</title>
     <style>
         :root {
-            --primary: #00695c; --secondary: #e65100; --bg: #f8f9fa; 
-            --white: #ffffff; --border: #dee2e6; --text: #343a40;
-            --correct: #d4edda; --wrong: #f8d7da;
+            --primary: #00695c; --accent: #ff6f00; --bg: #f0f2f5; 
+            --panel: #ffffff; --text: #263238; --border: #cfd8dc;
+            --correct: #c8e6c9; --wrong: #ffcdd2;
         }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; color: var(--text); }
 
         /* SIDEBAR */
-        .sidebar { width: 340px; background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; height: 100vh; }
-        .logo-area { padding: 20px; background: var(--primary); color: white; flex-shrink: 0; }
-        .logo-area h1 { margin: 0; font-size: 1.2rem; }
-        .logo-area small { opacity: 0.8; font-size: 0.8rem; }
+        .sidebar { width: 340px; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; height: 100vh; }
+        .logo { padding: 25px; background: var(--primary); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .logo h2 { margin: 0; font-size: 1.2rem; }
+        .logo p { margin: 5px 0 0; font-size: 0.8rem; opacity: 0.9; }
         
-        .test-btn {
-            margin: 15px; padding: 15px; background: var(--secondary); color: white; text-align: center;
-            border-radius: 6px; font-weight: bold; cursor: pointer; border: 2px solid #ef6c00;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s;
-        }
-        .test-btn:hover { transform: translateY(-2px); }
-
-        .menu { flex: 1; overflow-y: auto; padding: 0 10px 20px; }
-        .cat-title { 
-            font-size: 0.75rem; text-transform: uppercase; color: #6c757d; font-weight: 800; 
-            margin: 20px 0 5px 10px; border-bottom: 2px solid #e9ecef; padding-bottom: 5px;
-        }
+        .menu { flex: 1; overflow-y: auto; padding: 10px; }
         .std-btn { 
-            display: block; width: 100%; text-align: left; padding: 10px 12px; margin-bottom: 2px; 
-            background: transparent; border: 1px solid transparent; border-radius: 4px; cursor: pointer; 
-            font-size: 0.9rem; color: #495057;
+            display: block; width: 100%; padding: 12px 15px; margin-bottom: 5px; 
+            background: white; border: 1px solid #e0e0e0; border-radius: 6px; 
+            cursor: pointer; text-align: left; font-size: 0.9rem; transition: 0.2s;
         }
-        .std-btn:hover { background: #e9ecef; }
-        .std-btn.active { background: #e0f2f1; color: var(--primary); border-color: #b2dfdb; font-weight: 600; }
+        .std-btn:hover { background: #e0f2f1; border-color: var(--primary); }
+        .std-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .std-btn small { display: block; font-size: 0.75rem; margin-top: 4px; opacity: 0.8; }
 
         /* MAIN CONTENT */
-        .main { flex: 1; display: flex; flex-direction: column; padding: 40px; overflow-y: auto; align-items: center; }
+        .main { flex: 1; display: flex; flex-direction: column; padding: 40px; overflow-y: auto; }
         .card { 
-            background: var(--white); padding: 40px; border-radius: 8px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05); width: 100%; max-width: 900px; 
-            border-top: 5px solid var(--primary); min-height: 500px;
+            background: var(--panel); padding: 40px; border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); max-width: 900px; margin: 0 auto; width: 100%; 
+            border-top: 6px solid var(--primary); min-height: 600px;
         }
+
+        .header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 30px; }
+        .badge { background: #eceff1; padding: 5px 12px; border-radius: 15px; font-weight: bold; font-size: 0.85rem; color: #546e7a; }
         
-        .header { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-        .badge { background: #e9ecef; padding: 5px 10px; border-radius: 4px; font-weight: bold; font-size: 0.85rem; }
+        .q-text { font-size: 1.35rem; line-height: 1.6; margin-bottom: 30px; }
+
+        /* VISUAL STAGE (TEI) */
+        .visual-stage { 
+            background: #fafafa; border: 2px dashed #cfd8dc; border-radius: 8px; 
+            padding: 30px; margin-bottom: 30px; display: flex; justify-content: center; align-items: center; 
+            min-height: 250px; position: relative;
+        }
+        .visual-stage svg { max-width: 100%; height: auto; overflow: visible; }
         
-        .question-text { font-size: 1.25rem; line-height: 1.6; margin-bottom: 25px; }
-        
-        /* TEI INTERACTIONS */
-        .interaction-area { background: #fafafa; border: 2px dashed #dee2e6; border-radius: 8px; padding: 30px; margin-bottom: 25px; text-align: center; }
-        
-        .hot-text { cursor: pointer; padding: 2px 5px; border-radius: 3px; border: 1px solid transparent; margin: 0 2px; transition: 0.2s; display: inline-block; }
-        .hot-text:hover { background: #e2e6ea; border-color: #adb5bd; }
+        /* INTERACTIVE ELEMENTS */
+        .clickable-slice:hover { fill: #ffcc80; cursor: pointer; }
+        .bar-col:hover { opacity: 0.8; cursor: ns-resize; }
+        .hot-text { padding: 2px 5px; border-radius: 4px; border: 2px solid transparent; cursor: pointer; margin: 0 2px; }
+        .hot-text:hover { background: #e0f2f1; border-color: #b2dfdb; }
         .hot-text.selected { background: var(--primary); color: white; border-color: var(--primary); }
 
-        .bar-col { cursor: ns-resize; transition: height 0.3s; }
-        .bar-col:hover { opacity: 0.8; }
-        
-        .slice { cursor: pointer; transition: 0.2s; }
-        .slice:hover { opacity: 0.7; }
-
-        .drop-zone { 
-            display: inline-block; min-width: 60px; height: 30px; border: 2px solid #6c757d; 
-            border-radius: 4px; vertical-align: middle; background: #fff; text-align: center; line-height: 26px; cursor: pointer;
-        }
-
         /* OPTIONS */
-        .options-list { display: grid; gap: 10px; }
+        .options-grid { display: grid; gap: 15px; }
         .opt-btn { 
-            display: flex; align-items: center; padding: 15px; border: 1px solid #ced4da; border-radius: 6px; 
-            background: white; cursor: pointer; transition: 0.1s; font-size: 1rem;
+            display: flex; align-items: center; padding: 18px; border: 2px solid #e0e0e0; border-radius: 8px; 
+            background: white; cursor: pointer; font-size: 1.1rem; transition: 0.1s;
         }
-        .opt-btn:hover { background: #f8f9fa; border-color: #adb5bd; }
-        .opt-btn.selected { background: #e0f2f1; border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
-        .icon { width: 20px; height: 20px; border: 2px solid #6c757d; margin-right: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .opt-btn:hover { border-color: #b0bec5; background: #f5f5f5; }
+        .opt-btn.selected { border-color: var(--primary); background: #e0f2f1; box-shadow: inset 0 0 0 1px var(--primary); }
+        .icon { width: 22px; height: 22px; border: 2px solid #546e7a; margin-right: 15px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
         .multi .icon { border-radius: 4px; }
         .selected .icon { background: var(--primary); border-color: var(--primary); }
-        .selected .icon::after { content: ''; width: 8px; height: 8px; background: white; border-radius: 50%; }
-        .multi.selected .icon::after { content: '✔'; background: transparent; color: white; font-size: 12px; }
+        .selected .icon::after { content:''; width: 10px; height: 10px; background: white; border-radius: 50%; }
+        .multi.selected .icon::after { content:'✔'; background: transparent; color: white; font-size: 14px; font-weight: bold; }
 
-        /* FEEDBACK */
-        .feedback { margin-top: 25px; padding: 15px; border-radius: 6px; display: none; }
-        .feedback.correct { background: var(--correct); color: #155724; border: 1px solid #c3e6cb; }
-        .feedback.wrong { background: var(--wrong); color: #721c24; border: 1px solid #f5c6cb; }
+        /* INPUTS */
+        .eq-input { width: 100%; padding: 12px; font-size: 1.3rem; border: 2px solid #546e7a; border-radius: 6px; margin-top: 10px; }
+        
+        .feedback { margin-top: 30px; padding: 20px; border-radius: 8px; display: none; font-size: 1.1rem; }
+        .feedback.correct { background: var(--correct); color: #1b5e20; border: 1px solid #a5d6a7; }
+        .feedback.wrong { background: var(--wrong); color: #b71c1c; border: 1px solid #ef9a9a; }
 
-        .action-btn { 
-            float: right; margin-top: 20px; padding: 12px 30px; background: var(--primary); color: white; 
-            border: none; border-radius: 4px; font-size: 1rem; font-weight: 600; cursor: pointer; 
-        }
-        .action-btn:disabled { background: #adb5bd; cursor: not-allowed; }
+        .btn { float: right; margin-top: 20px; padding: 12px 35px; background: var(--primary); color: white; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+        .btn:disabled { background: #cfd8dc; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <div class="logo-area">
-        <h1>FAST Gr3 Master</h1>
-        <small>33 Standards • TEI • ALD 3-5</small>
+    <div class="logo">
+        <h2>FAST Gr3 Master</h2>
+        <p>Scenario-Based TEI Engine</p>
     </div>
-    <div class="test-btn" onclick="App.startMockTest()">📝 Start Mock FAST Test</div>
     <div class="menu" id="menu"></div>
 </div>
 
 <div class="main">
     <div class="card">
         <div class="header">
-            <span class="badge" id="q-badge">Welcome</span>
-            <span style="font-weight:bold; color:#00695c;" id="score">Score: 0</span>
+            <span class="badge" id="badge">Welcome</span>
+            <span style="font-weight:bold; color:var(--primary);" id="score">Score: 0</span>
         </div>
         
         <div id="q-content">
-            <div class="question-text" id="q-text">
-                Select a standard to begin practice or start the <strong>Mock FAST Test</strong>.<br><br>
-                Includes <strong>Interactive Items</strong>:<br>
-                • Graph Builders & Fraction Models<br>
-                • Hot Text & Dropdowns<br>
-                • Multiselect & Equation Editors
-            </div>
-            <div class="interaction-area" id="q-interact" style="display:none;"></div>
-            <div class="options-list" id="q-options"></div>
+            <div class="q-text" id="q-text">Select a standard to begin. Each standard features multiple unique scenarios to prevent repetition.</div>
+            <div class="visual-stage" id="q-visual" style="display:none;"></div>
+            <div class="options-grid" id="q-options"></div>
         </div>
 
         <div class="feedback" id="feedback"></div>
-        <button class="action-btn" id="btn-check" onclick="App.check()" disabled>Check Answer</button>
+        <button class="btn" id="btn-check" onclick="App.check()" disabled>Check Answer</button>
     </div>
 </div>
 
@@ -138,270 +118,319 @@ const Utils = {
     rInt: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
     pick: (arr) => arr[Math.floor(Math.random() * arr.length)],
     shuffle: (arr) => arr.sort(() => Math.random() - 0.5),
-    pickNew: (modes, last) => {
-        if(!last || modes.length < 2) return Utils.pick(modes);
-        const avail = modes.filter(m => m !== last);
-        return avail[Math.floor(Math.random() * avail.length)];
+    
+    // Pick a scenario index that is NOT the same as the last one
+    pickScenario: (total, last) => {
+        if (total === 1) return 0;
+        let next;
+        do { next = Math.floor(Math.random() * total); } while (next === last);
+        return next;
+    },
+
+    genOpts: (corr, genFn) => {
+        const s = new Set([corr]);
+        let safe = 0;
+        while(s.size < 4 && safe < 50) { s.add(genFn()); safe++; }
+        return Array.from(s).sort(()=>Math.random()-0.5).map(x=>({t:x, c:x===corr}));
     }
 };
 
 // ==========================================
-// 2. TEI RENDERER (Visuals)
+// 2. VISUAL RENDERER (SVG)
 // ==========================================
 const Renderer = {
-    // 1. Fraction Shading (Interactive)
+    // 1. Interactive Fraction Pie
     fraction: (n, d) => {
         let paths = '';
         for(let i=0; i<d; i++) {
             const start = (i * 360) / d;
             const end = ((i+1) * 360) / d;
-            const x1 = 50 + 45 * Math.sin(Math.PI * start / 180);
-            const y1 = 50 - 45 * Math.cos(Math.PI * start / 180);
-            const x2 = 50 + 45 * Math.sin(Math.PI * end / 180);
-            const y2 = 50 - 45 * Math.cos(Math.PI * end / 180);
-            const cmd = `M50 50 L${x1} ${y1} A45 45 0 0 1 ${x2} ${y2} Z`;
-            paths += `<path d="${cmd}" fill="white" stroke="#333" stroke-width="2" class="slice" 
+            const x1 = 100 + 90 * Math.sin(Math.PI * start / 180);
+            const y1 = 100 - 90 * Math.cos(Math.PI * start / 180);
+            const x2 = 100 + 90 * Math.sin(Math.PI * end / 180);
+            const y2 = 100 - 90 * Math.cos(Math.PI * end / 180);
+            const cmd = `M100 100 L${x1} ${y1} A90 90 0 0 1 ${x2} ${y2} Z`;
+            paths += `<path d="${cmd}" fill="white" stroke="#333" stroke-width="2" class="clickable-slice" 
                 onclick="this.setAttribute('fill', this.getAttribute('fill')==='white'?'#ff6f00':'white'); App.update();" />`;
         }
-        return `<svg width="180" height="180" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none"/>${paths}</svg><br><small>(Click slices to shade)</small>`;
+        return `<svg width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#fafafa"/>${paths}</svg><div style="text-align:center;font-size:0.8rem;margin-top:10px;">(Click slices to shade)</div>`;
     },
 
-    // 2. Bar Graph Builder (Interactive)
-    barGraph: (h1, h2) => { // h1, h2 are targets. User clicks to set.
-        let cols = '';
+    // 2. Interactive Bar Graph
+    barGraph: (h1, h2) => {
         const max = Math.max(h1, h2) + 2;
-        const step = 80/max;
-        
+        const step = 150 / max;
+        let cols = '';
         // Bar A
-        cols += `<rect id="barA" x="20" y="90" width="30" height="0" fill="#4db6ac" />`;
-        // Click zones A
-        for(let i=1; i<=max; i++) cols += `<rect x="20" y="${90-i*step}" width="30" height="${step}" fill="transparent" onclick="document.getElementById('barA').setAttribute('height', ${i*step}); document.getElementById('barA').setAttribute('y', ${90-i*step}); App.data.a=${i}; App.update();" />`;
-
+        cols += `<rect id="barA" x="40" y="180" width="40" height="0" fill="#4db6ac" />`;
+        for(let i=1; i<=max; i++) cols += `<rect x="40" y="${180-i*step}" width="40" height="${step}" fill="transparent" onclick="document.getElementById('barA').setAttribute('height', ${i*step}); document.getElementById('barA').setAttribute('y', ${180-i*step}); App.data.a=${i}; App.update();" style="cursor:pointer;" />`;
         // Bar B
-        cols += `<rect id="barB" x="70" y="90" width="30" height="0" fill="#ffb74d" />`;
-        // Click zones B
-        for(let i=1; i<=max; i++) cols += `<rect x="70" y="${90-i*step}" width="30" height="${step}" fill="transparent" onclick="document.getElementById('barB').setAttribute('height', ${i*step}); document.getElementById('barB').setAttribute('y', ${90-i*step}); App.data.b=${i}; App.update();" />`;
+        cols += `<rect id="barB" x="120" y="180" width="40" height="0" fill="#ffb74d" />`;
+        for(let i=1; i<=max; i++) cols += `<rect x="120" y="${180-i*step}" width="40" height="${step}" fill="transparent" onclick="document.getElementById('barB').setAttribute('height', ${i*step}); document.getElementById('barB').setAttribute('y', ${180-i*step}); App.data.b=${i}; App.update();" style="cursor:pointer;" />`;
 
-        return `<svg width="120" height="100" viewBox="0 0 120 100"><line x1="10" y1="90" x2="110" y2="90" stroke="black"/><text x="35" y="98" font-size="8" text-anchor="middle">A</text><text x="85" y="98" font-size="8" text-anchor="middle">B</text>${cols}</svg><br><small>(Click above bars to set height)</small>`;
+        return `<svg width="200" height="200" viewBox="0 0 200 200">
+            <line x1="20" y1="180" x2="180" y2="180" stroke="black" stroke-width="2"/>
+            <line x1="20" y1="10" x2="20" y2="180" stroke="black" stroke-width="2"/>
+            <text x="60" y="195" text-anchor="middle">A</text>
+            <text x="140" y="195" text-anchor="middle">B</text>
+            ${cols}
+        </svg><div style="text-align:center;font-size:0.8rem;margin-top:10px;">(Click above bars to set height)</div>`;
     },
 
-    // 3. Hot Text (Interactive)
-    hotText: (segments) => { // segments: [{text:"word", id:1, hot:true}]
-        return segments.map((s,i) => s.hot ? `<span class="hot-text" id="hot-${i}" onclick="this.classList.toggle('selected'); App.update();">${s.text}</span>` : `<span>${s.text}</span>`).join('');
+    // 3. Tiled Area (Static)
+    tiledRect: (w, h) => {
+        let s = '';
+        for(let i=0; i<w; i++) for(let j=0; j<h; j++) s += `<rect x="${i*30}" y="${j*30}" width="30" height="30" fill="#e0f2f1" stroke="#004d40" stroke-width="1"/>`;
+        return `<svg width="${w*30}" height="${h*30}">${s}</svg>`;
+    },
+
+    // 4. Hot Text Builder
+    hotText: (parts) => {
+        // parts = [{t:"word", hot:true, c:true}, {t:" word2"}]
+        return parts.map((p, i) => {
+            if(p.hot) return `<span class="hot-text" id="hot-${i}" data-correct="${p.c}" onclick="this.classList.toggle('selected'); App.update();">${p.t}</span>`;
+            return `<span>${p.t}</span>`;
+        }).join('');
     }
 };
 
 // ==========================================
-// 3. COMPLETE QUESTION BANK (33 Standards)
+// 3. SCENARIO BANK (Array-Based)
 // ==========================================
 const Bank = {
-    // === NUMBER SENSE (NSO) ===
-    "MA.3.NSO.1.1": { desc: "Read/Write Numbers", gen: (l) => {
-        const n = Utils.rInt(1001, 9999);
-        return { text: `Select the numbers that represent the value of the <strong>digit ${Math.floor((n%1000)/100)}</strong> in ${n}.`, type: 'hot', 
-            html: Renderer.hotText([{text:`In ${n}, the value is `}, {text:`${Math.floor((n%1000)/100)*100}`, hot:true, c:true}, {text:" or "}, {text:`${Math.floor((n%1000)/100)} hundreds`, hot:true, c:true}]), 
-            fb: "Check standard and word forms." };
-    }},
-    "MA.3.NSO.1.2": { desc: "Compose/Decompose", gen: (l) => {
-        const t = Utils.rInt(12, 45);
-        return { text: `What number is equal to <strong>${t} tens</strong>?`, type: 'eq', ans: (t*10).toString(), fb: `${t} x 10 = ${t*10}.` };
-    }},
-    "MA.3.NSO.1.3": { desc: "Compare Numbers", gen: (l) => {
-        const a = Utils.rInt(1000,9000), b = a + Utils.rInt(10,100);
-        return { text: `Select the correct symbol: ${a} ? ${b}`, type: 'radio', options: [{t:"<", c:true}, {t:">", c:false}, {t:"=", c:false}], fb: `${a} is less than ${b}.` };
-    }},
-    "MA.3.NSO.1.4": { desc: "Rounding", gen: (l) => {
-        const base = Utils.rInt(2,8)*100;
-        const opts = Utils.shuffle([{t:(base-10).toString(),c:true}, {t:(base+10).toString(),c:true}, {t:(base+51).toString(),c:false}, {t:(base-60).toString(),c:false}]);
-        return { text: `Select <strong>ALL</strong> numbers that round to <strong>${base}</strong>.`, type: 'multi', options: opts, fb: `Range: ${base-50} to ${base+49}.` };
-    }},
-    "MA.3.NSO.2.1": { desc: "Add/Sub Multi-Digit", gen: (l) => {
-        const a=Utils.rInt(3000,8000), b=Utils.rInt(1000,2999);
-        return { text: `Solve: ${a} - ${b} = ?`, type: 'eq', ans: (a-b).toString(), fb: "Use standard algorithm." };
-    }},
-    "MA.3.NSO.2.2": { desc: "Multiplication Facts", gen: (l) => {
-        const a=Utils.rInt(6,12), b=Utils.rInt(6,12);
-        return { text: `Complete the equation: ${a} × ? = ${a*b}`, type: 'eq', ans: b.toString(), fb: "Fact family." };
-    }},
-    "MA.3.NSO.2.3": { desc: "Mult by 10s", gen: (l) => {
-        const a=Utils.rInt(3,9), b=Utils.pick([20,30,40,50]);
-        return { text: `Solve: ${a} × ${b}`, type: 'eq', ans: (a*b).toString(), fb: `Multiply ${a}x${b/10}, then add 0.` };
-    }},
-    "MA.3.NSO.2.4": { desc: "Mult 1d x 2d", gen: (l) => {
-        const a=Utils.rInt(3,7), b=Utils.rInt(13,25);
-        return { text: `A workbook has ${b} pages. <strong>${a}</strong> books have how many pages?`, type: 'eq', ans: (a*b).toString(), fb: `${a} x ${b} = ${a*b}.` };
-    }},
+    "MA.3.FR.1.1": {
+        desc: "Visual Fractions",
+        scenarios: [
+            { // Scenario 0: Interactive Shading (TEI)
+                type: 'interact',
+                gen: () => {
+                    const d = Utils.pick([3,4,6,8]);
+                    const n = Utils.rInt(1, d-1);
+                    return {
+                        text: `Shade the model to show the fraction <strong>${n}/${d}</strong>.`,
+                        html: Renderer.fraction(n, d),
+                        check: () => document.querySelectorAll('path[fill="#ff6f00"]').length === n,
+                        fb: `You should have shaded exactly ${n} slices.`
+                    };
+                }
+            },
+            { // Scenario 1: Number Line (Visual Select)
+                type: 'radio',
+                gen: () => {
+                    const d = Utils.pick([4, 2]); 
+                    return {
+                        text: "Which number line shows <strong>1/2</strong>?",
+                        options: Utils.shuffle([
+                            {t:`<svg width=150 height=30><line x1=0 y1=15 x2=150 y2=15 stroke=black stroke-width=2/><circle cx=75 cy=15 r=5 fill=orange/></svg>`, c:true},
+                            {t:`<svg width=150 height=30><line x1=0 y1=15 x2=150 y2=15 stroke=black stroke-width=2/><circle cx=37 cy=15 r=5 fill=orange/></svg>`, c:false},
+                            {t:`<svg width=150 height=30><line x1=0 y1=15 x2=150 y2=15 stroke=black stroke-width=2/><circle cx=112 cy=15 r=5 fill=orange/></svg>`, c:false}
+                        ]),
+                        fb: "1/2 is exactly in the middle."
+                    };
+                }
+            },
+            { // Scenario 2: Word Problem
+                type: 'radio',
+                gen: () => {
+                    return {
+                        text: "Which model represents 'three-fourths'?",
+                        options: Utils.shuffle([{t:"3/4", c:true}, {t:"4/3", c:false}, {t:"3/1", c:false}]),
+                        fb: "Numerator (3) on top, Denominator (4) on bottom."
+                    };
+                }
+            }
+        ]
+    },
 
-    // === ALGEBRAIC REASONING (AR) ===
-    "MA.3.AR.1.1": { desc: "Distributive Prop", gen: (l) => {
-        const a=Utils.rInt(4,9), b=Utils.rInt(13,18);
-        return { text: `Which expression shows <strong>${a} × ${b}</strong>?`, type: 'radio', options: Utils.shuffle([{t:`(${a}×10) + (${a}×${b-10})`,c:true}, {t:`${a} + 10 + ${b-10}`,c:false}, {t:`${a} × 10 × ${b-10}`,c:false}]), fb: `Break ${b} into 10 and ${b-10}.` };
-    }},
-    "MA.3.AR.1.2": { desc: "Word Problems", gen: (l) => {
-        const a=Utils.rInt(4,9), b=Utils.rInt(5,9);
-        return { text: `Ms. Lee has ${a} boxes. Each box has ${b} pens. How many pens total?`, type: 'eq', ans: (a*b).toString(), fb: "Equal groups = Multiplication." };
-    }},
-    "MA.3.AR.2.1": { desc: "Inverse Operations", gen: (l) => {
-        return { text: "Which equation helps solve <strong>42 ÷ 6 = ?</strong>", type: 'radio', options: Utils.shuffle([{t:"6 × ? = 42",c:true}, {t:"42 + 6 = ?",c:false}, {t:"42 - 6 = ?",c:false}]), fb: "Multiplication is the inverse of Division." };
-    }},
-    "MA.3.AR.2.2": { desc: "Equality", gen: (l) => {
-        return { text: "True or False: <strong>6 × 4 = 10 + 14</strong>", type: 'radio', options: [{t:"True",c:true}, {t:"False",c:false}], fb: "24 = 24. True." };
-    }},
-    "MA.3.AR.2.3": { desc: "Missing Factor", gen: (l) => {
-        const a=Utils.rInt(6,9), p=a*Utils.rInt(4,9);
-        return { text: `Find <i>n</i>: <strong>${a} × <i>n</i> = ${p}</strong>`, type: 'eq', ans: (p/a).toString(), fb: `${p} ÷ ${a}.` };
-    }},
-    "MA.3.AR.3.1": { desc: "Even/Odd", gen: (l) => {
-        return { text: "Select <strong>ALL</strong> even numbers.", type: 'multi', options: Utils.shuffle([{t:"24",c:true}, {t:"102",c:true}, {t:"31",c:false}, {t:"9",c:false}]), fb: "Ends in 0, 2, 4, 6, 8." };
-    }},
-    "MA.3.AR.3.2": { desc: "Multiples", gen: (l) => {
-        return { text: "Select the number that is a multiple of 3.", type: 'radio', options: Utils.shuffle([{t:"15",c:true}, {t:"14",c:false}, {t:"16",c:false}, {t:"20",c:false}]), fb: "3, 6, 9, 12, 15..." };
-    }},
-    "MA.3.AR.3.3": { desc: "Number Patterns", gen: (l) => {
-        return { text: "Rule: Multiply by 5. Input: 6. Output?", type: 'eq', ans: "30", fb: "6 x 5 = 30." };
-    }},
+    "MA.3.DP.1.1": {
+        desc: "Graphing Data",
+        scenarios: [
+            { // Scenario 0: Graph Builder (TEI)
+                type: 'interact',
+                gen: () => {
+                    const a = Utils.rInt(2, 6);
+                    const b = Utils.rInt(2, 6);
+                    return {
+                        text: `Create a bar graph where <strong>A = ${a}</strong> and <strong>B = ${b}</strong>.`,
+                        html: Renderer.barGraph(a,b),
+                        check: () => App.data.a === a && App.data.b === b,
+                        fb: `Set Bar A to ${a} and Bar B to ${b}.`
+                    };
+                }
+            },
+            { // Scenario 1: Interpret Scale
+                type: 'eq',
+                gen: () => {
+                    const key = Utils.pick([2, 5, 10]);
+                    const count = Utils.rInt(3, 6);
+                    return {
+                        text: `A pictograph key shows 1 Star = ${key} students. If there are ${count} Stars, how many students?`,
+                        ans: (key*count).toString(),
+                        fb: `${count} x ${key} = ${count*key}.`
+                    };
+                }
+            },
+            { // Scenario 2: Data Table
+                type: 'radio',
+                gen: () => {
+                    const a=10, b=5;
+                    return {
+                        text: "Which table matches: A=10, B=5?",
+                        options: Utils.shuffle([
+                            {t:"A: 10, B: 5", c:true},
+                            {t:"A: 5, B: 10", c:false},
+                            {t:"A: 2, B: 1", c:false}
+                        ]),
+                        fb: "Match the labels to the values."
+                    };
+                }
+            }
+        ]
+    },
 
-    // === FRACTIONS (FR) ===
-    "MA.3.FR.1.1": { desc: "Visual Fractions", gen: (l) => {
-        const d=Utils.pick([4,6,8]), n=Utils.rInt(1,d-1);
-        return { text: `Shade <strong>${n}/${d}</strong> of the circle.`, type: 'interact', html: Renderer.fraction(n,d), 
-            check: ()=>{ return document.querySelectorAll('path[fill="#ff6f00"]').length === n; }, fb: `You must click exactly ${n} slices.` };
-    }},
-    "MA.3.FR.1.2": { desc: "Unit & Whole", gen: (l) => {
-        return { text: "Select <strong>ALL</strong> fractions equal to 1.", type: 'multi', options: Utils.shuffle([{t:"4/4",c:true}, {t:"8/8",c:true}, {t:"4/1",c:false}, {t:"1/4",c:false}]), fb: "Numerator = Denominator." };
-    }},
-    "MA.3.FR.1.3": { desc: "Fraction Words", gen: (l) => {
-        return { text: "Select the fraction form of <strong>Two-Thirds</strong>.", type: 'radio', options: Utils.shuffle([{t:"2/3",c:true}, {t:"3/2",c:false}, {t:"3/3",c:false}]), fb: "2 is numerator, 3 is denominator." };
-    }},
-    "MA.3.FR.2.1": { desc: "Compare Fractions", gen: (l) => {
-        return { text: "Select the larger fraction.", type: 'radio', options: Utils.shuffle([{t:"1/3",c:true}, {t:"1/8",c:false}]), fb: "Smaller denominator = larger parts." };
-    }},
-    "MA.3.FR.2.2": { desc: "Equivalent Fractions", gen: (l) => {
-        return { text: "Select <strong>ALL</strong> fractions equivalent to 1/2.", type: 'multi', options: Utils.shuffle([{t:"2/4",c:true}, {t:"4/8",c:true}, {t:"3/5",c:false}, {t:"1/3",c:false}]), fb: "Top is half of bottom." };
-    }},
+    "MA.3.GR.2.3": {
+        desc: "Perimeter",
+        scenarios: [
+            { // Scenario 0: Tiled Visual
+                type: 'radio',
+                gen: () => {
+                    const w=Utils.rInt(3,5), h=Utils.rInt(2,4);
+                    return {
+                        text: "Find the perimeter of the shaded figure.",
+                        html: `<div class="visual-stage">${Renderer.tiledRect(w,h)}</div>`,
+                        options: Utils.genOpts((2*w+2*h).toString(), ()=>Utils.rInt(10,25).toString()),
+                        fb: "Count the unit edges on the outside."
+                    };
+                }
+            },
+            { // Scenario 1: Missing Side (Algebra)
+                type: 'eq',
+                gen: () => {
+                    const w=Utils.rInt(3,8), l=Utils.rInt(3,8);
+                    const p = 2*w + 2*l;
+                    return {
+                        text: `The Perimeter is <strong>${p}</strong>. The width is <strong>${w}</strong>. What is the length?`,
+                        ans: l.toString(),
+                        fb: `(${p} - ${2*w}) / 2 = ${l}.`
+                    };
+                }
+            },
+            { // Scenario 2: Word Problem (Context)
+                type: 'radio',
+                gen: () => {
+                    const s = Utils.rInt(4, 9);
+                    return {
+                        text: `Mr. Jones is building a fence around a square garden. One side is ${s} feet. How much fence does he need?`,
+                        options: Utils.shuffle([{t:(s*4).toString(), c:true}, {t:(s*s).toString(), c:false}, {t:(s+4).toString(), c:false}]),
+                        fb: "Square perimeter = Side x 4."
+                    };
+                }
+            }
+        ]
+    },
 
-    // === GEOMETRY (GR) ===
-    "MA.3.GR.1.1": { desc: "Points, Lines, Rays", gen: (l) => {
-        return { text: "Which figure has <strong>2 endpoints</strong>?", type: 'radio', options: Utils.shuffle([{t:"Line Segment",c:true}, {t:"Ray",c:false}, {t:"Line",c:false}]), fb: "Segments end. Lines go forever." };
-    }},
-    "MA.3.GR.1.2": { desc: "Shape Attributes", gen: (l) => {
-        return { text: "Select <strong>ALL</strong> quadrilaterals with 4 right angles.", type: 'multi', options: Utils.shuffle([{t:"Square",c:true}, {t:"Rectangle",c:true}, {t:"Rhombus",c:false}, {t:"Trapezoid",c:false}]), fb: "Only Squares and Rectangles." };
-    }},
-    "MA.3.GR.1.3": { desc: "Symmetry", gen: (l) => {
-        return { text: "How many lines of symmetry does a Square have?", type: 'eq', ans: "4", fb: "Vertical, Horizontal, 2 Diagonals." };
-    }},
-    "MA.3.GR.2.1": { desc: "Area", gen: (l) => {
-        const w=Utils.rInt(4,9), h=Utils.rInt(4,9);
-        return { text: `Find the Area of a rectangle with length ${w} and width ${h}.`, type: 'eq', ans: (w*h).toString(), fb: "Length x Width." };
-    }},
-    "MA.3.GR.2.2": { desc: "Distributive Area", gen: (l) => {
-        return { text: "Break 6x12 into:", type: 'radio', options: Utils.shuffle([{t:"(6x10)+(6x2)",c:true}, {t:"(6x6)+(6x6)",c:false}, {t:"6+10+2",c:false}]), fb: "Decompose 12." };
-    }},
-    "MA.3.GR.2.3": { desc: "Perimeter", gen: (l) => {
-        const s=Utils.rInt(3,9);
-        return { text: `A square has side length ${s}. Find the Perimeter.`, type: 'eq', ans: (s*4).toString(), fb: "Add all 4 sides." };
-    }},
-    "MA.3.GR.2.4": { desc: "Composite Area", gen: (l) => {
-        return { text: "Area of two rectangles: 4x2 and 3x5. Total?", type: 'eq', ans: "23", fb: "8 + 15 = 23." };
-    }},
-
-    // === MEASUREMENT (M) ===
-    "MA.3.M.1.1": { desc: "Measurement Tools", gen: (l) => {
-        return { text: "Select the tool to measure the <strong>length of a pencil</strong>.", type: 'hot', html: Renderer.hotText([{text:"Ruler",hot:true,c:true}, {text:"Scale",hot:true,c:false}, {text:"Beaker",hot:true,c:false}]), fb: "Ruler measures length." };
-    }},
-    "MA.3.M.1.2": { desc: "Mass & Volume", gen: (l) => {
-        return { text: "A bucket holds 10 Liters. 4 buckets hold?", type: 'eq', ans: "40", fb: "10 x 4." };
-    }},
-    "MA.3.M.2.1": { desc: "Telling Time", gen: (l) => {
-        return { text: "A clock shows 3:45. Is it <strong>'Quarter til 4'</strong>?", type: 'radio', options: [{t:"Yes",c:true},{t:"No",c:false}], fb: "15 mins until 4:00." };
-    }},
-    "MA.3.M.2.2": { desc: "Elapsed Time", gen: (l) => {
-        return { text: "Start: 1:00. End: 1:45. How many minutes?", type: 'eq', ans: "45", fb: "45 - 0 = 45." };
-    }},
-
-    // === DATA (DP) ===
-    "MA.3.DP.1.1": { desc: "Graphing", gen: (l) => {
-        const a=Utils.rInt(2,5), b=Utils.rInt(2,5);
-        return { text: `Build a bar graph where <strong>A=${a}</strong> and <strong>B=${b}</strong>.`, type: 'interact', html: Renderer.barGraph(a,b), 
-            check: ()=>{ return App.data.a===a && App.data.b===b; }, fb: `Set A to ${a}, B to ${b}.` };
-    }},
-    "MA.3.DP.1.2": { desc: "Interpret Data", gen: (l) => {
-        return { text: "Key: Star = 5 students. 4 Stars = ?", type: 'eq', ans: "20", fb: "4 x 5 = 20." };
-    }}
+    "MA.3.NSO.1.4": {
+        desc: "Rounding",
+        scenarios: [
+            { // Scenario 0: Hot Text (Select All)
+                type: 'hot',
+                gen: () => {
+                    const t = Utils.rInt(2,8)*100;
+                    return {
+                        text: `Select <strong>ALL</strong> numbers that round to <strong>${t}</strong>.`,
+                        html: Renderer.hotText([
+                            {t:(t-10).toString(), hot:true, c:true}, {t:" , "},
+                            {t:(t+40).toString(), hot:true, c:true}, {t:" , "},
+                            {t:(t+60).toString(), hot:true, c:false}, {t:" , "},
+                            {t:(t-60).toString(), hot:true, c:false}
+                        ]),
+                        fb: `Numbers from ${t-50} to ${t+49} round to ${t}.`
+                    };
+                }
+            },
+            { // Scenario 1: Equation
+                type: 'eq',
+                gen: () => {
+                    const n = Utils.rInt(120, 880);
+                    return {
+                        text: `Round <strong>${n}</strong> to the nearest 100.`,
+                        ans: (Math.round(n/100)*100).toString(),
+                        fb: "5 or more rounds up."
+                    };
+                }
+            },
+            { // Scenario 2: Number Line Logic
+                type: 'radio',
+                gen: () => {
+                    const start = 300, mid=350, end=400;
+                    return {
+                        text: `A number is at 360 on the number line. Does it round to 300 or 400?`,
+                        options: [{t:"400", c:true}, {t:"300", c:false}],
+                        fb: "360 is past the midpoint (350), so it rounds up."
+                    };
+                }
+            }
+        ]
+    }
 };
 
 // ==========================================
 // 4. APP CONTROLLER
 // ==========================================
 const App = {
-    currStd: null, currQ: null, score: 0, mode: 'practice',
-    data: {}, // Temp storage for interactive inputs
+    currStd: null, currQ: null, score: 0, 
+    history: {}, // Tracks last used scenario index
+    data: {}, // Temp data for interactive items
 
     init: function() {
         const m = document.getElementById('menu');
-        // Sort and render menu
-        Object.keys(Bank).sort().forEach(id => {
+        for(const id in Bank) {
             const b = document.createElement('div');
             b.className = 'std-btn';
             b.innerHTML = `<strong>${id}</strong><br><small>${Bank[id].desc}</small>`;
             b.onclick = () => App.load(id);
             m.appendChild(b);
-        });
+        }
     },
 
-    startMockTest: function() {
-        this.mode = 'test'; this.score = 0;
-        document.getElementById('q-badge').innerText = "Mock FAST Test";
-        document.getElementById('score').innerText = "Score: 0";
-        this.nextTestQ();
-    },
-
-    nextTestQ: function() {
-        const ids = Object.keys(Bank);
-        const randId = Utils.pick(ids);
-        this.load(randId, true);
-    },
-
-    load: function(id, isTest = false) {
-        if(!isTest) this.mode = 'practice';
+    load: function(id) {
         this.currStd = id;
         this.data = {}; // Reset data
         
-        // Generate Question
-        const q = Bank[id].gen();
-        this.currQ = q;
+        // Scenario Rotation Logic
+        const totalScenarios = Bank[id].scenarios.length;
+        const lastIdx = this.history[id] !== undefined ? this.history[id] : -1;
+        const nextIdx = Utils.pickScenario(totalScenarios, lastIdx);
+        this.history[id] = nextIdx; // Remember for next time
 
-        // Render Text
-        document.getElementById('q-badge').innerText = isTest ? `Test Mode (${id})` : id;
+        const q = Bank[id].scenarios[nextIdx].gen();
+        this.currQ = q;
+        this.currQ.type = Bank[id].scenarios[nextIdx].type; // Store type for checker
+
+        // Render UI
+        document.getElementById('badge').innerText = id;
         document.getElementById('q-text').innerHTML = q.text;
         
-        // Render Areas
-        const interact = document.getElementById('q-interact');
+        const visual = document.getElementById('q-visual');
         const opts = document.getElementById('q-options');
-        interact.style.display = 'none';
+        visual.style.display = 'none';
         opts.innerHTML = '';
         
-        // INTERACTIVE RENDER
-        if(q.type === 'interact') {
-            interact.style.display = 'block';
-            interact.innerHTML = q.html;
+        // Render based on type
+        if(q.type === 'interact' || q.type === 'hot') {
+            visual.style.display = 'flex';
+            visual.innerHTML = q.html;
         } 
-        else if(q.type === 'hot') {
-            interact.style.display = 'block';
-            interact.innerHTML = q.html; // Hot text renderer
-        }
-        else if(q.type === 'eq') {
-            opts.innerHTML = `<input type="text" id="inp" class="eq-input" placeholder="Enter answer..." onkeyup="document.getElementById('btn-check').disabled = this.value===''">`;
-        }
-        else {
-            // Radio / Multi
-            q.options.forEach((o,i) => {
+        else if (q.type === 'radio' || q.type === 'multi') {
+            if(q.html) { visual.style.display='flex'; visual.innerHTML=q.html; } // Static visual
+            
+            q.options.forEach((o, i) => {
                 const el = document.createElement('div');
                 el.className = `opt-btn ${q.type}`;
                 el.innerHTML = `<div class="icon"></div> ${o.t}`;
                 el.onclick = () => {
-                    if(q.type === 'radio') {
-                        document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+                    if(q.type==='radio'){
+                        document.querySelectorAll('.opt-btn').forEach(b=>b.classList.remove('selected'));
                         el.classList.add('selected');
                         App.sel = i;
                     } else {
@@ -413,52 +442,50 @@ const App = {
                 opts.appendChild(el);
             });
         }
+        else if (q.type === 'eq') {
+            opts.innerHTML = `<input type="text" id="inp" class="eq-input" placeholder="Type answer..." onkeyup="document.getElementById('btn-check').disabled = this.value===''">`;
+        }
 
-        // Reset Feedback
         document.getElementById('feedback').style.display = 'none';
-        document.getElementById('btn-check').disabled = true;
-        document.getElementById('btn-check').innerText = "Check Answer";
-        document.getElementById('btn-check').onclick = () => App.check();
+        const btn = document.getElementById('btn-check');
+        btn.innerText = "Check Answer";
+        btn.disabled = true;
+        btn.onclick = () => App.check();
     },
 
-    update: function() { // Called by interactive elements
+    update: function() {
         document.getElementById('btn-check').disabled = false;
     },
 
     check: function() {
         const q = this.currQ;
-        let isCorrect = false;
+        let ok = false;
 
-        // Validation Logic
-        if(q.type === 'radio') isCorrect = q.options[App.sel].c;
-        else if(q.type === 'multi') isCorrect = q.options.every(o => !!o.sel === o.c);
-        else if(q.type === 'eq') isCorrect = document.getElementById('inp').value.trim() === q.ans;
-        else if(q.type === 'interact') isCorrect = q.check();
-        else if(q.type === 'hot') {
-            // Check hot text
+        if(q.type === 'radio') ok = q.options[this.sel].c;
+        if(q.type === 'multi') ok = q.options.every(o => !!o.sel === o.c);
+        if(q.type === 'eq') ok = document.getElementById('inp').value.trim() === q.ans;
+        if(q.type === 'interact') ok = q.check();
+        if(q.type === 'hot') {
             const spans = document.querySelectorAll('.hot-text');
-            // Logic: All correct ones must be selected, no wrong ones
-            // This requires storing 'c' in the HTML generation or checking differently.
-            // Simplified for this demo:
-            isCorrect = true; 
-            // Real implementation would bind IDs to correctness.
+            let allCorrect = true;
+            spans.forEach(s => {
+                const isSel = s.classList.contains('selected');
+                const isCorr = s.dataset.correct === "true";
+                if(isSel !== isCorr) allCorrect = false;
+            });
+            ok = allCorrect;
         }
 
-        // Show Feedback
         const fb = document.getElementById('feedback');
         fb.style.display = 'block';
-        fb.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
-        fb.innerHTML = `<strong>${isCorrect ? 'Correct!' : 'Incorrect.'}</strong> ${q.fb}`;
-
-        if(isCorrect) {
-            this.score++;
-            document.getElementById('score').innerText = `Score: ${this.score}`;
-        }
-
-        // Next Button
+        fb.className = `feedback ${ok?'correct':'wrong'}`;
+        fb.innerHTML = `<strong>${ok?'Correct!':'Incorrect.'}</strong> ${q.fb}`;
+        
+        if(ok) document.getElementById('score').innerText = `Score: ${++this.score}`;
+        
         const btn = document.getElementById('btn-check');
         btn.innerText = "Next Question";
-        btn.onclick = () => this.mode === 'test' ? this.nextTestQ() : this.load(this.currStd);
+        btn.onclick = () => App.load(this.currStd);
     }
 };
 
