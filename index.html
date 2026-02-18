@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAST Grade 3 Math Simulator | Official Build</title>
+    <title>FAST Grade 3 Master Simulator | Level 5 Rigor</title>
     <style>
         :root {
             --primary: #00695c; --secondary: #e65100; --bg: #f8f9fa; 
@@ -14,7 +14,7 @@
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
         /* SIDEBAR */
-        .sidebar { width: 340px; background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; height: 100vh; }
+        .sidebar { width: 360px; background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; height: 100vh; }
         .logo-area { padding: 25px; background: var(--primary); color: white; flex-shrink: 0; }
         .logo-area h1 { margin: 0; font-size: 1.3rem; letter-spacing: 0.5px; }
         .logo-area p { margin: 5px 0 0; font-size: 0.85rem; opacity: 0.9; }
@@ -27,6 +27,8 @@
         .test-btn:hover { transform: translateY(-2px); }
 
         .menu { flex: 1; overflow-y: auto; padding: 0 10px 30px; }
+        .cat-header { font-size: 0.8rem; text-transform: uppercase; color: #6c757d; font-weight: 800; margin: 25px 0 8px; border-bottom: 2px solid #e9ecef; padding-bottom: 5px; padding-left: 10px; }
+        
         .std-btn { 
             display: block; width: 100%; text-align: left; padding: 12px 15px; margin-bottom: 4px; 
             background: transparent; border: 1px solid transparent; border-radius: 6px; cursor: pointer; 
@@ -70,7 +72,7 @@
         .bar-col { cursor: ns-resize; transition: height 0.3s, y 0.3s; }
         .bar-col:hover { opacity: 0.8; }
 
-        .drop-select { padding: 8px; font-size: 1.1rem; border: 2px solid #6c757d; border-radius: 4px; background: white; cursor: pointer; margin: 0 5px; }
+        .inline-select { padding: 5px 10px; font-size: 1.1rem; border: 2px solid #6c757d; border-radius: 4px; background: white; cursor: pointer; margin: 0 5px; }
 
         /* OPTIONS */
         .options-list { display: grid; gap: 15px; }
@@ -109,7 +111,7 @@
 <div class="sidebar">
     <div class="logo-area">
         <h1>FAST Gr3 Master</h1>
-        <p>Interactive TEI Engine</p>
+        <p>Level 5 Rigor & TEI Engine</p>
     </div>
     <div class="test-btn" onclick="App.startTest()">📝 Start Mock FAST Test</div>
     <div class="menu" id="menu"></div>
@@ -125,10 +127,11 @@
         <div id="q-content">
             <div class="q-text" id="q-text">
                 Select a standard to begin practice.<br><br>
-                <strong>Features Included:</strong><br>
-                • <strong>Interactive TEI:</strong> Click graphs, shade fractions, select hot text.<br>
-                • <strong>Scenario Engine:</strong> Rotates between 3 unique templates per standard.<br>
-                • <strong>Full Coverage:</strong> Geometry, Measurement, Data, and Number Sense.
+                <strong>Level 5 Rigor Features:</strong><br>
+                • <strong>Error Analysis:</strong> Identify mistakes in reasoning.<br>
+                • <strong>Multi-Step:</strong> Problems requiring 2+ operations.<br>
+                • <strong>Interactive TEI:</strong> Dropdowns, Hot Text, Graph Builders.<br>
+                • <strong>No Repetition:</strong> Smart Scenario Rotation.
             </div>
             
             <div class="interaction-area" id="q-interact" style="display:none;"></div>
@@ -163,6 +166,18 @@ const Utils = {
         let safe = 0;
         while(s.size < 4 && safe < 50) { s.add(genFn()); safe++; }
         return Array.from(s).sort(() => Math.random() - 0.5).map(x => ({t:x, c:x===corr}));
+    },
+
+    numToWords: (n) => {
+        const o=['','one','two','three','four','five','six','seven','eight','nine'];
+        const ty=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+        if(n===0) return 'zero';
+        let s='';
+        if(n>=1000){s+=o[Math.floor(n/1000)]+' thousand '; n%=1000;}
+        if(n>=100){s+=o[Math.floor(n/100)]+' hundred '; n%=100;}
+        if(n>=20){s+=ty[Math.floor(n/10)]+(n%10!==0?' ':'')+o[n%10];}
+        else if(n>0){s+=o[n];}
+        return s.trim();
     }
 };
 
@@ -194,12 +209,28 @@ const Renderer = {
         return `<svg width="200" height="200" viewBox="0 0 200 200">${s}</svg><br><small>(Click above bars to set height)</small>`;
     },
 
+    // Dropdown Builder
+    dropdown: (parts) => { // [{t:"text"}, {opts:[1,2], c:1}]
+        return parts.map(p => {
+            if(p.opts) {
+                const ops = `<option value="">?</option>` + p.opts.map(o => `<option value="${o}">${o}</option>`).join('');
+                return `<select class="inline-select" data-corr="${p.c}" onchange="App.update()">${ops}</select>`;
+            }
+            return `<span>${p.t}</span>`;
+        }).join('');
+    },
+
     // Hot Text
     hotText: (parts) => { // [{t:"word", hot:true, c:true}]
         return parts.map((p, i) => p.hot ? `<span class="hot-text" id="hot-${i}" data-corr="${p.c}" onclick="this.classList.toggle('selected'); App.update();">${p.t}</span>` : `<span>${p.t}</span>`).join('');
     },
 
-    // Static SVGs
+    // Static Visuals
+    ruler: (len) => {
+        let t=''; for(let i=0;i<=6;i++){ t+=`<line x1="${10+i*40}" y1="30" x2="${10+i*40}" y2="50" stroke="black" stroke-width="2"/>`; if(i<6) t+=`<line x1="${30+i*40}" y1="35" x2="${30+i*40}" y2="50" stroke="black" stroke-width="1"/><line x1="${20+i*40}" y1="40" x2="${20+i*40}" y2="50" stroke="black" stroke-width="1"/><line x1="${40+i*40}" y1="40" x2="${40+i*40}" y2="50" stroke="black" stroke-width="1"/>`; t+=`<text x="${10+i*40}" y="25" text-anchor="middle" font-size="10">${i}</text>`; }
+        return `<svg width="270" height="70"><rect x="10" y="50" width="240" height="15" fill="#eee" stroke="black"/><rect x="10" y="55" width="${len*40}" height="5" fill="#ffca28" stroke="black"/>${t}</svg>`;
+    },
+    
     geo: (t) => {
         const s = 'fill="#e0f2f1" stroke="#004d40" stroke-width="3"';
         if(t==='perp') return `<svg width="100" height="100" viewBox="0 0 100 100"><line x1="50" y1="10" x2="50" y2="90" stroke="black" stroke-width="3"/><line x1="10" y1="50" x2="90" y2="50" stroke="black" stroke-width="3"/><rect x="50" y="50" width="10" height="10" fill="none" stroke="black"/></svg>`;
@@ -208,25 +239,14 @@ const Renderer = {
         return `<svg width="100" height="80"><rect x="10" y="20" width="80" height="40" ${s}/></svg>`;
     },
     
-    thermometer: (t) => `<svg width="60" height="150" viewBox="0 0 60 150"><rect x="20" y="10" width="20" height="130" rx="10" fill="#fff" stroke="black"/><rect x="25" y="${130-t}" width="10" height="${t}" fill="red"/><circle cx="30" cy="130" r="15" fill="red"/><text x="50" y="20" font-size="10">100</text><text x="50" y="70" font-size="10">50</text><text x="50" y="120" font-size="10">0</text></svg>`,
-    
-    ruler: (len) => {
-        let t=''; for(let i=0;i<=6;i++){ t+=`<line x1="${10+i*40}" y1="30" x2="${10+i*40}" y2="50" stroke="black" stroke-width="2"/>`; if(i<6) t+=`<line x1="${30+i*40}" y1="35" x2="${30+i*40}" y2="50" stroke="black" stroke-width="1"/>`; t+=`<text x="${10+i*40}" y="25" text-anchor="middle" font-size="10">${i}</text>`; }
-        return `<svg width="270" height="70"><rect x="10" y="50" width="240" height="15" fill="#eee" stroke="black"/><rect x="10" y="55" width="${len*40}" height="5" fill="#ffca28" stroke="black"/>${t}</svg>`;
+    clock: (h,m) => {
+        let t=''; for(let i=0;i<60;i++) t+=`<line x1="50" y1="6" x2="50" y2="${i%5?7:10}" transform="rotate(${i*6} 50 50)" stroke="#333" stroke-width="${i%5?1:2}"/>`;
+        return `<svg width="150" height="150" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="#333" fill="#fff" stroke-width="2"/>${t}<line x1="50" y1="50" x2="50" y2="28" stroke="black" stroke-width="3" transform="rotate(${(h%12)*30+m*0.5} 50 50)"/><line x1="50" y1="50" x2="50" y2="15" stroke="red" stroke-width="2" transform="rotate(${m*6} 50 50)"/><circle cx="50" cy="50" r="3"/></svg>`;
     },
-
+    
     tiled: (w, h) => {
         let s=''; for(let i=0;i<w;i++) for(let j=0;j<h;j++) s+=`<rect x="${i*25}" y="${j*25}" width="25" height="25" fill="#e0f2f1" stroke="#004d40" stroke-width="1"/>`;
         return `<svg width="${w*25}" height="${h*25}">${s}</svg>`;
-    },
-    
-    // Interactive Symmetry (Click correct image)
-    symmetrySelect: () => {
-        // Returns 2 SVGs: One correct, one wrong
-        const s = 'fill="#e0f2f1" stroke="black" stroke-width="2"';
-        const corr = `<svg width="80" height="80"><path d="M10 70 L70 70 L40 10 Z" ${s}/><line x1="40" y1="10" x2="40" y2="70" stroke="red" stroke-dasharray="4" stroke-width="2"/></svg>`;
-        const wrong = `<svg width="80" height="80"><path d="M10 70 L70 70 L40 10 Z" ${s}/><line x1="10" y1="40" x2="70" y2="40" stroke="red" stroke-dasharray="4" stroke-width="2"/></svg>`;
-        return { c: corr, w: wrong };
     }
 };
 
@@ -234,142 +254,218 @@ const Renderer = {
 // 3. SCENARIO BANK (33 Standards)
 // ==========================================
 const Bank = {
-    "MA.3.M.1.1": {
-        desc: "Measurement Tools",
-        scenarios: [
-            { // Scenario 0: Thermometer
-                type: 'eq',
-                gen: () => {
-                    const t = Utils.pick([40, 50, 60, 70, 80]);
-                    return {
-                        text: "What is the temperature shown in degrees Fahrenheit?",
-                        html: Renderer.thermometer(t),
-                        ans: t.toString(),
-                        fb: "Read the red level."
-                    };
-                }
-            },
-            { // Scenario 1: Ruler (Half Inch)
-                type: 'radio',
-                gen: () => {
-                    const l = Utils.pick([2, 2.5, 3, 3.5, 4, 4.5]);
-                    return {
-                        text: "What is the length of the yellow bar?",
-                        html: Renderer.ruler(l),
-                        options: Utils.shuffle([{t:l+" inches",c:true}, {t:(l+0.5)+" inches",c:false}, {t:(l-0.5)+" inches",c:false}]),
-                        fb: "Check if it ends on a whole number or a half-mark."
-                    };
-                }
-            },
-            { // Scenario 2: Hot Text (Volume/Temp)
-                type: 'hot',
-                gen: () => {
-                    return {
-                        text: "Select the tool used to measure <strong>Temperature</strong>.",
-                        html: Renderer.hotText([{t:"Ruler",hot:true,c:false}, {t:" , "}, {t:"Thermometer",hot:true,c:true}, {t:" , "}, {t:"Scale",hot:true,c:false}]),
-                        fb: "Thermometers measure heat."
-                    };
-                }
-            }
-        ]
-    },
-
-    "MA.3.GR.1.1": {
-        desc: "Points, Lines, Rays",
-        scenarios: [
-            { // Scenario 0: Visual Identify
-                type: 'radio',
-                gen: () => {
-                    return {
-                        text: "Which image shows <strong>Perpendicular Lines</strong>?",
-                        options: Utils.shuffle([
-                            {t:Renderer.geo('perp'), c:true},
-                            {t:Renderer.geo('para'), c:false},
-                            {t:Renderer.geo('trap'), c:false}
-                        ]),
-                        fb: "Perpendicular lines meet at a right angle (90°)."
-                    };
-                }
-            },
-            { // Scenario 1: Parallel Definition (Hot Text)
-                type: 'hot',
-                gen: () => {
-                    return {
-                        text: "Select the pair of lines that <strong>never intersect</strong>.",
-                        html: Renderer.hotText([{t:"Parallel Lines",hot:true,c:true}, {t:" , "}, {t:"Perpendicular Lines",hot:true,c:false}, {t:" , "}, {t:"Intersecting Lines",hot:true,c:false}]),
-                        fb: "Parallel lines are like railroad tracks; they never cross."
-                    };
-                }
-            }
-        ]
-    },
-
-    "MA.3.GR.1.3": {
-        desc: "Symmetry",
-        scenarios: [
-            { // Scenario 0: Select Correct Line
-                type: 'radio',
-                gen: () => {
-                    const svgs = Renderer.symmetrySelect();
-                    return {
-                        text: "Which shape shows a correct <strong>Line of Symmetry</strong>?",
-                        options: Utils.shuffle([{t:svgs.c, c:true}, {t:svgs.w, c:false}]),
-                        fb: "The line must divide the shape into matching mirror images."
-                    };
-                }
-            }
-        ]
-    },
-
-    "MA.3.GR.2.1": {
-        desc: "Area Concepts",
-        scenarios: [
-            { // Scenario 0: Tiling Visual
-                type: 'eq',
-                gen: () => {
-                    const w=Utils.rInt(3,6), h=Utils.rInt(3,5);
-                    return {
-                        text: "Count the square units to find the Area.",
-                        html: Renderer.tiled(w,h),
-                        ans: (w*h).toString(),
-                        fb: "Count every square inside the rectangle."
-                    };
-                }
-            }
-        ]
-    },
-
-    "MA.3.DP.1.1": {
-        desc: "Create Graphs",
-        scenarios: [
-            { // Scenario 0: Graph Builder (TEI)
-                type: 'interact',
-                gen: () => {
-                    const a = Utils.rInt(2,6), b = Utils.rInt(2,6);
-                    return {
-                        text: `Create a bar graph where <strong>A=${a}</strong> and <strong>B=${b}</strong>.`,
-                        html: Renderer.barGraph(a,b),
-                        check: () => App.data.a===a && App.data.b===b,
-                        fb: `Click above the bars to set A to ${a} and B to ${b}.`
-                    };
-                }
-            }
-        ]
-    },
-
+    // --- NUMBER SENSE (NSO) ---
     "MA.3.NSO.1.1": {
         desc: "Read/Write Numbers",
         scenarios: [
-            { type: 'hot', gen: () => { 
-                const n = Utils.rInt(2000, 9000); 
-                return { text: `Select the value of the <strong>thousands digit</strong> in ${n}.`, html: Renderer.hotText([{t:(Math.floor(n/1000)*100).toString(), hot:true, c:false}, {t:" , "}, {t:(Math.floor(n/1000)*1000).toString(), hot:true, c:true}]), fb: "Value = Digit x Place." }; 
-            }}
+            { // Scenario A: Hot Text (Place Value)
+                type: 'hot',
+                gen: () => {
+                    const n = Utils.rInt(2000, 9000);
+                    const val = Math.floor((n%1000)/100)*100;
+                    return {
+                        text: `Select the value of the <strong>hundreds digit</strong> in ${n}.`,
+                        html: Renderer.hotText([{t:val.toString(), hot:true, c:true}, {t:" , "}, {t:(val*10).toString(), hot:true, c:false}, {t:" , "}, {t:(val/10).toString(), hot:true, c:false}]),
+                        fb: `The hundreds digit is ${val/100}, so its value is ${val}.`
+                    };
+                }
+            },
+            { // Scenario B: Dropdown (Word Form)
+                type: 'drop',
+                gen: () => {
+                    const n = Utils.rInt(1001, 9999);
+                    const t = Math.floor((n%1000)/100);
+                    return {
+                        html: Renderer.dropdown([{t:`The number <strong>${n}</strong> has `}, {opts:[t, t*10, t*100], c:t}, {t:" hundreds."}]),
+                        fb: "Check the third digit from the right."
+                    };
+                }
+            },
+            { // Scenario C: Multi-Select (Standard Forms)
+                type: 'multi',
+                gen: () => {
+                    const n = Utils.rInt(1001, 2000);
+                    return {
+                        text: `Select <strong>ALL</strong> forms that represent ${n}.`,
+                        options: Utils.shuffle([{t: Utils.numToWords(n), c:true}, {t: `${1000} + ${n-1000}`, c:true}, {t: `${n+100}`, c:false}]),
+                        fb: "Standard form and expanded form must equal the number."
+                    };
+                }
+            }
         ]
     },
     
-    // ... Additional Standards (AR, FR, etc.) mapped similarly ...
-    "MA.3.AR.1.1": { desc: "Distributive", scenarios: [{ type: 'radio', gen: () => ({ text: "Select 7x12 broken down.", options: Utils.shuffle([{t:"(7x10)+(7x2)",c:true},{t:"7+10+2",c:false}]), fb:"Break 12." }) }] },
-    "MA.3.FR.1.1": { desc: "Visual Fractions", scenarios: [{ type: 'interact', gen: () => { const n=Utils.rInt(1,3); return { text:`Shade ${n}/4`, html:Renderer.fraction(n,4), check:()=>document.querySelectorAll('[fill="#ff6f00"]').length===n, fb:`Shade ${n} pieces.` } } }] }
+    "MA.3.NSO.1.2": {
+        desc: "Compose/Decompose",
+        scenarios: [
+            { // Scenario A: Regrouping Logic (Level 5)
+                type: 'eq',
+                gen: () => {
+                    const h = Utils.rInt(1,5);
+                    const t = Utils.rInt(12, 25); // >10 tens = regrouping needed
+                    return {
+                        text: `What number is composed of <strong>${h} hundreds</strong> and <strong>${t} tens</strong>?`,
+                        ans: (h*100 + t*10).toString(),
+                        fb: `${h}00 + ${t}0 = ${h*100 + t*10}.`
+                    };
+                }
+            },
+            { // Scenario B: Standard Composition
+                type: 'radio',
+                gen: () => {
+                    return {
+                        text: "Which number is equal to 2 thousands, 4 hundreds, and 15 ones?",
+                        options: Utils.shuffle([{t:"2,415", c:true}, {t:"2,451", c:false}, {t:"2,505", c:false}]),
+                        fb: "2000 + 400 + 15 = 2415."
+                    };
+                }
+            }
+        ]
+    },
+
+    "MA.3.NSO.1.4": {
+        desc: "Rounding",
+        scenarios: [
+            { // Scenario A: Hot Text (Select All)
+                type: 'hot',
+                gen: () => {
+                    const t = Utils.rInt(2,8)*100;
+                    return {
+                        text: `Select <strong>ALL</strong> numbers that round to <strong>${t}</strong>.`,
+                        html: Renderer.hotText([{t:(t-10).toString(), hot:true, c:true}, {t:" , "}, {t:(t+60).toString(), hot:true, c:false}, {t:" , "}, {t:(t+10).toString(), hot:true, c:true}]),
+                        fb: `Range is ${t-50} to ${t+49}.`
+                    };
+                }
+            },
+            { // Scenario B: Equation Input
+                type: 'eq',
+                gen: () => {
+                    const n = Utils.rInt(120, 880);
+                    return {
+                        text: `Round <strong>${n}</strong> to the nearest 100.`,
+                        ans: (Math.round(n/100)*100).toString(),
+                        fb: "5 or greater rounds up."
+                    };
+                }
+            }
+        ]
+    },
+
+    // --- ALGEBRA (AR) ---
+    "MA.3.AR.1.1": {
+        desc: "Distributive Property",
+        scenarios: [
+            { // Scenario A: Error Analysis (Level 5)
+                type: 'radio',
+                gen: () => {
+                    return {
+                        text: "Student A wrote: 7 x 12 = (7 x 10) + (7 x 20). What is the error?",
+                        options: Utils.shuffle([
+                            {t:"They multiplied by 20 instead of 2.", c:true},
+                            {t:"They should have added 7 + 12.", c:false},
+                            {t:"The equation is actually correct.", c:false}
+                        ]),
+                        fb: "12 breaks into 10 + 2, not 10 + 20."
+                    };
+                }
+            },
+            { // Scenario B: Dropdown Completion
+                type: 'drop',
+                gen: () => {
+                    const a=6, b=14;
+                    return {
+                        html: Renderer.dropdown([{t:`${a} x ${b} = (${a} x 10) + (${a} x `}, {opts:[4, 14, 10], c:4}, {t:")"}]),
+                        fb: "14 = 10 + 4."
+                    };
+                }
+            }
+        ]
+    },
+
+    // --- FRACTIONS (FR) ---
+    "MA.3.FR.1.1": {
+        desc: "Visual Fractions",
+        scenarios: [
+            { // Scenario A: Interactive Shading (TEI)
+                type: 'interact',
+                gen: () => {
+                    const d = Utils.pick([3,4,6,8]);
+                    const n = Utils.rInt(1, d-1);
+                    return {
+                        text: `Shade the model to show <strong>${n}/${d}</strong>.`,
+                        html: Renderer.fraction(n, d),
+                        check: () => document.querySelectorAll('path[fill="#ff6f00"]').length === n,
+                        fb: `Shade exactly ${n} slices.`
+                    };
+                }
+            }
+        ]
+    },
+
+    // --- MEASUREMENT (M) ---
+    "MA.3.M.1.1": {
+        desc: "Measurement Tools",
+        scenarios: [
+            { // Scenario A: Visual Ruler (Half-Inch)
+                type: 'radio',
+                gen: () => {
+                    const l = Utils.pick([2.5, 3.5, 4.5]);
+                    return {
+                        text: "What is the length of the yellow bar?",
+                        html: Renderer.ruler(l),
+                        options: Utils.shuffle([{t:l+" inches",c:true}, {t:(l+0.5)+" inches",c:false}, {t:Math.floor(l)+" inches",c:false}]),
+                        fb: "Look at the halfway mark between numbers."
+                    };
+                }
+            }
+        ]
+    },
+
+    // --- GEOMETRY (GR) ---
+    "MA.3.GR.1.1": {
+        desc: "Lines & Points",
+        scenarios: [
+            { // Scenario A: Hot Text Definition
+                type: 'hot',
+                gen: () => {
+                    return {
+                        text: "Select the term that means <strong>lines that never cross</strong>.",
+                        html: Renderer.hotText([{t:"Perpendicular",hot:true,c:false}, {t:" / "}, {t:"Parallel",hot:true,c:true}, {t:" / "}, {t:"Intersecting",hot:true,c:false}]),
+                        fb: "Parallel lines are like railroad tracks."
+                    };
+                }
+            },
+            { // Scenario B: Visual ID
+                type: 'radio',
+                gen: () => {
+                    return {
+                        text: "Which image shows Perpendicular Lines?",
+                        options: Utils.shuffle([{t:Renderer.geo('perp'),c:true}, {t:Renderer.geo('para'),c:false}]),
+                        fb: "Perpendicular lines meet at 90 degrees."
+                    };
+                }
+            }
+        ]
+    },
+
+    // --- DATA (DP) ---
+    "MA.3.DP.1.1": {
+        desc: "Graphing Data",
+        scenarios: [
+            { // Scenario A: Graph Builder (TEI)
+                type: 'interact',
+                gen: () => {
+                    const a=Utils.rInt(2,6), b=Utils.rInt(2,6);
+                    return {
+                        text: `Create a graph where <strong>A=${a}</strong> and <strong>B=${b}</strong>.`,
+                        html: Renderer.barGraph(a,b),
+                        check: () => App.data.a===a && App.data.b===b,
+                        fb: `Click above the bars to set heights.`
+                    };
+                }
+            }
+        ]
+    }
 };
 
 // ==========================================
@@ -377,18 +473,23 @@ const Bank = {
 // ==========================================
 const App = {
     currStd: null, currQ: null, score: 0, 
-    history: {}, // Tracks last used scenario
-    data: {}, // TEI data
+    history: {}, data: {}, mode: 'practice',
 
     init: function() {
         const m = document.getElementById('menu');
-        Object.keys(Bank).forEach(id => {
-            const b = document.createElement('div');
-            b.className = 'std-btn';
-            b.innerHTML = `<strong>${id}</strong><br><small>${Bank[id].desc}</small>`;
-            b.onclick = () => App.load(id);
-            m.appendChild(b);
-        });
+        
+        // Render Categories
+        const cats = { "Number Sense": "NSO", "Algebra": "AR", "Fractions": "FR", "Geometry": "GR", "Measure": "M", "Data": "DP" };
+        for(let c in cats) {
+            const h = document.createElement('div'); h.className = 'cat-header'; h.innerText = c; m.appendChild(h);
+            Object.keys(Bank).filter(k => k.includes(cats[c])).forEach(id => {
+                const b = document.createElement('div');
+                b.className = 'std-btn';
+                b.innerHTML = `<strong>${id}</strong><br><small>${Bank[id].desc}</small>`;
+                b.onclick = () => App.load(id);
+                m.appendChild(b);
+            });
+        }
     },
 
     startTest: function() {
@@ -398,8 +499,16 @@ const App = {
     },
 
     nextTestQ: function() {
-        const ids = Object.keys(Bank);
-        this.load(Utils.pick(ids), true);
+        // Weighted Logic: 30% NSO, 20% FR, 30% GR/M, 20% AR/DP
+        const r = Math.random();
+        let filter = "NSO";
+        if(r > 0.3) filter = "FR";
+        if(r > 0.5) filter = "GR";
+        if(r > 0.8) filter = "AR";
+        
+        const possible = Object.keys(Bank).filter(k => k.includes(filter));
+        const final = possible.length > 0 ? Utils.pick(possible) : Utils.pick(Object.keys(Bank));
+        this.load(final, true);
     },
 
     load: function(id, isTest=false) {
@@ -426,16 +535,18 @@ const App = {
         interact.style.display = 'none';
         opts.innerHTML = '';
 
+        // Render Visuals/HTML
         if(q.html) {
             interact.style.display = 'flex';
             interact.innerHTML = q.html;
         }
 
+        // Render Inputs
         if(this.currQ.type === 'radio' || this.currQ.type === 'multi') {
             q.options.forEach((o,i) => {
                 const el = document.createElement('div');
                 el.className = `opt-btn ${this.currQ.type}`;
-                el.innerHTML = `<div class="icon"></div> ${o.t}`; // Support SVG in options
+                el.innerHTML = `<div class="icon"></div> ${o.t}`;
                 el.onclick = () => {
                     if(this.currQ.type === 'radio') {
                         document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
@@ -470,11 +581,20 @@ const App = {
         if(q.type === 'multi') ok = q.options.every(o => !!o.sel === o.c);
         if(q.type === 'eq') ok = document.getElementById('inp').value.trim() === q.ans;
         if(q.type === 'interact') ok = q.check();
+        
         if(q.type === 'hot') {
             const spans = document.querySelectorAll('.hot-text');
             ok = true;
             spans.forEach(s => {
                 if(s.classList.contains('selected') !== (s.dataset.corr === "true")) ok = false;
+            });
+        }
+        
+        if(q.type === 'drop') {
+            const selects = document.querySelectorAll('.inline-select');
+            ok = true;
+            selects.forEach(s => {
+                if(s.value != s.dataset.corr) ok = false;
             });
         }
 
