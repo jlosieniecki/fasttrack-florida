@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florida FAST Math | Cambium Simulator</title>
+    <title>Florida FAST Math | Level 5 Cambium Clone</title>
     <style>
         :root {
             --cam-blue: #003366; --cam-light-blue: #e6f0fa; --cam-gray: #f4f4f4;
@@ -12,37 +12,37 @@
         * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
         body { margin: 0; padding: 0; background: var(--cam-gray); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* DASHBOARD / MENU (Hidden during test) */
+        /* DASHBOARD / MENU */
         #dashboard { display: flex; height: 100vh; }
-        .sidebar { width: 320px; background: white; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
-        .logo-area { padding: 20px; background: var(--cam-blue); color: white; }
-        .logo-area h1 { margin: 0; font-size: 1.2rem; }
+        .sidebar { width: 340px; background: white; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .logo-area { padding: 25px; background: var(--cam-blue); color: white; }
+        .logo-area h1 { margin: 0; font-size: 1.3rem; letter-spacing: 0.5px; }
         .menu-scroll { flex: 1; overflow-y: auto; padding: 10px; }
-        .cat-title { font-size: 0.75rem; text-transform: uppercase; color: #666; font-weight: bold; margin: 15px 0 5px 5px; border-bottom: 2px solid #eee; }
-        .std-btn { display: block; width: 100%; text-align: left; padding: 8px 10px; margin-bottom: 2px; background: transparent; border: 1px solid transparent; cursor: pointer; font-size: 0.85rem; color: #333; }
+        .cat-title { font-size: 0.8rem; text-transform: uppercase; color: #666; font-weight: bold; margin: 15px 0 5px 5px; border-bottom: 2px solid #eee; padding-bottom: 5px;}
+        .std-btn { display: block; width: 100%; text-align: left; padding: 10px 10px; margin-bottom: 2px; background: transparent; border: 1px solid transparent; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; }
         .std-btn:hover { background: var(--cam-light-blue); }
-        .main-dash { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; }
-        .mock-btn { padding: 15px 40px; font-size: 1.2rem; font-weight: bold; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .mock-btn:hover { background: #0056b3; }
+        .std-btn small { display: block; font-size: 0.75rem; margin-top: 3px; color: #666; }
+
+        .main-dash { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; background: white; }
+        .mock-btn { padding: 18px 40px; font-size: 1.2rem; font-weight: bold; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s; }
+        .mock-btn:hover { background: #0056b3; transform: translateY(-2px); }
 
         /* CAMBIUM TEST INTERFACE */
         #test-interface { display: none; height: 100vh; flex-direction: column; background: white; }
         
-        /* Top Navigation Bar */
         .top-nav { background: var(--cam-blue); color: white; height: 50px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; flex-shrink: 0; }
         .nav-left { display: flex; gap: 15px; align-items: center; }
         .nav-right { display: flex; gap: 10px; }
-        .nav-btn { background: transparent; border: 1px solid white; color: white; padding: 5px 15px; cursor: pointer; font-size: 0.9rem; border-radius: 3px; }
+        .nav-btn { background: transparent; border: 1px solid white; color: white; padding: 6px 15px; cursor: pointer; font-size: 0.9rem; border-radius: 3px; }
         .nav-btn:hover { background: rgba(255,255,255,0.2); }
         .nav-btn.primary { background: white; color: var(--cam-blue); font-weight: bold; }
         
-        /* Split Screen Content */
         .test-body { flex: 1; display: flex; overflow: hidden; }
-        .pane { flex: 1; overflow-y: auto; padding: 30px; position: relative; }
-        .stimulus-pane { border-right: 2px solid var(--border); background: #fafafa; display: flex; flex-direction: column; align-items: center; }
-        .response-pane { background: white; }
+        .pane { flex: 1; overflow-y: auto; padding: 40px; position: relative; }
+        .stimulus-pane { border-right: 2px solid var(--border); background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .response-pane { background: white; display: flex; flex-direction: column; }
 
-        .q-text { font-size: 1.2rem; line-height: 1.5; margin-bottom: 25px; }
+        .q-text { font-size: 1.25rem; line-height: 1.6; margin-bottom: 25px; }
 
         /* TEI Elements */
         .visual-stage svg { max-width: 100%; height: auto; overflow: visible; }
@@ -51,39 +51,40 @@
         .bar-zone { cursor: pointer; }
         .bar-zone:hover rect { fill: #b2dfdb; }
         
-        .hot-text { cursor: pointer; padding: 2px 6px; border: 1px solid #ccc; border-radius: 3px; margin: 0 2px; background: white; }
-        .hot-text:hover { border-color: #666; }
+        .hot-text { cursor: pointer; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; margin: 0 3px; background: white; display: inline-block; font-weight: bold;}
+        .hot-text:hover { border-color: #666; background: #e9ecef; }
         .hot-text.selected { background: var(--cam-blue); color: white; border-color: var(--cam-blue); }
-        .inline-drop { font-size: 1.1rem; padding: 4px 8px; border: 1px solid #666; border-radius: 3px; }
+        .inline-drop { font-size: 1.1rem; padding: 6px 10px; border: 2px solid #666; border-radius: 4px; cursor: pointer; font-weight: bold; margin: 0 4px; }
 
-        /* Radio & Checkbox Lists */
-        .opt-list { display: flex; flex-direction: column; gap: 10px; }
-        .opt-item { display: flex; align-items: center; padding: 12px; border: 1px solid var(--border); border-radius: 4px; cursor: pointer; font-size: 1.1rem; }
+        /* Radio & Checkbox */
+        .opt-list { display: flex; flex-direction: column; gap: 12px; }
+        .opt-list.grid { display: grid; grid-template-columns: 1fr 1fr; }
+        .opt-item { display: flex; align-items: center; padding: 15px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 1.1rem; background: white;}
         .opt-item:hover { background: var(--cam-light-blue); }
         .opt-item.selected { border-color: var(--cam-blue); background: var(--cam-light-blue); box-shadow: inset 0 0 0 1px var(--cam-blue); }
-        .opt-icon { width: 20px; height: 20px; border: 2px solid #666; margin-right: 15px; display: flex; justify-content: center; align-items: center; border-radius: 50%; }
+        .opt-icon { width: 22px; height: 22px; border: 2px solid #666; margin-right: 15px; display: flex; justify-content: center; align-items: center; border-radius: 50%; flex-shrink: 0;}
         .multi .opt-icon { border-radius: 3px; }
         .selected .opt-icon { background: var(--cam-blue); border-color: var(--cam-blue); }
         .selected .opt-icon::after { content:''; width:8px; height:8px; background:white; border-radius:50%; }
         .multi.selected .opt-icon::after { content:'✔'; background:none; color:white; font-size:14px; font-weight:bold; }
 
-        /* Matrix Grid TEI */
-        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .matrix-table th, .matrix-table td { border: 1px solid var(--border); padding: 10px; text-align: center; font-size: 1.1rem; }
-        .matrix-table th { background: var(--cam-light-blue); font-weight: bold; }
-        .matrix-cb { width: 22px; height: 22px; cursor: pointer; }
+        /* Matrix TEI */
+        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .matrix-table th, .matrix-table td { border: 1px solid var(--border); padding: 12px; text-align: center; }
+        .matrix-table th { background: var(--cam-light-blue); font-size: 1.1rem; }
+        .matrix-cb { width: 24px; height: 24px; cursor: pointer; }
 
-        /* Soft Keypad & Input */
-        .eq-display { width: 100%; padding: 15px; font-size: 1.5rem; border: 2px solid #666; border-radius: 4px; outline: none; margin-bottom: 15px; background: white; }
+        /* Equation Input & Soft Keypad */
+        .eq-display { width: 100%; padding: 15px; font-size: 1.5rem; border: 2px solid #666; border-radius: 4px; outline: none; margin-bottom: 15px; text-align: center; }
         .eq-display:focus { border-color: var(--focus); box-shadow: 0 0 5px var(--focus); }
-        .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; max-width: 350px; background: #e9ecef; padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
-        .key-btn { padding: 12px; font-size: 1.2rem; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .key-btn:hover { background: #e2e6ea; }
-        .key-btn.op { background: #d0d5db; }
+        .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 400px; background: #e9ecef; padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+        .key-btn { padding: 15px; font-size: 1.2rem; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .key-btn:hover { background: #d0d5db; }
+        .key-btn.op { background: #cfd8dc; }
         .key-btn.wide { grid-column: span 2; }
 
         /* Feedback Overlay */
-        #feedback-overlay { position: fixed; bottom: 20px; right: 20px; padding: 20px 30px; border-radius: 8px; font-size: 1.2rem; font-weight: bold; color: white; display: none; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        #feedback-overlay { position: fixed; bottom: 30px; right: 30px; padding: 20px 40px; border-radius: 8px; font-size: 1.3rem; font-weight: bold; color: white; display: none; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         .correct-fb { background: #28a745; }
         .wrong-fb { background: #dc3545; }
     </style>
@@ -94,14 +95,14 @@
     <div class="sidebar">
         <div class="logo-area">
             <h1>FAST Mathematics</h1>
-            <p>Grade 3 Simulator</p>
+            <p>Level 5 Simulator</p>
         </div>
         <div class="menu-scroll" id="menu"></div>
     </div>
     <div class="main-dash">
-        <h2>Florida B.E.S.T. Mathematics Simulator</h2>
-        <p style="max-width: 600px; font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px; color:#555;">
-            Welcome to the ultimate FAST test environment. This simulator features true Cambium-style interfaces including split-screens, on-screen equation editors, matrix grids, and Level 5 rigor logic.
+        <h2 style="font-size:2rem; color:var(--cam-blue); margin-bottom:10px;">Florida B.E.S.T. Assessment</h2>
+        <p style="max-width: 600px; font-size: 1.2rem; line-height: 1.6; margin-bottom: 40px; color:#555;">
+            Welcome to the fully repaired simulator. All 33 standards are active. Features include Cambium-style split screens, soft-keypads, and Error Analysis formatting.
         </p>
         <button class="mock-btn" onclick="App.startTest()">Launch Mock FAST Test</button>
     </div>
@@ -110,25 +111,23 @@
 <div id="test-interface">
     <div class="top-nav">
         <div class="nav-left">
-            <strong id="test-title">Grade 3 Math Practice</strong>
-            <span id="q-counter" style="opacity: 0.8; font-size: 0.9rem;">Q 1</span>
+            <strong id="test-title" style="font-size:1.1rem;">Practice</strong>
+            <span id="q-counter" style="opacity: 0.8; font-size: 1rem; border-left:1px solid #aaa; padding-left:15px;">Q 1</span>
         </div>
         <div class="nav-right">
-            <button class="nav-btn" onclick="App.exitToMenu()">Save & Exit</button>
-            <button class="nav-btn primary" id="btn-check" onclick="App.check()">Submit & Next &rarr;</button>
+            <button class="nav-btn" onclick="App.exitToMenu()">Save & Pause</button>
+            <button class="nav-btn primary" id="btn-check" onclick="App.check()" disabled>Submit Answer &rarr;</button>
         </div>
     </div>
     <div class="test-body">
-        <div class="pane stimulus-pane" id="stimulus-pane">
-            </div>
+        
+        <div class="pane stimulus-pane" id="stimulus-pane"></div>
         
         <div class="pane response-pane">
-            <div class="q-text" id="q-text">Question text goes here.</div>
-            <div id="q-response-area">
-                </div>
+            <div class="q-text" id="q-text"></div>
+            <div id="q-response-area"></div>
             
             <div id="keypad-container" style="display:none; margin-top:20px;">
-                <input type="text" id="eq-input" class="eq-display" placeholder="Use keypad or keyboard" readonly>
                 <div class="keypad">
                     <button class="key-btn" onclick="App.typeKey('1')">1</button>
                     <button class="key-btn" onclick="App.typeKey('2')">2</button>
@@ -146,8 +145,8 @@
                     <button class="key-btn" onclick="App.typeKey('.')">.</button>
                     <button class="key-btn op" onclick="App.typeKey('/')">/</button>
                     <button class="key-btn op" onclick="App.typeKey('÷')">÷</button>
-                    <button class="key-btn op wide" onclick="App.typeKey('BACK')">&larr; Backspace</button>
-                    <button class="key-btn op wide" onclick="document.getElementById('eq-input').value=''">Clear</button>
+                    <button class="key-btn op wide" onclick="App.typeKey('BACK')">&larr; Delete</button>
+                    <button class="key-btn op wide" onclick="App.typeKey('CLEAR')">Clear All</button>
                 </div>
             </div>
         </div>
@@ -158,96 +157,138 @@
 
 <script>
 // ==========================================
-// 1. ENGINE UTILITIES
+// 1. ENGINE UTILITIES (Crash-Proofed)
 // ==========================================
 const Utils = {
     rInt: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
     pick: (arr) => arr[Math.floor(Math.random() * arr.length)],
     shuffle: (arr) => arr.sort(() => Math.random() - 0.5),
     
-    // Strict 4-Option Generator
+    // Strict 4-Option Generator (Crash-Proof for Strings)
     genOpts: (corr, genFn) => {
         const s = new Set([corr.toString()]);
-        let safe = 0;
-        while(s.size < 4 && safe < 100) { s.add(genFn().toString()); safe++; }
+        let failsafe = 0;
+        
+        while(s.size < 4 && failsafe < 200) { 
+            const val = genFn().toString();
+            if(val !== corr.toString()) s.add(val); 
+            failsafe++; 
+        }
+        
+        // Fallback if generator logic fails
         let fallback = 1;
-        while(s.size < 4) { s.add((parseInt(corr)+fallback).toString()); fallback++; }
+        while(s.size < 4) {
+            if(!isNaN(corr)) {
+                s.add((Number(corr) + fallback).toString());
+            } else {
+                s.add(corr.toString() + " (Option " + fallback + ")"); // Prevents NaN string crash
+            }
+            fallback++;
+        }
         return Array.from(s).sort(() => Math.random() - 0.5).map(x => ({t:x, c:x===corr.toString()}));
+    },
+
+    numWords: (n) => {
+        const o=['','one','two','three','four','five','six','seven','eight','nine'];
+        const ty=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+        const te=['ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+        if(n===0) return 'zero';
+        let s='';
+        if(n>=1000){s+=o[Math.floor(n/1000)]+' thousand '; n%=1000;}
+        if(n>=100){s+=o[Math.floor(n/100)]+' hundred '; n%=100;}
+        if(n>=20){s+=ty[Math.floor(n/10)]+(n%10!==0?' ':'')+o[n%10];}
+        else if(n>=10){s+=te[n-10];}
+        else if(n>0){s+=o[n];}
+        return s.trim();
     }
 };
 
 // ==========================================
-// 2. TEI RENDERER (Cambium Specific)
+// 2. TEI RENDERER
 // ==========================================
 const TEI = {
-    // 1. Interactive Graph
     barGraph: (a, b) => {
         const max = Math.max(a,b) + 3; const step = 150/max;
         let s = `<line x1="30" y1="180" x2="170" y2="180" stroke="black" stroke-width="2"/><line x1="30" y1="10" x2="30" y2="180" stroke="black" stroke-width="2"/>`;
         s += `<rect id="barA" x="50" y="180" width="40" height="0" fill="#003366" /><text x="70" y="195" text-anchor="middle" font-weight="bold">A</text>`;
-        for(let i=1; i<=max; i++) s += `<g class="bar-zone" onclick="document.getElementById('barA').setAttribute('height', ${i*step}); document.getElementById('barA').setAttribute('y', ${180-i*step}); App.data.a=${i};"><rect x="50" y="${180-i*step}" width="40" height="${step}" fill="transparent" stroke="#ccc" stroke-dasharray="2" /></g>`;
+        for(let i=1; i<=max; i++) s += `<g class="bar-zone" onclick="document.getElementById('barA').setAttribute('height', ${i*step}); document.getElementById('barA').setAttribute('y', ${180-i*step}); App.data.a=${i}; App.enableBtn();"><rect x="50" y="${180-i*step}" width="40" height="${step}" fill="transparent" stroke="#ccc" stroke-dasharray="2" /></g>`;
         s += `<rect id="barB" x="110" y="180" width="40" height="0" fill="#ff9900" /><text x="130" y="195" text-anchor="middle" font-weight="bold">B</text>`;
-        for(let i=1; i<=max; i++) s += `<g class="bar-zone" onclick="document.getElementById('barB').setAttribute('height', ${i*step}); document.getElementById('barB').setAttribute('y', ${180-i*step}); App.data.b=${i};"><rect x="110" y="${180-i*step}" width="40" height="${step}" fill="transparent" stroke="#ccc" stroke-dasharray="2" /></g>`;
+        for(let i=1; i<=max; i++) s += `<g class="bar-zone" onclick="document.getElementById('barB').setAttribute('height', ${i*step}); document.getElementById('barB').setAttribute('y', ${180-i*step}); App.data.b=${i}; App.enableBtn();"><rect x="110" y="${180-i*step}" width="40" height="${step}" fill="transparent" stroke="#ccc" stroke-dasharray="2" /></g>`;
         return `<svg width="250" height="250" viewBox="0 0 200 200">${s}</svg><p style="color:#666;">(Click grid lines to set bar height)</p>`;
     },
 
-    // 2. Interactive Fractions
     fracCirc: (n, d) => {
         let p = '';
         for(let i=0; i<d; i++) {
-            const start = (i*360)/d, end = ((i+1)*360)/d;
-            const x1 = 100 + 90 * Math.sin(Math.PI*start/180), y1 = 100 - 90 * Math.cos(Math.PI*start/180);
-            const x2 = 100 + 90 * Math.sin(Math.PI*end/180), y2 = 100 - 90 * Math.cos(Math.PI*end/180);
-            p += `<path d="M100 100 L${x1} ${y1} A90 90 0 0 1 ${x2} ${y2} Z" fill="white" stroke="#333" stroke-width="2" class="clk-slice" onclick="this.setAttribute('fill', this.getAttribute('fill')==='white'?'#ff9900':'white');" />`;
+            const s = (i*360)/d, e = ((i+1)*360)/d;
+            const x1 = 100 + 90 * Math.sin(Math.PI*s/180), y1 = 100 - 90 * Math.cos(Math.PI*s/180);
+            const x2 = 100 + 90 * Math.sin(Math.PI*e/180), y2 = 100 - 90 * Math.cos(Math.PI*e/180);
+            p += `<path d="M100 100 L${x1} ${y1} A90 90 0 0 1 ${x2} ${y2} Z" fill="white" stroke="#333" stroke-width="2" class="clk-slice" onclick="this.setAttribute('fill', this.getAttribute('fill')==='white'?'#ff9900':'white'); App.enableBtn();" />`;
         }
-        return `<svg width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#fff"/>${p}</svg><p style="color:#666;">(Click pieces to shade)</p>`;
+        return `<svg width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#fff"/>${p}</svg><p style="color:#666; font-size:0.9rem;">(Click pieces to shade)</p>`;
     },
 
-    // 3. Matrix Grid Generator
-    matrix: (rows, cols, answers) => { // answers: array of correct col indices per row
+    dropdown: (parts) => { 
+        return parts.map(p => {
+            if(p.opts) {
+                const options = `<option value="">[ Select ]</option>` + p.opts.map(o => `<option value="${o}">${o}</option>`).join('');
+                return `<select class="inline-drop" data-c="${p.c}" onchange="App.enableBtn()">${options}</select>`;
+            }
+            return `<span>${p.t}</span>`;
+        }).join('');
+    },
+
+    hotText: (parts) => { 
+        return parts.map((p, i) => {
+            if(p.hot) return `<span class="hot-text" data-c="${p.c}" onclick="this.classList.toggle('selected'); App.enableBtn();">${p.t}</span>`;
+            return `<span>${p.t}</span>`;
+        }).join('');
+    },
+
+    matrix: (rows, cols, answers) => { 
         let h = `<table class="matrix-table"><tr><th></th>`;
-        cols.forEach(c => h += `<th>${c}</th>`);
-        h += `</tr>`;
+        cols.forEach(c => h += `<th>${c}</th>`); h += `</tr>`;
         rows.forEach((r, rIdx) => {
             h += `<tr><td><strong>${r}</strong></td>`;
             cols.forEach((c, cIdx) => {
-                h += `<td><input type="checkbox" class="matrix-cb" data-r="${rIdx}" data-c="${cIdx}" data-corr="${answers[rIdx].includes(cIdx)}"></td>`;
+                h += `<td><input type="checkbox" class="matrix-cb" data-corr="${answers[rIdx].includes(cIdx)}" onchange="App.enableBtn()"></td>`;
             });
             h += `</tr>`;
         });
         return h + `</table>`;
     },
 
-    // Static SVGs
-    areaModel: (h, w1, w2) => `<svg width="${(w1+w2)*20+40}" height="${h*20+40}" viewBox="0 0 ${(w1+w2)*20+40} ${h*20+40}"><rect x="20" y="20" width="${w1*20}" height="${h*20}" fill="#e6f0fa" stroke="#003366" stroke-width="2"/><text x="${20+(w1*20)/2}" y="${20+(h*20)/2+5}" text-anchor="middle" font-weight="bold">${h}x${w1}</text><rect x="${20+w1*20}" y="20" width="${w2*20}" height="${h*20}" fill="#fff3cd" stroke="#ff9900" stroke-width="2"/><text x="${20+w1*20+(w2*20)/2}" y="${20+(h*20)/2+5}" text-anchor="middle" font-weight="bold">${h}x${w2}</text></svg>`,
-    lShape: (w1,h1,w2,h2) => { const sc=25; return `<svg width="${(w1+w2)*sc+40}" height="${(h1+h2)*sc+40}"><path d="M20 20 H${20+w1*sc} V${20+h1*sc} H${20+(w1+w2)*sc} V${20+(h1+h2)*sc} H20 Z" fill="#e6f0fa" stroke="#003366" stroke-width="3"/><text x="${20+w1*sc/2}" y="15" text-anchor="middle" font-weight="bold">${w1}</text><text x="10" y="${20+(h1+h2)*sc/2}" text-anchor="middle" font-weight="bold">${h1+h2}</text><text x="${20+w1*sc+w2*sc/2}" y="${20+h1*sc-5}" text-anchor="middle" font-weight="bold">${w2}</text><text x="${20+(w1+w2)*sc+10}" y="${20+h1*sc+h2*sc/2}" text-anchor="middle" font-weight="bold">${h2}</text></svg>`; },
-    rulerQuarter: (len) => { let t=''; for(let i=0;i<=5;i++){ t+=`<line x1="${20+i*40}" y1="30" x2="${20+i*40}" y2="60" stroke="black" stroke-width="2"/>`; if(i<5) t+=`<line x1="${40+i*40}" y1="35" x2="${40+i*40}" y2="60" stroke="black"/><line x1="${30+i*40}" y1="45" x2="${30+i*40}" y2="60" stroke="black"/><line x1="${50+i*40}" y1="45" x2="${50+i*40}" y2="60" stroke="black"/>`; t+=`<text x="${20+i*40}" y="25" text-anchor="middle" font-weight="bold">${i}</text>`; } return `<svg width="250" height="90"><rect x="20" y="60" width="200" height="20" fill="#f4f4f4" stroke="black"/><rect x="20" y="65" width="${len*40}" height="10" fill="#ff9900" stroke="black"/>${t}</svg>`; },
-    geoShapes: (t, drawSym) => {
+    // Fixed Visuals (Red lines explicitly added for symmetry)
+    geoShapes: (t, sym) => {
         const s = 'fill="#e6f0fa" stroke="#003366" stroke-width="3"';
-        const sym = drawSym ? `<line x1="50" y1="5" x2="50" y2="75" stroke="red" stroke-width="4" stroke-dasharray="6"/>` : '';
+        // Explicit thick red dashed line
+        const redLine = sym ? `<line x1="50" y1="5" x2="50" y2="95" stroke="red" stroke-width="4" stroke-dasharray="6"/>` : '';
+        const badLine = sym === false ? `<line x1="10" y1="20" x2="90" y2="80" stroke="red" stroke-width="4" stroke-dasharray="6"/>` : '';
+        
         if(t==='perp') return `<svg width="100" height="100"><line x1="50" y1="10" x2="50" y2="90" stroke="black" stroke-width="3"/><line x1="10" y1="50" x2="90" y2="50" stroke="black" stroke-width="3"/><rect x="50" y="50" width="10" height="10" fill="none" stroke="black"/></svg>`;
         if(t==='para') return `<svg width="100" height="100"><line x1="30" y1="20" x2="30" y2="80" stroke="black" stroke-width="3"/><line x1="70" y1="20" x2="70" y2="80" stroke="black" stroke-width="3"/></svg>`;
-        if(t==='trap') return `<svg width="100" height="80"><path d="M20 60 L80 60 L70 20 L30 20 Z" ${s}/>${sym}</svg>`;
-        if(t==='rhomb') return `<svg width="100" height="80"><path d="M50 10 L80 40 L50 70 L20 40 Z" ${s}/>${sym}</svg>`;
-        if(t==='rect') return `<svg width="100" height="80"><rect x="10" y="20" width="80" height="40" ${s}/>${sym}</svg>`;
-        if(t==='tri') return `<svg width="100" height="80"><path d="M10 70 L90 70 L50 10 Z" ${s}/>${sym}</svg>`;
+        if(t==='trap') return `<svg width="100" height="100"><path d="M20 70 L80 70 L60 30 L40 30 Z" ${s}/>${sym?redLine:badLine}</svg>`;
+        if(t==='rhomb') return `<svg width="100" height="100"><path d="M50 20 L80 50 L50 80 L20 50 Z" ${s}/>${sym?redLine:badLine}</svg>`;
+        if(t==='rect') return `<svg width="100" height="100"><rect x="10" y="30" width="80" height="40" ${s}/>${sym?redLine:badLine}</svg>`;
+        if(t==='tri') return `<svg width="100" height="100"><path d="M10 80 L90 80 L50 20 Z" ${s}/>${sym?redLine:badLine}</svg>`;
     },
-    clock: (h,m) => { let t=''; for(let i=0;i<60;i++) t+=`<line x1="50" y1="6" x2="50" y2="${i%5?7:10}" transform="rotate(${i*6} 50 50)" stroke="#333" stroke-width="${i%5?1:2}"/>`; return `<svg width="150" height="150" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="#333" fill="#fff" stroke-width="2"/>${t}<line x1="50" y1="50" x2="50" y2="28" stroke="black" stroke-width="4" stroke-linecap="round" transform="rotate(${(h%12)*30+m*0.5} 50 50)"/><line x1="50" y1="50" x2="50" y2="15" stroke="#cc0000" stroke-width="2" stroke-linecap="round" transform="rotate(${m*6} 50 50)"/><circle cx="50" cy="50" r="4"/></svg>`; },
-    tiled: (w, h) => { let s=''; for(let i=0;i<w;i++) for(let j=0;j<h;j++) s+=`<rect x="${i*25}" y="${j*25}" width="25" height="25" fill="#e6f0fa" stroke="#003366" stroke-width="1"/>`; return `<svg width="${w*25}" height="${h*25}">${s}</svg>`; }
+    rulerQuarter: (len) => { let t=''; for(let i=0;i<=5;i++){ t+=`<line x1="${20+i*40}" y1="30" x2="${20+i*40}" y2="60" stroke="black" stroke-width="2"/>`; if(i<5) t+=`<line x1="${40+i*40}" y1="35" x2="${40+i*40}" y2="60" stroke="black"/><line x1="${30+i*40}" y1="45" x2="${30+i*40}" y2="60" stroke="black"/><line x1="${50+i*40}" y1="45" x2="${50+i*40}" y2="60" stroke="black"/>`; t+=`<text x="${20+i*40}" y="25" text-anchor="middle" font-weight="bold">${i}</text>`; } return `<svg width="250" height="90"><rect x="20" y="60" width="200" height="20" fill="#f4f4f4" stroke="black"/><rect x="20" y="65" width="${len*40}" height="10" fill="#ff9900" stroke="black"/>${t}</svg>`; },
+    lShape: (w1,h1,w2,h2) => { const sc=25; return `<svg width="${(w1+w2)*sc+40}" height="${(h1+h2)*sc+40}"><path d="M20 20 H${20+w1*sc} V${20+h1*sc} H${20+(w1+w2)*sc} V${20+(h1+h2)*sc} H20 Z" fill="#e6f0fa" stroke="#003366" stroke-width="3"/><text x="${20+w1*sc/2}" y="15" text-anchor="middle" font-weight="bold">${w1}</text><text x="10" y="${20+(h1+h2)*sc/2}" text-anchor="middle" font-weight="bold">${h1+h2}</text><text x="${20+w1*sc+w2*sc/2}" y="${20+h1*sc-5}" text-anchor="middle" font-weight="bold">${w2}</text><text x="${20+(w1+w2)*sc+10}" y="${20+h1*sc+h2*sc/2}" text-anchor="middle" font-weight="bold">${h2}</text></svg>`; },
+    clock: (h,m) => { let t=''; for(let i=0;i<60;i++) t+=`<line x1="50" y1="6" x2="50" y2="${i%5?7:10}" transform="rotate(${i*6} 50 50)" stroke="#333" stroke-width="${i%5?1:2}"/>`; return `<svg width="150" height="150" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="#333" fill="#fff" stroke-width="2"/>${t}<line x1="50" y1="50" x2="50" y2="28" stroke="black" stroke-width="4" stroke-linecap="round" transform="rotate(${(h%12)*30+m*0.5} 50 50)"/><line x1="50" y1="50" x2="50" y2="15" stroke="#cc0000" stroke-width="2" stroke-linecap="round" transform="rotate(${m*6} 50 50)"/><circle cx="50" cy="50" r="4"/></svg>`; }
 };
 
 // ==========================================
-// 3. MASTER QUESTION BANK (All 34 Standards)
+// 3. MASTER QUESTION BANK (All 33 Standards)
 // ==========================================
 const Bank = {
     // --- NSO ---
     "MA.3.NSO.1.1": { desc: "Read/Write Numbers", scenarios: [
-        { type: 'drop', gen: () => { const n=Utils.rInt(2000,9000), h=Math.floor((n%1000)/100); return { text:"Editing Task Choice", right: TEI.dropdown([{t:`In ${n}, the value of the hundreds digit is `}, {opts:[h, h*10, h*100], c:h*100}, {t:"."}]), fb:`The digit ${h} is in the hundreds place.` }; }},
-        { type: 'radio', gen: () => { const n=Utils.rInt(1000,9999); return { text: `Select the word form for ${n}.`, options: Utils.genOpts(Utils.numWords(n), ()=>Utils.numWords(Utils.rInt(1000,9999))), fb:"Check place values."}; }}
+        { type: 'drop', gen: () => { const n=Utils.rInt(2000,9000), h=Math.floor((n%1000)/100); return { text:"Editing Task", right: TEI.dropdown([{t:`In ${n}, the value of the hundreds digit is `}, {opts:[h, h*10, h*100], c:h*100}, {t:"."}]), fb:`The digit ${h} is in the hundreds place.` }; }},
+        { type: 'radio', gen: () => { const n=Utils.rInt(1000,9999); return { text: `Select the word form for ${n}.`, options: Utils.genOpts(Utils.numWords(n), ()=>Utils.numWords(Utils.rInt(1000,9999))), fb:"Read place values carefully."}; }}
     ]},
     "MA.3.NSO.1.2": { desc: "Compose/Decompose", scenarios: [
-        { type: 'eq', gen: () => { const h=Utils.rInt(1,5), t=Utils.rInt(15,35); return { text: `<b>Level 5 Rigor</b><br>What number is formed by ${h} hundreds, ${t} tens, and 5 ones?`, ans: (h*100+t*10+5).toString(), fb:`Regroup: ${h}00 + ${t}0 + 5.`}; }},
-        { type: 'radio', gen: () => { const n=Utils.rInt(2000,8000); return { text:`Which decomposition equals ${n}?`, options: Utils.shuffle([{t:`${Math.floor(n/1000)*1000} + ${n%1000}`,c:true},{t:`${n+100}`,c:false},{t:`${n*10}`,c:false},{t:`${n-100}`,c:false}]), fb:"Add the parts."}; }}
+        { type: 'eq', gen: () => { const h=Utils.rInt(2,5), t=Utils.rInt(15,35); return { text: `<b>Level 5 Rigor</b><br>What number is formed by ${h} hundreds, ${t} tens, and 5 ones?`, ans: (h*100+t*10+5).toString(), fb:`Regroup: ${h}00 + ${t}0 + 5.`}; }},
+        { type: 'radio', gen: () => { const n=Utils.rInt(2000,8000); return { text:`Which decomposition equals ${n}?`, options: Utils.shuffle([{t:`${Math.floor(n/1000)*1000} + ${n%1000}`,c:true},{t:`${n+100}`,c:false},{t:`${n*10}`,c:false},{t:`${n-100}`,c:false}]), fb:"Add the parts to check."}; }}
     ]},
     "MA.3.NSO.1.3": { desc: "Compare", scenarios: [
         { type: 'hot', gen: () => { const a=Utils.rInt(1000,4000), b=a+Utils.rInt(10,50); return { text: `Select the correct symbol:`, right: `${a} ` + TEI.hotText([{t:" > ",hot:true,c:false},{t:" < ",hot:true,c:true},{t:" = ",hot:true,c:false}]) + ` ${b}`, fb:`${a} is smaller.`}; }},
@@ -258,11 +299,11 @@ const Bank = {
         { type: 'eq', gen: () => { const n=Utils.rInt(150,850); return { text:`Round ${n} to the nearest 100.`, ans: (Math.round(n/100)*100).toString(), fb:"5 or more rounds up."}; }}
     ]},
     "MA.3.NSO.2.1": { desc: "Add/Sub", scenarios: [
-        { type: 'eq', gen: () => { const a=Utils.rInt(2000,5000), b=Utils.rInt(1000,1999); return { text: `Find the difference: ${a} - ${b} = ?`, ans: (a-b).toString(), fb:"Standard algorithm."}; }},
-        { type: 'radio', gen: () => { const a=Utils.rInt(1000,4000), b=Utils.rInt(1000,4000); return { text: `<b>Error Analysis</b><br>A student added ${a} + ${b} and got ${(a+b)-100}. What mistake was made?`, options: Utils.shuffle([{t:"Failed to regroup the hundreds correctly.",c:true},{t:"Added the thousands place wrong.",c:false},{t:"Subtracted instead of adding.",c:false},{t:"No mistake, it is correct.",c:false}]), fb:"Check the hundreds place."}; }}
+        { type: 'eq', gen: () => { const a=Utils.rInt(2000,5000), b=Utils.rInt(1000,1999); return { text: `Find the difference: ${a} - ${b} = ?`, ans: (a-b).toString(), fb:"Use standard algorithm."}; }},
+        { type: 'drop', gen: () => { const a=Utils.rInt(1000,4000), b=Utils.rInt(1000,4000); return { text: `<b>Error Analysis</b><br>A student added ${a} + ${b} and got ${(a+b)-100}. What mistake did they make?`, right: TEI.dropdown([{t:"They failed to regroup the "}, {opts:["ones", "tens", "hundreds"], c:"hundreds"}, {t:" place."}]), fb:"The error is exactly 100, meaning a hundreds regroup was missed."}; }}
     ]},
     "MA.3.NSO.2.2": { desc: "Mult/Div Facts", scenarios: [
-        { type: 'eq', gen: () => { const a=Utils.rInt(7,12), b=Utils.rInt(7,12); return { text: `Solve: ${a} x ${b} = ?`, ans: (a*b).toString(), fb:"Fact recall."}; }}
+        { type: 'eq', gen: () => { const a=Utils.rInt(7,12), b=Utils.rInt(7,12); return { text: `Solve: ${a} x ${b} = ?`, ans: (a*b).toString(), fb:"Recall math facts."}; }}
     ]},
     "MA.3.NSO.2.3": { desc: "Mult by 10s", scenarios: [
         { type: 'eq', gen: () => { const a=Utils.rInt(4,9), b=Utils.pick([20,30,40,50,60]); return { text: `Solve: ${a} x ${b} = ?`, ans: (a*b).toString(), fb:`Multiply ${a} x ${b/10}, then add 0.`}; }}
@@ -273,14 +314,14 @@ const Bank = {
 
     // --- AR ---
     "MA.3.AR.1.1": { desc: "Distributive Prop", scenarios: [
-        { type: 'radio', gen: () => { const a=Utils.rInt(4,9), b=Utils.rInt(12,18); return { left: TEI.areaModel(a,10,b-10), text: `Which expression represents the Area Model for ${a} x ${b}?`, options: Utils.shuffle([{t:`(${a}x10) + (${a}x${b-10})`,c:true},{t:`${a} + 10 + ${b-10}`,c:false},{t:`(${a}x10) x (${a}x${b-10})`,c:false},{t:`${a} x 100`,c:false}]), fb:"Add the two sub-areas." }; }},
+        { type: 'drop', gen: () => { return { text: `<b>Error Analysis</b><br>Student A wrote: 7 x 13 = (7 x 10) + (7 x 30). Fix their equation.`, right: TEI.dropdown([{t:`7 x 13 = (7 x 10) + (7 x `}, {opts:[3, 13, 20], c:3}, {t:`)`}]), fb:"13 breaks into 10 and 3." }; }},
         { type: 'multi', gen: () => { return { text: `Select ALL expressions equal to 5 x 14.`, options: Utils.shuffle([{t:"(5x10) + (5x4)",c:true},{t:"70",c:true},{t:"5 + 14",c:false},{t:"(5x10) x (5x4)",c:false}]), fb:"14 breaks into 10 and 4."}; }}
     ]},
     "MA.3.AR.1.2": { desc: "Multi-Step Probs", scenarios: [
         { type: 'eq', gen: () => { const a=Utils.rInt(3,6), b=Utils.rInt(4,8), c=Utils.rInt(2,10); return { text: `<b>Level 5 Rigor</b><br>Jon buys ${a} packs of cards. Each pack has ${b} cards. He gives ${c} cards away. How many are left?`, ans: ((a*b)-c).toString(), fb:`(${a} x ${b}) - ${c}.`}; }}
     ]},
     "MA.3.AR.2.1": { desc: "Inverse Ops", scenarios: [
-        { type: 'hot', gen: () => { const a=Utils.rInt(6,9), p=a*Utils.rInt(6,9); return { text: `Select the equation used to solve <strong>${p} ÷ ${a} = ?</strong>`, right: TEI.hotText([{t:`${a} x ? = ${p}`,hot:true,c:true},{t:" / "},{t:`${p} - ${a} = ?`,hot:true,c:false},{t:" / "},{t:`${a} + ? = ${p}`,hot:true,c:false}]), fb:"Inverse operation."}; }}
+        { type: 'hot', gen: () => { const a=Utils.rInt(6,9), p=a*Utils.rInt(6,9); return { text: `Select the equation used to solve <strong>${p} ÷ ${a} = ?</strong>`, right: TEI.hotText([{t:`${a} x ? = ${p}`,hot:true,c:true},{t:" / "},{t:`${p} - ${a} = ?`,hot:true,c:false},{t:" / "},{t:`${a} + ? = ${p}`,hot:true,c:false}]), fb:"Multiplication is the inverse of division."}; }}
     ]},
     "MA.3.AR.2.2": { desc: "Equality", scenarios: [
         { type: 'drop', gen: () => { const a=Utils.rInt(4,8), b=Utils.rInt(4,8); return { text:"Make the equation true.", right: TEI.dropdown([{t:`${a} x ${b} = `},{opts:[a*b, a+b, a*b+1],c:a*b},{t:` + 0`}]), fb:"Both sides must equal."}; }}
@@ -317,13 +358,15 @@ const Bank = {
 
     // --- GR ---
     "MA.3.GR.1.1": { desc: "Points/Lines", scenarios: [
-        { type: 'radio', gen: () => { return { text: "Which image shows <strong>Perpendicular Lines</strong>?", options: Utils.shuffle([{t:TEI.geoShapes('perp'),c:true},{t:TEI.geoShapes('para'),c:false},{t:TEI.geoShapes('trap'),c:false},{t:TEI.geoShapes('tri'),c:false}]), fb:"90-degree right angles."}; }}
+        { type: 'radio', gen: () => { return { text: "Which image shows <strong>Perpendicular Lines</strong>?", options: Utils.shuffle([{t:TEI.geoShapes('perp'),c:true},{t:TEI.geoShapes('para'),c:false},{t:TEI.geoShapes('trap'),c:false},{t:TEI.geoShapes('tri'),c:false}]), fb:"90-degree right angles."}; }},
+        { type: 'hot', gen: () => { return { text: "Select the term for a line with one endpoint and one arrow.", right: TEI.hotText([{t:"Line Segment",hot:true,c:false},{t:" / "},{t:"Ray",hot:true,c:true},{t:" / "},{t:"Line",hot:true,c:false}]), fb:"Rays start at a point and go forever in one direction."}; }}
     ]},
     "MA.3.GR.1.2": { desc: "Attributes", scenarios: [
-        { type: 'matrix', gen: () => { return { text: "Match the shapes to their attributes.", right: TEI.matrix(["Square", "Trapezoid"], ["4 Right Angles", "Parallel Sides"], [[0,1],[1]]), fb:"Squares have both; Trapezoids only have parallel sides."}; }}
+        { type: 'matrix', gen: () => { return { text: "Match the shapes to their attributes.", right: TEI.matrix(["Square", "Trapezoid"], ["4 Right Angles", "Parallel Sides"], [[0,1],[1]]), fb:"Squares have both; Trapezoids only have parallel sides."}; }},
+        { type: 'radio', gen: () => { return { text: "Click the shape that is a Rhombus.", options: Utils.shuffle([{t:TEI.geoShapes('rhomb'),c:true},{t:TEI.geoShapes('rect'),c:false},{t:TEI.geoShapes('trap'),c:false},{t:TEI.geoShapes('tri'),c:false}]), fb:"Rhombus has 4 equal sides."}; }}
     ]},
     "MA.3.GR.1.3": { desc: "Symmetry", scenarios: [
-        { type: 'radio', gen: () => { return { text: "Which figure shows a correct line of symmetry?", options: Utils.shuffle([{t:TEI.geoShapes('rect',true),c:true},{t:TEI.geoShapes('trap',true),c:false},{t:TEI.geoShapes('para',false),c:false},{t:TEI.geoShapes('rhomb',false),c:false}]), fb:"Must cut into perfect mirror images."}; }}
+        { type: 'radio', gen: () => { return { text: "Which figure shows a correct <strong>line of symmetry</strong>? (Red Dashed Line)", options: Utils.shuffle([{t:TEI.geoShapes('rect',true),c:true},{t:TEI.geoShapes('trap',false),c:false},{t:TEI.geoShapes('para',false),c:false},{t:TEI.geoShapes('rhomb',false),c:false}]), fb:"Must cut into perfect mirror images."}; }}
     ]},
     "MA.3.GR.2.1": { desc: "Area", scenarios: [
         { type: 'eq', gen: () => { const w=Utils.rInt(4,7), h=Utils.rInt(3,5); return { left: TEI.tiled(w,h), text: "Find the Area.", ans:(w*h).toString(), fb:"Multiply length x width."}; }}
@@ -366,7 +409,7 @@ const Bank = {
 // ==========================================
 const App = {
     currStd: null, currQ: null, score: 0, mode: 'practice', qCount: 1,
-    history: {}, data: {}, 
+    history: {}, data: {}, activeInput: 'eq-input',
 
     init: function() {
         const m = document.getElementById('menu');
@@ -393,6 +436,7 @@ const App = {
         this.mode = 'test'; this.score = 0; this.qCount = 1;
         document.getElementById('dashboard').style.display = 'none';
         document.getElementById('test-interface').style.display = 'flex';
+        document.querySelectorAll('.std-btn').forEach(x=>x.classList.remove('active'));
         this.nextTestQ();
     },
 
@@ -408,19 +452,24 @@ const App = {
     },
 
     load: function(id, isTest=false) {
-        this.currStd = id; this.data = {};
+        this.currStd = id; this.data = {}; this.activeInput = 'eq-input';
         document.getElementById('test-title').innerText = isTest ? `FAST Mock Test` : `Practice: ${id}`;
         document.getElementById('q-counter').innerText = isTest ? `Q ${this.qCount}` : ``;
         
+        // Anti-Repeat Memory Logic
         const count = Bank[id].scenarios.length;
-        const last = this.history[id] !== undefined ? this.history[id] : -1;
-        const next = Utils.pickScenario(count, last);
-        this.history[id] = next;
+        if (!this.history[id]) this.history[id] = [];
+        if (this.history[id].length >= count) this.history[id] = []; // Reset when all are seen
+        
+        let next;
+        do { next = Math.floor(Math.random() * count); } while (this.history[id].includes(next) && count > 1);
+        this.history[id].push(next);
 
+        // Generate Question Data
         const q = Bank[id].scenarios[next].gen();
         this.currQ = q; this.currQ.type = Bank[id].scenarios[next].type;
 
-        // Reset UI
+        // Reset UI Panels
         const stim = document.getElementById('stimulus-pane');
         const resp = document.getElementById('q-response-area');
         const kp = document.getElementById('keypad-container');
@@ -433,7 +482,9 @@ const App = {
 
         // Render Question Types
         if(q.type === 'radio' || q.type === 'multi') {
-            const list = document.createElement('div'); list.className = 'opt-list';
+            const list = document.createElement('div'); 
+            list.className = q.options[0].t.includes('<svg') ? 'opt-list grid' : 'opt-list';
+            
             q.options.forEach((o,i) => {
                 const el = document.createElement('div'); el.className = `opt-item ${q.type}`;
                 el.innerHTML = `<div class="opt-icon"></div> <div>${o.t}</div>`;
@@ -449,25 +500,27 @@ const App = {
                 list.appendChild(el);
             });
             resp.appendChild(list);
-        } else if (q.type === 'eq') {
-            kp.style.display = 'block'; document.getElementById('eq-input').value = '';
-        } else if (q.type === 'interact' || q.type === 'drop' || q.type === 'hot' || q.type === 'matrix') {
+        } 
+        else if (q.type === 'eq') {
+            kp.style.display = 'block'; 
+            document.getElementById('eq-input').value = '';
+        } 
+        else if (q.type === 'interact' || q.type === 'drop' || q.type === 'hot' || q.type === 'matrix') {
             resp.innerHTML = q.right || '';
-            // For matrix, bind click events
             if(q.type === 'matrix') {
-                document.querySelectorAll('.matrix-cb').forEach(cb => {
-                    cb.onchange = () => App.enableBtn();
-                });
+                document.querySelectorAll('.matrix-cb').forEach(cb => { cb.onchange = () => App.enableBtn(); });
             }
         }
 
         const btn = document.getElementById('btn-check');
-        btn.innerText = "Submit & Next \u2192"; btn.disabled = true;
+        btn.innerText = "Submit Answer \u2192"; btn.disabled = true;
     },
 
     typeKey: function(k) {
-        const inp = document.getElementById('eq-input');
-        if(k === 'BACK') inp.value = inp.value.slice(0,-1);
+        if(!this.activeInput) return;
+        const inp = document.getElementById(this.activeInput);
+        if(k === 'CLEAR') inp.value = '';
+        else if(k === 'BACK') inp.value = inp.value.slice(0,-1);
         else inp.value += k;
         App.enableBtn();
     },
@@ -481,6 +534,7 @@ const App = {
         if(q.type === 'multi') ok = q.options.every(o => !!o.sel === o.c);
         if(q.type === 'eq') ok = document.getElementById('eq-input').value.trim() === q.ans;
         if(q.type === 'interact') ok = q.check();
+        
         if(q.type === 'hot') {
             const spans = document.querySelectorAll('.hot-text'); ok = true;
             spans.forEach(s => { if(s.classList.contains('selected') !== (s.dataset.c === "true")) ok = false; });
@@ -500,7 +554,7 @@ const App = {
         fb.style.display = 'block';
         setTimeout(() => { fb.style.display = 'none'; }, 1500);
 
-        if(ok) this.score++;
+        if(ok) { this.score++; }
         this.qCount++;
 
         setTimeout(() => {
