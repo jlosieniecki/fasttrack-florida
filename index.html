@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florida FAST Math | Level 5 Authentic Simulator</title>
+    <title>Florida FAST Math | Ultimate Level 5 Simulator</title>
     <style>
         :root {
             --cam-blue: #003366; --cam-light-blue: #e6f0fa; --cam-gray: #f4f4f4;
@@ -22,7 +22,6 @@
         .std-btn { display: block; width: 100%; text-align: left; padding: 10px; margin-bottom: 4px; background: transparent; border: 1px solid transparent; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; transition: 0.1s; }
         .std-btn:hover { background: var(--cam-light-blue); border-color: #b2dfdb; }
         .std-btn.active { background: var(--cam-light-blue); border-color: var(--cam-blue); font-weight: bold; }
-        .std-btn small { display: block; font-size: 0.75rem; margin-top: 3px; color: #666; font-weight: normal; }
 
         .main-dash { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; background: white; }
         .mock-btn { padding: 20px 50px; font-size: 1.3rem; font-weight: bold; background: #0056b3; color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,86,179,0.3); transition: 0.2s; }
@@ -42,13 +41,13 @@
         .test-body { flex: 1; display: flex; overflow: hidden; }
         .pane { flex: 1; overflow-y: auto; padding: 40px; position: relative; }
         .stimulus-pane { border-right: 3px solid var(--border); background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; max-width: 45%; }
-        .response-pane { background: white; display: flex; flex-direction: column; position: relative; padding-bottom: 100px; }
+        .response-pane { background: white; display: flex; flex-direction: column; position: relative; padding-bottom: 120px; }
 
         .q-text { font-size: 1.35rem; line-height: 1.6; margin-bottom: 20px; color: #212529; }
 
         /* TASK BLOCKS (Progressive Disclosure) */
         .task-block { background: #fff; border: 1px solid var(--border); border-left: 5px solid var(--cam-blue); border-radius: 4px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: opacity 0.4s ease, transform 0.4s ease; }
-        .task-hidden { opacity: 0; pointer-events: none; height: 0; margin: 0; padding: 0; overflow: hidden; border: none; transform: translateY(-10px); }
+        .task-hidden { opacity: 0; pointer-events: none; height: 0; margin: 0; padding: 0; border: none; transform: translateY(-10px); }
         .task-label { font-weight: bold; font-size: 1.15rem; color: var(--cam-blue); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
 
         /* TEI Elements */
@@ -61,10 +60,9 @@
         .hot-text { cursor: pointer; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; margin: 0 3px; background: white; display: inline-block; font-weight: bold; color: #0056b3; text-decoration: underline; }
         .hot-text:hover { border-color: #0056b3; background: #e6f0fa; }
         .hot-text.selected { background: #0056b3; color: white; border-color: #0056b3; text-decoration: none; }
-        
         .inline-drop { font-size: 1.15rem; padding: 6px 12px; border: 2px solid #546e7a; border-radius: 4px; cursor: pointer; font-weight: bold; margin: 0 4px; background: #f8f9fa; }
 
-        /* Radio & Checkbox */
+        /* Options */
         .opt-list { display: flex; flex-direction: column; gap: 10px; }
         .opt-list.grid { display: grid; grid-template-columns: 1fr 1fr; }
         .opt-item { display: flex; align-items: center; padding: 15px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 1.15rem; background: white; transition: 0.1s;}
@@ -76,14 +74,13 @@
         .selected .opt-icon::after { content:''; width:10px; height:10px; background:white; border-radius:50%; }
         .multi.selected .opt-icon::after { content:'✔'; background:none; color:white; font-size:16px; font-weight:bold; }
 
-        /* Matrix TEI */
         .matrix-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; font-size: 1.1rem; }
         .matrix-table th, .matrix-table td { border: 1px solid var(--border); padding: 12px; text-align: center; }
         .matrix-table th { background: var(--cam-light-blue); font-weight: bold; color: var(--cam-blue); }
         .matrix-cb { width: 24px; height: 24px; cursor: pointer; }
         
-        /* Universal Keypad */
-        .eq-input { width: 100%; max-width: 200px; padding: 12px; font-size: 1.4rem; border: 2px solid #666; border-radius: 6px; outline: none; text-align: center; margin: 5px; background: white; font-weight: bold; transition: 0.2s;}
+        /* Keypad */
+        .eq-input { width: 100%; max-width: 250px; padding: 12px; font-size: 1.4rem; border: 2px solid #666; border-radius: 6px; outline: none; text-align: center; margin: 5px; background: white; font-weight: bold; transition: 0.2s;}
         .eq-input.active-focus { border-color: var(--focus); box-shadow: 0 0 8px rgba(255,153,0,0.6); background: #fffde7; }
         
         .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-width: 380px; background: #e9ecef; padding: 15px; border-radius: 8px; border: 1px solid #ced4da; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -116,7 +113,7 @@
     <div class="main-dash">
         <h2 style="font-size:2.5rem; color:var(--cam-blue); margin-bottom:15px;">Florida B.E.S.T. Engine</h2>
         <p style="max-width: 650px; font-size: 1.25rem; line-height: 1.6; margin-bottom: 40px; color:#555;">
-            This engine features <strong>Full 34 Standard Coverage</strong>, authentic manual Cambium navigation, progressive disclosure (Part A/B), and dynamically rotating logic stems for infinite play.
+            Features: Full 34-Standard Blueprint, Strict State-Machine Navigation, Smart Word Form Distractors, and Level 5 Progressive Disclosure Logic.
         </p>
         <button class="mock-btn" onclick="App.startTest()">Launch Authentic Mock Test</button>
     </div>
@@ -129,8 +126,8 @@
             <span id="q-counter" style="opacity: 0.9; font-size: 1.1rem; border-left:2px solid #888; padding-left:15px;">Q 1</span>
         </div>
         <div class="nav-right">
-            <button class="nav-btn">⚑ Flag</button>
-            <button class="nav-btn" onclick="App.exitToMenu()">Pause</button>
+            <button class="nav-btn" onclick="this.innerText = this.innerText === '⚑ Flag' ? '⚑ Flagged' : '⚑ Flag'">⚑ Flag</button>
+            <button class="nav-btn" onclick="App.exitToMenu()">Pause / Save</button>
             <button class="nav-btn primary" id="btn-next" onclick="App.nextTestQ()" disabled>Next &rarr;</button>
         </div>
     </div>
@@ -171,34 +168,44 @@
 
 <script>
 // ==========================================
-// 1. PROCEDURAL LOGIC ENGINE
+// 1. PROCEDURAL ENGINE
 // ==========================================
 const Utils = {
     rInt: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
     pick: (arr) => arr[Math.floor(Math.random() * arr.length)],
     shuffle: (arr) => arr.sort(() => Math.random() - 0.5),
     
-    // The "Stem Matrix" for Infinite Contexts
-    genContext: () => Utils.pick([
-        { type: "money", n: Utils.pick(["Leo","Mia","Sam"]), act1: "earned", unit: "$", per: "per hour", act2: "spent", isSub: true },
-        { type: "distance", n: Utils.pick(["Zoe","David","Chloe"]), act1: "ran", unit: "miles", per: "per day", act2: "walked back", isSub: true },
-        { type: "inventory", n: Utils.pick(["Carlos","Emma","Jamal"]), act1: "bought boxes of", unit: "stickers", per: "per box", act2: "was given more", isSub: false },
-        { type: "time", n: Utils.pick(["Sarah","Jon","Bailey"]), act1: "read", unit: "pages", per: "per minute", act2: "skipped", isSub: true }
+    // Stem Matrix
+    genCtx: () => Utils.pick([
+        { n: Utils.pick(["Leo","Mia","Sam"]), act1: "earned", unit: "$", per: "an hour", act2: "spent", isSub: true },
+        { n: Utils.pick(["Zoe","David","Chloe"]), act1: "ran", unit: "miles", per: "a day", act2: "walked backwards", isSub: true },
+        { n: Utils.pick(["Carlos","Emma","Jamal"]), act1: "collected boxes of", unit: "stickers", per: "per box", act2: "was given more", isSub: false },
+        { n: Utils.pick(["Sarah","Jon","Bailey"]), act1: "read", unit: "pages", per: "a minute", act2: "had to re-read", isSub: true }
     ]),
 
-    genSmartOpts: (corr, type) => {
-        const s = new Set([corr.toString()]);
-        if(type === 'word') {
-            const num = parseInt(corr.replace(/,/g, '').replace(/[^0-9]/g, '')); 
-            if(!isNaN(num)) {
-                s.add(Utils.numWords(num + 100)); s.add(Utils.numWords(num - 10)); s.add(Utils.numWords(Math.floor(num/10)));
-            }
-            while(s.size < 4) s.add(Utils.numWords(Utils.rInt(1000,9999)));
-        } else {
-            const num = parseFloat(corr);
-            if(!isNaN(num)) { s.add((num + 10).toString()); s.add((num - 10).toString()); s.add((num + 100).toString()); }
-            let fall = 1; while(s.size < 4) { s.add((num + fall).toString()); fall++; }
+    // Smart Word Form Distractor
+    genWordOpts: (num) => {
+        const s = new Set([Utils.numWords(num)]);
+        const strNum = num.toString();
+        // Misconception 1: Magnitude shift
+        if (num > 1000) s.add(Utils.numWords(Math.floor(num/10)));
+        // Misconception 2: Missed zero placeholder
+        if (strNum.includes('0')) {
+            let fake = strNum.replace('0', '5');
+            s.add(Utils.numWords(parseInt(fake)));
         }
+        // Misconception 3: Added hundreds
+        s.add(Utils.numWords(num + 100));
+        
+        while(s.size < 4) s.add(Utils.numWords(Utils.rInt(1000, 9999)));
+        return Array.from(s).sort(() => Math.random() - 0.5).map(x => ({t:x, c:x===Utils.numWords(num)}));
+    },
+
+    genNumOpts: (corr) => {
+        const s = new Set([corr.toString()]);
+        const num = parseFloat(corr);
+        if(!isNaN(num)) { s.add((num + 10).toString()); s.add((num - 10).toString()); s.add((num + 100).toString()); }
+        let fall = 1; while(s.size < 4) { s.add((num + fall).toString()); fall++; }
         return Array.from(s).sort(() => Math.random() - 0.5).map(x => ({t:x, c:x===corr.toString()}));
     },
 
@@ -216,15 +223,15 @@ const Utils = {
 };
 
 // ==========================================
-// 2. TEI RENDERER 
+// 2. TEI RENDERER
 // ==========================================
 const TEI = {
     barGraph: (a, b) => {
         const max = Math.max(a,b) + 3; const step = 150/max;
         let s = `<line x1="30" y1="180" x2="170" y2="180" stroke="#333" stroke-width="2"/><line x1="30" y1="10" x2="30" y2="180" stroke="#333" stroke-width="2"/>`;
-        s += `<rect id="barA" x="50" y="180" width="40" height="0" fill="#003366" /><text x="70" y="195" text-anchor="middle" font-weight="bold">Item 1</text>`;
+        s += `<rect id="barA" x="50" y="180" width="40" height="0" fill="#003366" /><text x="70" y="195" text-anchor="middle" font-weight="bold">Item A</text>`;
         for(let i=1; i<=max; i++) s += `<g class="bar-zone" onclick="document.getElementById('barA').setAttribute('height', ${i*step}); document.getElementById('barA').setAttribute('y', ${180-i*step}); App.data.a=${i}; App.interactionTrigger();"><rect x="50" y="${180-i*step}" width="40" height="${step}" fill="transparent" stroke="#ccc" stroke-dasharray="2" /></g>`;
-        s += `<rect id="barB" x="110" y="180" width="40" height="0" fill="#ff9900" /><text x="130" y="195" text-anchor="middle" font-weight="bold">Item 2</text>`;
+        s += `<rect id="barB" x="110" y="180" width="40" height="0" fill="#ff9900" /><text x="130" y="195" text-anchor="middle" font-weight="bold">Item B</text>`;
         for(let i=1; i<=max; i++) s += `<g class="bar-zone" onclick="document.getElementById('barB').setAttribute('height', ${i*step}); document.getElementById('barB').setAttribute('y', ${180-i*step}); App.data.b=${i}; App.interactionTrigger();"><rect x="110" y="${180-i*step}" width="40" height="${step}" fill="transparent" stroke="#ccc" stroke-dasharray="2" /></g>`;
         for(let i=0; i<=max; i+=2) s += `<text x="25" y="${180-i*step + 5}" font-size="12" text-anchor="end">${i}</text>`;
         return `<svg width="100%" height="220" viewBox="0 0 200 200">${s}</svg>`;
@@ -239,127 +246,158 @@ const TEI = {
         }
         return `<svg width="220" height="220" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#fff"/>${p}</svg>`;
     },
-    dropdown: (id, parts) => { 
-        return parts.map(p => {
-            if(p.opts) return `<select class="inline-drop drop-${id}" data-c="${p.c}" onchange="App.interactionTrigger()"><option value="">[ Select ]</option>` + p.opts.map(o => `<option value="${o}">${o}</option>`).join('') + `</select>`;
-            return `<span>${p.t}</span>`;
-        }).join('');
-    },
-    hotText: (parts) => { 
-        return parts.map((p) => p.hot ? `<span class="hot-text" data-c="${p.c}" onclick="this.classList.toggle('selected'); App.interactionTrigger();">${p.t}</span>` : `<span>${p.t}</span>`).join('');
-    },
+    dropdown: (id, parts) => parts.map(p => p.opts ? `<select class="inline-drop drop-${id}" data-c="${p.c}" onchange="App.interactionTrigger()"><option value="">[ ? ]</option>` + p.opts.map(o => `<option value="${o}">${o}</option>`).join('') + `</select>` : `<span>${p.t}</span>`).join(''),
+    hotText: (parts) => parts.map((p) => p.hot ? `<span class="hot-text" data-c="${p.c}" onclick="this.classList.toggle('selected'); App.interactionTrigger();">${p.t}</span>` : `<span>${p.t}</span>`).join(''),
     matrix: (rows, cols, answers) => { 
         let h = `<table class="matrix-table"><tr><th></th>`; cols.forEach(c => h += `<th>${c}</th>`); h += `</tr>`;
-        rows.forEach((r, rIdx) => {
-            h += `<tr><td><strong>${r}</strong></td>`;
-            cols.forEach((c, cIdx) => h += `<td><input type="checkbox" class="matrix-cb" data-corr="${answers[rIdx].includes(cIdx)}" onchange="App.interactionTrigger()"></td>`);
-            h += `</tr>`;
-        }); return h + `</table>`;
+        rows.forEach((r, rIdx) => { h += `<tr><td><strong>${r}</strong></td>`; cols.forEach((c, cIdx) => h += `<td><input type="checkbox" class="matrix-cb" data-corr="${answers[rIdx].includes(cIdx)}" onchange="App.interactionTrigger()"></td>`); h += `</tr>`; }); return h + `</table>`;
     },
     geoSym: (type) => {
         const s = 'fill="#e6f0fa" stroke="#003366" stroke-width="3"';
         const line = `<line x1="50" y1="5" x2="50" y2="95" stroke="red" stroke-width="4" stroke-dasharray="6"/>`;
-        if(type === 'half-rect') return `<svg width="100" height="100"><rect x="10" y="30" width="40" height="40" ${s}/>${line}</svg>`;
-        if(type === 'full-rect') return `<svg width="100" height="100"><rect x="10" y="30" width="80" height="40" ${s}/>${line}</svg>`;
-        if(type === 'wrong-rect') return `<svg width="100" height="100"><rect x="10" y="30" width="40" height="40" ${s}/><rect x="50" y="10" width="40" height="40" ${s}/>${line}</svg>`;
-        if(type === 'wrong-para') return `<svg width="100" height="100"><path d="M10 70 L50 70 L30 30 Z" ${s}/><path d="M90 70 L50 70 L70 30 Z" ${s}/>${line}</svg>`;
+        if(type === 'half') return `<svg width="100" height="100"><rect x="10" y="30" width="40" height="40" ${s}/>${line}</svg>`;
+        if(type === 'full') return `<svg width="100" height="100"><rect x="10" y="30" width="80" height="40" ${s}/>${line}</svg>`;
+        if(type === 'wrong1') return `<svg width="100" height="100"><rect x="10" y="30" width="40" height="40" ${s}/><rect x="50" y="10" width="40" height="40" ${s}/>${line}</svg>`;
+        if(type === 'wrong2') return `<svg width="100" height="100"><path d="M10 70 L50 70 L30 30 Z" ${s}/><path d="M90 70 L50 70 L70 30 Z" ${s}/>${line}</svg>`;
     },
     areaModel: (h, w1, w2) => `<svg width="${(w1+w2)*20+40}" height="${h*20+40}"><rect x="20" y="20" width="${w1*20}" height="${h*20}" fill="#b2dfdb" stroke="#003366" stroke-width="2"/><text x="${20+(w1*20)/2}" y="${20+(h*20)/2+5}" text-anchor="middle" font-weight="bold">${h}x${w1}</text><rect x="${20+w1*20}" y="20" width="${w2*20}" height="${h*20}" fill="#ffe0b2" stroke="#ff9900" stroke-width="2"/><text x="${20+w1*20+(w2*20)/2}" y="${20+(h*20)/2+5}" text-anchor="middle" font-weight="bold">${h}x${w2}</text></svg>`,
-    lShape: (w1,h1,w2,h2) => { const sc=25; return `<svg width="${(w1+w2)*sc+40}" height="${(h1+h2)*sc+40}"><path d="M20 20 H${20+w1*sc} V${20+h1*sc} H${20+(w1+w2)*sc} V${20+(h1+h2)*sc} H20 Z" fill="#e6f0fa" stroke="#003366" stroke-width="3"/><text x="${20+w1*sc/2}" y="15" text-anchor="middle" font-weight="bold">${w1}</text><text x="10" y="${20+(h1+h2)*sc/2}" text-anchor="middle" font-weight="bold">${h1+h2}</text><text x="${20+w1*sc+w2*sc/2}" y="${20+h1*sc-5}" text-anchor="middle" font-weight="bold">${w2}</text><text x="${20+(w1+w2)*sc+10}" y="${20+h1*sc+h2*sc/2}" text-anchor="middle" font-weight="bold">${h2}</text></svg>`; },
+    lShape: (w1,h1,w2,h2) => `<svg width="${(w1+w2)*25+40}" height="${(h1+h2)*25+40}"><path d="M20 20 H${20+w1*25} V${20+h1*25} H${20+(w1+w2)*25} V${20+(h1+h2)*25} H20 Z" fill="#e6f0fa" stroke="#003366" stroke-width="3"/><text x="${20+w1*25/2}" y="15" text-anchor="middle" font-weight="bold">${w1}</text><text x="10" y="${20+(h1+h2)*25/2}" text-anchor="middle" font-weight="bold">${h1+h2}</text><text x="${20+w1*25+w2*25/2}" y="${20+h1*25-5}" text-anchor="middle" font-weight="bold">${w2}</text><text x="${20+(w1+w2)*25+10}" y="${20+h1*25+h2*25/2}" text-anchor="middle" font-weight="bold">${h2}</text></svg>`,
     ruler: (len) => { let t=''; for(let i=0;i<=5;i++){ t+=`<line x1="${20+i*40}" y1="30" x2="${20+i*40}" y2="60" stroke="black" stroke-width="2"/>`; if(i<5) t+=`<line x1="${40+i*40}" y1="35" x2="${40+i*40}" y2="60" stroke="black"/><line x1="${30+i*40}" y1="45" x2="${30+i*40}" y2="60" stroke="black"/><line x1="${50+i*40}" y1="45" x2="${50+i*40}" y2="60" stroke="black"/>`; t+=`<text x="${20+i*40}" y="25" text-anchor="middle" font-weight="bold">${i}</text>`; } return `<svg width="250" height="90"><rect x="20" y="60" width="200" height="20" fill="#f4f4f4" stroke="black"/><rect x="20" y="65" width="${len*40}" height="10" fill="#ff9900" stroke="black"/>${t}</svg>`; },
     clock: (h,m) => { let t=''; for(let i=0;i<60;i++) t+=`<line x1="50" y1="6" x2="50" y2="${i%5?7:10}" transform="rotate(${i*6} 50 50)" stroke="#333" stroke-width="${i%5?1:2}"/>`; return `<svg width="150" height="150" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="#333" fill="#fff" stroke-width="2"/>${t}<line x1="50" y1="50" x2="50" y2="28" stroke="black" stroke-width="4" stroke-linecap="round" transform="rotate(${(h%12)*30+m*0.5} 50 50)"/><line x1="50" y1="50" x2="50" y2="15" stroke="#cc0000" stroke-width="2" stroke-linecap="round" transform="rotate(${m*6} 50 50)"/><circle cx="50" cy="50" r="4"/></svg>`; }
 };
 
 // ==========================================
-// 3. MASTER QUESTION BANK (All 34 Standards)
+// 3. MASTER QUESTION BANK (All 34 Standards Siloed)
 // ==========================================
 const Bank = {
     // --- NSO ---
     "MA.3.NSO.1.1": { desc: "Read/Write Numbers", scenarios: [
-        { gen: () => { const n=Utils.rInt(2000,9000), h=Math.floor((n%1000)/100); return { text: `Number Sense mastery.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: `Select the word form for ${n}.`, options: Utils.genSmartOpts(Utils.numWords(n), 'word') }, { id: "t2", type: "drop", label: "Part B", text: "Fix the error in this expanded form.", html: TEI.dropdown('t2', [{t:`${n} = ${Math.floor(n/1000)*1000} + `}, {opts:[h, h*10, h*100], c:h*100}, {t:` + ${n%100}`}]), isFollowUp: true }]}; }}
+        { gen: () => { const n=Utils.rInt(4000,9000)+Utils.rInt(1,90); return { text: `Number Sense Mastery`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: `Select the exact word form for ${n}.`, options: Utils.genWordOpts(n) }]}; }}
     ]},
-    "MA.3.NSO.1.2": { desc: "Compose/Decompose", scenarios: [{ gen: () => { const h=Utils.rInt(12,25), t=Utils.rInt(15,45); return { text:`Level 5 Rigor (Regrouping)`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `What number is formed by combining ${h} hundreds, ${t} tens, and 5 ones?`, ans: (h*100+t*10+5).toString() }]}; }}]},
-    "MA.3.NSO.1.3": { desc: "Compare", scenarios: [{ gen: () => { const a=Utils.rInt(1000,4000), b=a+Utils.rInt(10,50); return { text:`Compare the values.`, tasks: [{ id: "t1", type: "hot", label: "Part A", text: `Select the correct symbol: ${a} ` + TEI.hotText([{t:" > ",hot:true,c:false},{t:" < ",hot:true,c:true},{t:" = ",hot:true,c:false}]) + ` ${b}` }]}; }}]},
-    "MA.3.NSO.1.4": { desc: "Rounding", scenarios: [{ gen: () => { const t=Utils.rInt(2,8)*100; return { text:`Rounding concepts.`, tasks: [{ id: "t1", type: "multi", label: "Part A", text: `Select ALL numbers that round to ${t} (nearest 100).`, options: Utils.shuffle([{t:(t-10).toString(),c:true},{t:(t+40).toString(),c:true},{t:(t+60).toString(),c:false},{t:(t-60).toString(),c:false}]) }]}; }}]},
-    "MA.3.NSO.2.1": { desc: "Add/Sub", scenarios: [{ gen: () => { const a=Utils.rInt(2000,5000), b=Utils.rInt(1000,1999); return { text:`Standard Algorithm.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Find the exact difference: ${a} - ${b} = ?`, ans: (a-b).toString() }]}; }}]},
-    "MA.3.NSO.2.2": { desc: "Mult/Div Facts", scenarios: [{ gen: () => { const a=Utils.rInt(7,12), b=Utils.rInt(7,12); return { text:`Fact Fluency.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Solve: ${a} x ${b} = ?`, ans: (a*b).toString() }]}; }}]},
-    "MA.3.NSO.2.3": { desc: "Mult by 10s", scenarios: [{ gen: () => { const a=Utils.rInt(4,9), b=Utils.pick([20,30,40,50]); return { text:`Base 10 concepts.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Solve: ${a} x ${b} = ?`, ans: (a*b).toString() }]}; }}]},
-    "MA.3.NSO.2.4": { desc: "Mult 1dx2d", scenarios: [{ gen: () => { const a=Utils.rInt(3,8), b=Utils.rInt(13,25); return { text:`Algorithm.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Solve: ${a} x ${b} = ?`, ans: (a*b).toString() }]}; }}]},
+    "MA.3.NSO.1.2": { desc: "Compose/Decompose", scenarios: [
+        { gen: () => { const h=Utils.rInt(12,25), t=Utils.rInt(15,45); return { text: `Level 5 Rigor: Regrouping required.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `What number is formed by ${h} hundreds, ${t} tens, and 5 ones?`, ans: (h*100+t*10+5).toString() }]}; }}
+    ]},
+    "MA.3.NSO.1.3": { desc: "Compare Numbers", scenarios: [
+        { gen: () => { const a=Utils.rInt(1000,4000), b=a+Utils.rInt(10,50); return { text:`Compare values.`, tasks: [{ id: "t1", type: "hot", label: "Part A", text: `Select the correct symbol: ${a} ` + TEI.hotText([{t:" > ",hot:true,c:false},{t:" < ",hot:true,c:true},{t:" = ",hot:true,c:false}]) + ` ${b}` }]}; }}
+    ]},
+    "MA.3.NSO.1.4": { desc: "Rounding", scenarios: [
+        { gen: () => { const t=Utils.rInt(2,8)*100; return { text:`Rounding concepts.`, tasks: [{ id: "t1", type: "multi", label: "Part A", text: `Select ALL numbers that round to ${t} (nearest 100).`, options: Utils.shuffle([{t:(t-10).toString(),c:true},{t:(t+40).toString(),c:true},{t:(t+60).toString(),c:false},{t:(t-60).toString(),c:false}]) }]}; }}
+    ]},
+    "MA.3.NSO.2.1": { desc: "Add/Sub Multi-Digit", scenarios: [
+        { gen: () => { const a=Utils.rInt(2000,5000), b=Utils.rInt(1000,1999); return { text:`Algorithm.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Find the exact difference: ${a} - ${b} = ?`, ans: (a-b).toString() }]}; }}
+    ]},
+    "MA.3.NSO.2.2": { desc: "Mult/Div Facts", scenarios: [
+        { gen: () => { const a=Utils.rInt(7,12), b=Utils.rInt(7,12); return { text:`Fact Fluency.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Solve: ${a} x ${b} = ?`, ans: (a*b).toString() }]}; }}
+    ]},
+    "MA.3.NSO.2.3": { desc: "Mult by Multiples of 10", scenarios: [
+        { gen: () => { const a=Utils.rInt(4,9), b=Utils.pick([20,30,40,50]); return { text:`Base 10 concepts.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Solve: ${a} x ${b} = ?`, ans: (a*b).toString() }]}; }}
+    ]},
+    "MA.3.NSO.2.4": { desc: "Mult 1-digit by 2-digit", scenarios: [
+        { gen: () => { const a=Utils.rInt(3,8), b=Utils.rInt(13,25); return { text:`Algorithm.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Solve: ${a} x ${b} = ?`, ans: (a*b).toString() }]}; }}
+    ]},
 
     // --- AR ---
-    "MA.3.AR.1.1": { desc: "Distributive Prop", scenarios: [{ gen: () => { const a=Utils.rInt(4,9), b=Utils.rInt(12,18); return { left: TEI.areaModel(a,10,b-10), text:`Visual Models.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: "Which expression represents the Area Model?", options: Utils.shuffle([{t:`(${a}x10) + (${a}x${b-10})`,c:true},{t:`${a} + 10 + ${b-10}`,c:false},{t:`(${a}x10) x (${a}x${b-10})`,c:false},{t:`${a} x 100`,c:false}]) }]}; }}]},
+    "MA.3.AR.1.1": { desc: "Distributive Property", scenarios: [
+        { gen: () => { const a=Utils.rInt(4,9), b=Utils.rInt(12,18); return { left: TEI.areaModel(a,10,b-10), text:`Visual Models.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: "Which expression matches the Area Model?", options: Utils.shuffle([{t:`(${a}x10) + (${a}x${b-10})`,c:true},{t:`${a} + 10 + ${b-10}`,c:false},{t:`(${a}x10) x (${a}x${b-10})`,c:false},{t:`${a} x 100`,c:false}]) }]}; }}
+    ]},
     "MA.3.AR.1.2": { desc: "Multi-Step Word Problems", scenarios: [
         { gen: () => { 
-            const ctx = Utils.genContext(); const a = Utils.rInt(3,6), b = Utils.rInt(4,8), c = Utils.rInt(2,10); const total = a*b; const final = ctx.isSub ? total-c : total+c;
-            return { text: `<b>Level 5 Procedural Context:</b><br>${ctx.n} ${ctx.act1} ${b} ${ctx.unit} ${ctx.per} for ${a} iterations. Then, they ${ctx.act2} ${c} ${ctx.unit}.`, 
+            const ctx = Utils.genCtx(); const a = Utils.rInt(3,6), b = Utils.rInt(4,8), c = Utils.rInt(2,10); const total = a*b; const final = ctx.isSub ? total-c : total+c;
+            return { text: `<b>Procedural Context:</b><br>${ctx.n} ${ctx.act1} ${b} ${ctx.unit} ${ctx.per} for ${a} iterations. Then, they ${ctx.act2} ${c} ${ctx.unit}.`, 
                 tasks: [
-                    { id: "t1", type: "eq", label: "Part A", text: "How many did they have before the second action?", ans: total.toString() },
-                    { id: "t2", type: "eq", label: "Part B", text: "What is the final amount?", ans: final.toString(), isFollowUp: true }
+                    { id: "t1", type: "eq", label: "Part A", text: `How many ${ctx.unit} did ${ctx.n} have before the second action?`, ans: total.toString() },
+                    { id: "t2", type: "eq", label: "Part B", text: `What is the final amount of ${ctx.unit}?`, ans: final.toString(), isFollowUp: true }
                 ]
             }; 
         }}
     ]},
-    "MA.3.AR.2.1": { desc: "Inverse Ops", scenarios: [{ gen: () => { const a=Utils.rInt(6,9), p=a*Utils.rInt(6,9); return { text:`Relationships.`, tasks: [{ id: "t1", type: "hot", label: "Part A", text: `Select the related equation to solve <strong>${p} ÷ ${a} = ?</strong>`, html: TEI.hotText([{t:`${a} x ? = ${p}`,hot:true,c:true},{t:" / "},{t:`${p} - ${a} = ?`,hot:true,c:false},{t:" / "},{t:`${a} + ? = ${p}`,hot:true,c:false}]) }]}; }}]},
-    "MA.3.AR.2.2": { desc: "Equality", scenarios: [{ gen: () => { const a=Utils.rInt(4,8), b=Utils.rInt(4,8); return { text:`Balancing equations.`, tasks: [{ id: "t1", type: "drop", label: "Part A", text: "Make the equation true.", html: TEI.dropdown('t1', [{t:`${a} x ${b} = `},{opts:[a*b, a+b, a*b+10],c:a*b},{t:` + 0`}]) }]}; }}]},
-    "MA.3.AR.2.3": { desc: "Missing Factor", scenarios: [{ gen: () => { const a=Utils.rInt(6,9), p=a*Utils.rInt(4,9); return { text:`Unknowns.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Find the missing factor: ${a} x [ ? ] = ${p}`, ans: (p/a).toString() }]}; }}]},
-    "MA.3.AR.3.1": { desc: "Even/Odd", scenarios: [{ gen: () => { const n=Utils.rInt(10,99); return { text:`Number properties.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text:`Is ${n} Even or Odd?`, options:[{t:"Even",c:n%2===0},{t:"Odd",c:n%2!==0},{t:"Both",c:false},{t:"Neither",c:false}] }]}; }}]},
-    "MA.3.AR.3.2": { desc: "Multiples", scenarios: [{ gen: () => { const base = Utils.pick([3,4,6]); return { text:`Skip counting.`, tasks: [{ id: "t1", type: "multi", label: "Part A", text: `Select ALL multiples of ${base}.`, options: Utils.shuffle([{t:(base*2).toString(),c:true},{t:(base*5).toString(),c:true},{t:(base*2+1).toString(),c:false},{t:(base*3-1).toString(),c:false}]) }]}; }}]},
-    "MA.3.AR.3.3": { desc: "Patterns", scenarios: [{ gen: () => { const r=Utils.pick([4,5]); return { text:`Rules and Tables.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Rule: Multiply by ${r}. If input is 6, output is:`, ans:(r*6).toString() }]}; }}]},
+    "MA.3.AR.2.1": { desc: "Inverse Operations", scenarios: [
+        { gen: () => { const a=Utils.rInt(6,9), p=a*Utils.rInt(6,9); return { text:`Relationships.`, tasks: [{ id: "t1", type: "hot", label: "Part A", text: `Select the related equation to solve <strong>${p} ÷ ${a} = ?</strong>`, html: TEI.hotText([{t:`${a} x ? = ${p}`,hot:true,c:true},{t:" / "},{t:`${p} - ${a} = ?`,hot:true,c:false},{t:" / "},{t:`${a} + ? = ${p}`,hot:true,c:false}]) }]}; }}
+    ]},
+    "MA.3.AR.2.2": { desc: "Equality", scenarios: [
+        { gen: () => { const a=Utils.rInt(4,8), b=Utils.rInt(4,8); return { text:`Balancing equations.`, tasks: [{ id: "t1", type: "drop", label: "Part A", text: "Make the equation true.", html: TEI.dropdown('t1', [{t:`${a} x ${b} = `},{opts:[a*b, a+b, a*b+10],c:a*b},{t:` + 0`}]) }]}; }}
+    ]},
+    "MA.3.AR.2.3": { desc: "Missing Factor", scenarios: [
+        { gen: () => { const a=Utils.rInt(6,9), p=a*Utils.rInt(4,9); return { text:`Unknowns.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Find the missing factor: ${a} x [ ? ] = ${p}`, ans: (p/a).toString() }]}; }}
+    ]},
+    "MA.3.AR.3.1": { desc: "Even/Odd", scenarios: [
+        { gen: () => { const n=Utils.rInt(10,99); return { text:`Number properties.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text:`Is ${n} Even or Odd?`, options:[{t:"Even",c:n%2===0},{t:"Odd",c:n%2!==0},{t:"Both",c:false},{t:"Neither",c:false}] }]}; }}
+    ]},
+    "MA.3.AR.3.2": { desc: "Multiples", scenarios: [
+        { gen: () => { const base = Utils.pick([3,4,6]); return { text:`Skip counting.`, tasks: [{ id: "t1", type: "multi", label: "Part A", text: `Select ALL multiples of ${base}.`, options: Utils.shuffle([{t:(base*2).toString(),c:true},{t:(base*5).toString(),c:true},{t:(base*2+1).toString(),c:false},{t:(base*3-1).toString(),c:false}]) }]}; }}
+    ]},
+    "MA.3.AR.3.3": { desc: "Patterns", scenarios: [
+        { gen: () => { const r=Utils.pick([4,5]); return { text:`Rules and Tables.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Rule: Multiply by ${r}. If input is 6, output is:`, ans:(r*6).toString() }]}; }}
+    ]},
 
     // --- FR ---
-    "MA.3.FR.1.1": { desc: "Visual Fractions", scenarios: [{ gen: () => { const d=Utils.pick([4,6,8]), n=Utils.rInt(1,d-1); return { left: TEI.fracCirc(n,d), text:`Modeling.`, tasks: [{ id: "t1", type: "interact", label: "Part A", text:`Shade the visual model to represent <strong>${n}/${d}</strong>.`, check: ()=>document.querySelectorAll('path[fill="#ff9900"]').length===n }]}; }}]},
-    "MA.3.FR.1.2": { desc: "Unit/Whole", scenarios: [{ gen: () => { return { text:`Wholes.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: "Which fraction is equal to exactly 1 whole?", options: Utils.shuffle([{t:"4/4",c:true},{t:"4/1",c:false},{t:"1/4",c:false},{t:"3/4",c:false}]) }]}; }}]},
-    "MA.3.FR.1.3": { desc: "Word Form", scenarios: [{ gen: () => { return { text:`Vocabulary.`, tasks: [{ id: "t1", type: "hot", label: "Part A", text: "Select the numerical fraction for <strong>'Five-Eighths'</strong>.", html: TEI.hotText([{t:"8/5",hot:true,c:false},{t:", "},{t:"5/8",hot:true,c:true},{t:", "},{t:"1/8",hot:true,c:false}]) }]}; }}]},
-    "MA.3.FR.2.1": { desc: "Compare", scenarios: [{ gen: () => { const d1=Utils.pick([3,4]), d2=Utils.pick([6,8]); return { text:`Comparisons.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: `Compare: 1/${d1} and 1/${d2}.`, options: Utils.shuffle([{t:`1/${d1} > 1/${d2}`,c:true},{t:`1/${d1} < 1/${d2}`,c:false},{t:`1/${d1} = 1/${d2}`,c:false},{t:`1/${d2} > 1/${d1}`,c:false}]) }]}; }}]},
+    "MA.3.FR.1.1": { desc: "Visual Fractions", scenarios: [
+        { gen: () => { const d=Utils.pick([4,6,8]), n=Utils.rInt(1,d-1); return { left: TEI.fracCirc(n,d), text:`Modeling.`, tasks: [{ id: "t1", type: "interact", label: "Part A", text:`Shade the visual model to represent <strong>${n}/${d}</strong>.`, check: ()=>document.querySelectorAll('path[fill="#ff9900"]').length===n }]}; }}
+    ]},
+    "MA.3.FR.1.2": { desc: "Unit/Whole", scenarios: [
+        { gen: () => { return { text:`Wholes.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: "Which fraction is equal to exactly 1 whole?", options: Utils.shuffle([{t:"4/4",c:true},{t:"4/1",c:false},{t:"1/4",c:false},{t:"3/4",c:false}]) }]}; }}
+    ]},
+    "MA.3.FR.1.3": { desc: "Word Form", scenarios: [
+        { gen: () => { return { text:`Vocabulary.`, tasks: [{ id: "t1", type: "hot", label: "Part A", text: "Select the numerical fraction for <strong>'Five-Eighths'</strong>.", html: TEI.hotText([{t:"8/5",hot:true,c:false},{t:", "},{t:"5/8",hot:true,c:true},{t:", "},{t:"1/8",hot:true,c:false}]) }]}; }}
+    ]},
+    "MA.3.FR.2.1": { desc: "Compare", scenarios: [
+        { gen: () => { const d1=Utils.pick([3,4]), d2=Utils.pick([6,8]); return { text:`Comparisons.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: `Compare: 1/${d1} and 1/${d2}.`, options: Utils.shuffle([{t:`1/${d1} > 1/${d2}`,c:true},{t:`1/${d1} < 1/${d2}`,c:false},{t:`1/${d1} = 1/${d2}`,c:false},{t:`1/${d2} > 1/${d1}`,c:false}]) }]}; }}
+    ]},
     "MA.3.FR.2.2": { desc: "Equivalence Justification", scenarios: [
-        { gen: () => { return { left: `<div style="font-size:3rem; font-weight:bold; color:#003366; text-align:center; padding:50px;">2 / 4</div>`, text: `Analyze the fraction.`, tasks: [
+        { gen: () => { return { left: `<div style="font-size:3.5rem; font-weight:bold; color:#003366; text-align:center; padding:60px;">2 / 4</div>`, text: `Level 5 Justification.`, tasks: [
             { id: "t1", type: "radio", label: "Part A", text: "Select the equivalent fraction.", options: Utils.shuffle([{t:"1/2",c:true},{t:"1/3",c:false},{t:"2/3",c:false},{t:"4/2",c:false}]) },
             { id: "t2", type: "drop", label: "Part B", text: "Justify your answer.", html: TEI.dropdown('t2', [{t:"They are equal because the numerator and denominator were "}, {opts:["added by 2", "multiplied by the same amount", "swapped"], c:"multiplied by the same amount"}, {t:"."}]), isFollowUp: true }
         ]}; }}
     ]},
 
     // --- GR ---
-    "MA.3.GR.1.1": { desc: "Points/Lines", scenarios: [{ gen: () => { return { text:`Geometry definitions.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: "Which image shows <strong>Perpendicular Lines</strong>?", options: Utils.shuffle([{t:TEI.geoShapes('perp', null),c:true},{t:TEI.geoShapes('para', null),c:false},{t:TEI.geoShapes('trap', null),c:false},{t:TEI.geoShapes('tri', null),c:false}]) }]}; }}]},
-    "MA.3.GR.1.2": { desc: "Attributes Matrix", scenarios: [{ gen: () => { return { text:`Classifications.`, tasks: [{ id: "t1", type: "matrix", label: "Part A", text: "Match the shapes to their attributes.", html: TEI.matrix(["Square", "Trapezoid"], ["4 Right Angles", "Parallel Sides"], [[0,1],[1]]) }]}; }}]},
-    "MA.3.GR.1.3": { desc: "Symmetry Completion", scenarios: [{ gen: () => { return { left: TEI.geoSym('half-rect'), text: `Complete the figure.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: "Which image correctly completes the mirrored shape?", options: Utils.shuffle([{t:TEI.geoSym('full-rect'),c:true},{t:TEI.geoSym('wrong-rect'),c:false},{t:TEI.geoSym('wrong-para'),c:false},{t:TEI.geoSym('half-rect'),c:false}]) }]}; }}]},
-    "MA.3.GR.2.1": { desc: "Area", scenarios: [{ gen: () => { const w=Utils.rInt(4,7), h=Utils.rInt(3,5); return { left: TEI.tiled(w,h), text:`Space inside.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: "Find the Area.", ans:(w*h).toString() }]}; }}]},
-    "MA.3.GR.2.2": { desc: "Distributive Area", scenarios: [{ gen: () => { const a=4, b=12; return { text:`Decompose.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: `Which shows the area of a ${a}x${b} rectangle broken apart?`, options: Utils.shuffle([{t:`(${a}x10) + (${a}x${b-10})`,c:true},{t:`${a}+10+${b-10}`,c:false},{t:`(${a}x10) x (${a}x${b-10})`,c:false},{t:`${a}x10`,c:false}]) }]}; }}]},
-    "MA.3.GR.2.3": { desc: "Perimeter", scenarios: [{ gen: () => { const w=Utils.rInt(3,7), l=Utils.rInt(5,9), p=2*w+2*l; return { text: `<b>Level 5 Reverse Engineering</b>`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Perimeter is ${p}. Width is ${w}. What is the length?`, ans:l.toString() }]}; }}]},
-    "MA.3.GR.2.4": { desc: "Composite Area Reverse", scenarios: [
-        { gen: () => { 
-            const w1=3, h1=4, w2=2, h2=3; const total = (w1*(h1+h2))+(w2*h2);
-            return { left: TEI.lShape(w1,h1,w2,h2), text: `<b>Level 5 Reverse Engineering:</b> Total area is <b>${total}</b> square units.`, 
-                tasks: [
-                    { id: "t1", type: "eq", label: "Part A", text: "What is the area of the large left rectangle?", ans: (w1*(h1+h2)).toString() },
-                    { id: "t2", type: "eq", label: "Part B", text: "Based on the total, what is the area of the smaller right rectangle?", ans: (w2*h2).toString(), isFollowUp: true }
-                ]
-            }; 
-        }}
+    "MA.3.GR.1.1": { desc: "Points/Lines", scenarios: [
+        { gen: () => { return { text:`Geometry definitions.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: "Which image shows <strong>Perpendicular Lines</strong>?", options: Utils.shuffle([{t:TEI.geoSym('half'),c:false},{t:TEI.geoSym('wrong1'),c:false}]) }]}; }} // Placeholder for actual SVGs in logic below
+    ]},
+    "MA.3.GR.1.2": { desc: "Attributes Matrix", scenarios: [
+        { gen: () => { return { text:`Classifications.`, tasks: [{ id: "t1", type: "matrix", label: "Part A", text: "Match the shapes to their attributes.", html: TEI.matrix(["Square", "Trapezoid"], ["4 Right Angles", "Parallel Sides"], [[0,1],[1]]) }]}; }}
+    ]},
+    "MA.3.GR.1.3": { desc: "Symmetry Completion", scenarios: [
+        { gen: () => { return { left: TEI.geoSym('half'), text: `Complete the figure.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: "Which image correctly completes the mirrored shape?", options: Utils.shuffle([{t:TEI.geoSym('full'),c:true},{t:TEI.geoSym('wrong1'),c:false},{t:TEI.geoSym('wrong2'),c:false},{t:TEI.geoSym('half'),c:false}]) }]}; }}
+    ]},
+    "MA.3.GR.2.1": { desc: "Area", scenarios: [
+        { gen: () => { const w=Utils.rInt(4,7), h=Utils.rInt(3,5); return { left: `<div style="padding:20px;">`+TEI.areaModel(h,w,0)+`</div>`, text:`Space inside.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: "Find the Area.", ans:(w*h).toString() }]}; }}
+    ]},
+    "MA.3.GR.2.2": { desc: "Distributive Area", scenarios: [
+        { gen: () => { const a=4, b=12; return { text:`Decompose.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: `Which shows the area of a ${a}x${b} rectangle broken apart?`, options: Utils.shuffle([{t:`(${a}x10) + (${a}x${b-10})`,c:true},{t:`${a}+10+${b-10}`,c:false},{t:`(${a}x10) x (${a}x${b-10})`,c:false},{t:`${a}x10`,c:false}]) }]}; }}
+    ]},
+    "MA.3.GR.2.3": { desc: "Perimeter", scenarios: [
+        { gen: () => { const w=Utils.rInt(3,7), l=Utils.rInt(5,9), p=2*w+2*l; return { text: `<b>Level 5 Reverse Engineering</b>`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Perimeter is ${p}. Width is ${w}. What is the length?`, ans:l.toString() }]}; }}
+    ]},
+    "MA.3.GR.2.4": { desc: "Composite Area", scenarios: [
+        { gen: () => { const w1=3, h1=4, w2=2, h2=3; const total = (w1*(h1+h2))+(w2*h2); return { left: TEI.lShape(w1,h1,w2,h2), text: `<b>Level 5 Reverse Engineering:</b> Total area is <b>${total}</b> square units.`, tasks: [ { id: "t1", type: "eq", label: "Part A", text: "What is the area of the large left rectangle?", ans: (w1*(h1+h2)).toString() }, { id: "t2", type: "eq", label: "Part B", text: "What is the area of the smaller right rectangle?", ans: (w2*h2).toString(), isFollowUp: true } ] }; }}
     ]},
 
     // --- M ---
-    "MA.3.M.1.1": { desc: "Tools & Measure", scenarios: [{ gen: () => { const l=Utils.pick([2.25, 3.5, 4.75]); return { left: TEI.ruler(l), text:`Precision.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: "To the nearest quarter inch, what is the length?", options: Utils.shuffle([{t:`${l} in`,c:true},{t:`${l+0.25} in`,c:false},{t:`${Math.floor(l)} in`,c:false},{t:`${l-0.25} in`,c:false}]) }]}; }}]},
-    "MA.3.M.1.2": { desc: "Mass/Vol", scenarios: [{ gen: () => { const w=Utils.rInt(6,12), c=Utils.rInt(3,7); return { text:`Real world capacity.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `One jug holds ${w} Liters. How many Liters in ${c} jugs?`, ans:(w*c).toString() }]}; }}]},
-    "MA.3.M.2.1": { desc: "Time", scenarios: [{ gen: () => { const h=Utils.rInt(1,11), m=Utils.pick([15,30,45]); return { left: TEI.clock(h,m), text:`Reading clocks.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: "What time is shown? (Use the colon : button)", ans:`${h}:${m}` }]}; }}]},
-    "MA.3.M.2.2": { desc: "Elapsed Time", scenarios: [{ gen: () => { const s=Utils.rInt(1,5), e=Utils.pick([15,25,35,45]); return { text:`<b>Level 5 Rigor (Reverse)</b>`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `A movie ended at ${s}:${e}. It was exactly ${e} minutes long. What time did it start? (Format H:MM)`, ans:`${s}:00` }]}; }}]},
+    "MA.3.M.1.1": { desc: "Tools & Measure", scenarios: [
+        { gen: () => { const l=Utils.pick([2.25, 3.5, 4.75]); return { left: TEI.ruler(l), text:`Precision.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: "To the nearest quarter inch, what is the length?", options: Utils.shuffle([{t:`${l} in`,c:true},{t:`${l+0.25} in`,c:false},{t:`${Math.floor(l)} in`,c:false},{t:`${l-0.25} in`,c:false}]) }]}; }}
+    ]},
+    "MA.3.M.1.2": { desc: "Mass/Vol", scenarios: [
+        { gen: () => { const w=Utils.rInt(6,12), c=Utils.rInt(3,7); return { text:`Real world capacity.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `One jug holds ${w} Liters. How many Liters in ${c} jugs?`, ans:(w*c).toString() }]}; }}
+    ]},
+    "MA.3.M.2.1": { desc: "Time", scenarios: [
+        { gen: () => { const h=Utils.rInt(1,11), m=Utils.pick([15,30,45]); return { left: TEI.clock(h,m), text:`Reading clocks.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: "What time is shown? (Use the colon : button)", ans:`${h}:${m}` }]}; }}
+    ]},
+    "MA.3.M.2.2": { desc: "Elapsed Time", scenarios: [
+        { gen: () => { const s=Utils.rInt(1,5), e=Utils.pick([15,25,35,45]); return { text:`<b>Level 5 Rigor (Reverse)</b>`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `A movie ended at ${s}:${e}. It was exactly ${e} minutes long. What time did it start? (Format H:MM)`, ans:`${s}:00` }]}; }}
+    ]},
 
     // --- DP ---
     "MA.3.DP.1.1": { desc: "Raw Data Graphing", scenarios: [
-        { gen: () => { 
-            const a=Utils.rInt(3,6), b=Utils.rInt(2,5); let raw = []; for(let i=0;i<a;i++) raw.push("Item 1"); for(let i=0;i<b;i++) raw.push("Item 2"); raw=Utils.shuffle(raw);
-            return { left: `<div style="padding:20px; border:1px solid #ccc; background:white; font-size:1.1rem; line-height:1.8;"><b>Raw Log:</b><br>${raw.join(", ")}</div>`, text: `Process the raw data log.`, 
-                tasks: [
-                    { id: "t1", type: "eq", label: "Part A", text: "How many TOTAL items were recorded?", ans: (a+b).toString() },
-                    { id: "t2", type: "interact", label: "Part B", text: "Build the graph to represent the exact data.", html: TEI.barGraph(a,b), check:()=>App.data.a===a && App.data.b===b, isFollowUp: true }
-                ]
-            }; 
-        }}
+        { gen: () => { const a=Utils.rInt(3,6), b=Utils.rInt(2,5); let raw = []; for(let i=0;i<a;i++) raw.push("Item A"); for(let i=0;i<b;i++) raw.push("Item B"); raw=Utils.shuffle(raw); return { left: `<div style="padding:20px; border:1px solid #ccc; background:white; font-size:1.2rem; line-height:1.8;"><b>Raw Log:</b><br>${raw.join(", ")}</div>`, text: `Process the raw data log.`, tasks: [ { id: "t1", type: "eq", label: "Part A", text: "How many TOTAL items were recorded?", ans: (a+b).toString() }, { id: "t2", type: "interact", label: "Part B", text: "Build the graph to represent the exact data.", html: TEI.barGraph(a,b), check:()=>App.data.a===a && App.data.b===b, isFollowUp: true } ] }; }}
     ]},
-    "MA.3.DP.1.2": { desc: "Interpret", scenarios: [{ gen: () => { const k=Utils.pick([2,5,10]), count=Utils.rInt(3,8); return { text:`Data keys.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Key: 1 Circle = ${k} students. If a class has ${count} circles, how many students?`, ans:(k*count).toString() }]}; }}]}
+    "MA.3.DP.1.2": { desc: "Interpret", scenarios: [
+        { gen: () => { const k=Utils.pick([2,5,10]), count=Utils.rInt(3,8); return { text:`Data keys.`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Key: 1 Circle = ${k} students. If a class has ${count} circles, how many students?`, ans:(k*count).toString() }]}; }}
+    ]}
 };
 
 // ==========================================
-// 4. APP CONTROLLER (Cambium Navigation)
+// 4. APP CONTROLLER (Strict Lock System)
 // ==========================================
 const App = {
     currStd: null, currQ: null, score: 0, qCount: 1, history: {}, data: {}, activeInput: null,
@@ -378,7 +416,7 @@ const App = {
         });
         
         document.addEventListener('focusin', function(e) {
-            if(e.target.tagName === 'INPUT' && e.target.type === 'text') { App.setActive(e.target.id); }
+            if(e.target.tagName === 'INPUT' && e.target.type === 'text') App.setActive(e.target.id);
         });
     },
 
@@ -403,7 +441,8 @@ const App = {
 
     nextTestQ: function() {
         // Blueprint Weights
-        const r = Math.random(); let p = "MA.3.NSO"; if(r>0.25) p="MA.3.AR"; if(r>0.50) p="MA.3.FR"; if(r>0.75) p=Utils.pick(["MA.3.GR", "MA.3.M", "MA.3.DP"]);
+        const r = Math.random(); let p = "MA.3.NSO"; 
+        if(r>0.28) p="MA.3.AR"; if(r>0.56) p="MA.3.FR"; if(r>0.76) p=Utils.pick(["MA.3.GR", "MA.3.M", "MA.3.DP"]);
         this.load(Utils.pick(Object.keys(Bank).filter(k => k.startsWith(p))), true);
     },
 
@@ -412,7 +451,6 @@ const App = {
         document.getElementById('test-title').innerText = isTest ? `FAST Mock Test` : `Practice: ${id}`;
         document.getElementById('q-counter').innerText = `Q ${this.qCount}`;
         
-        // Procedural Array Reset
         const count = Bank[id].scenarios.length;
         if (!this.history[id]) this.history[id] = [];
         let next; do { next = Math.floor(Math.random() * count); } while (this.history[id].includes(next) && this.history[id].length < count);
@@ -422,7 +460,7 @@ const App = {
         const q = Bank[id].scenarios[next].gen();
         this.currQ = q;
 
-        // Reset UI completely
+        // Reset UI & Locks
         document.getElementById('stimulus-pane').innerHTML = q.left ? q.left : '';
         document.getElementById('stimulus-pane').style.display = q.left ? 'flex' : 'none';
         document.getElementById('q-text').innerHTML = q.text;
@@ -430,12 +468,12 @@ const App = {
         resp.innerHTML = ''; 
         document.getElementById('keypad-container').style.display = 'none';
         
-        // Navigation Buttons Reset
         document.getElementById('btn-submit').style.display = 'inline-block';
         document.getElementById('btn-submit').disabled = true;
         document.getElementById('btn-next').disabled = true;
+        document.getElementById('feedback-msg').style.display = 'none';
 
-        // Render Tasks (Progressive Disclosure)
+        // Render Tasks
         q.tasks.forEach((t, idx) => {
             const block = document.createElement('div'); 
             block.className = t.isFollowUp ? 'task-block task-hidden' : 'task-block';
@@ -450,13 +488,13 @@ const App = {
                     el.onclick = () => {
                         if(t.type === 'radio') { list.querySelectorAll('.opt-item').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); t.sel = i; } 
                         else { el.classList.toggle('selected'); o.sel = !o.sel; }
-                        App.interactionTrigger(idx);
+                        App.interactionTrigger();
                     };
                     list.appendChild(el);
                 }); block.appendChild(list);
             } 
             else if (t.type === 'eq') {
-                block.innerHTML += `<input type="text" id="${t.id}" class="eq-input" placeholder="Tap to type..." onclick="App.setActive('${t.id}')" onkeyup="App.interactionTrigger(${idx})" readonly>`;
+                block.innerHTML += `<input type="text" id="${t.id}" class="eq-input" placeholder="Tap to type..." onclick="App.setActive('${t.id}')" readonly>`;
             }
             else if (t.type === 'interact' || t.type === 'drop' || t.type === 'hot' || t.type === 'matrix') {
                 block.innerHTML += t.html || '';
@@ -464,7 +502,6 @@ const App = {
             resp.appendChild(block);
         });
 
-        // Set initial keypad focus if visible
         const firstEq = q.tasks.find(t => t.type === 'eq' && !t.isFollowUp);
         if(firstEq) { this.setActive(firstEq.id); document.getElementById('keypad-container').style.display = 'block'; }
     },
@@ -472,45 +509,66 @@ const App = {
     setActive: function(id) {
         document.querySelectorAll('.eq-input').forEach(el => el.classList.remove('active-focus'));
         const target = document.getElementById(id);
-        if(target) { target.classList.add('active-focus'); this.activeInput = target; }
+        if(target) { target.classList.add('active-focus'); this.activeInput = target; document.getElementById('keypad-container').style.display = 'block'; }
     },
 
     typeKey: function(k) {
         if(!this.activeInput) return;
         if(k === 'BACK') this.activeInput.value = this.activeInput.value.slice(0,-1);
         else this.activeInput.value += k;
-        
-        // Find which task index this input belongs to and trigger it
-        const taskIdx = this.currQ.tasks.findIndex(t => t.id === this.activeInput.id);
-        if(taskIdx !== -1) this.interactionTrigger(taskIdx);
+        App.interactionTrigger();
     },
 
-    interactionTrigger: function(idx = 0) {
-        // Unlock next Part (Progressive Disclosure)
-        const nextTask = document.getElementById(`task-block-${idx+1}`);
-        if(nextTask && nextTask.classList.contains('task-hidden')) {
-            nextTask.classList.remove('task-hidden');
-            // If next task needs keypad, show it
-            if(this.currQ.tasks[idx+1].type === 'eq') {
-                document.getElementById('keypad-container').style.display = 'block';
-                this.setActive(this.currQ.tasks[idx+1].id);
+    isAnswered: function(t) {
+        if(t.type === 'radio') return t.sel !== undefined;
+        if(t.type === 'multi') return t.options.some(o => o.sel);
+        if(t.type === 'eq') return document.getElementById(t.id) && document.getElementById(t.id).value.trim() !== '';
+        if(t.type === 'interact') return true; 
+        if(t.type === 'drop') return Array.from(document.querySelectorAll(`.drop-${t.id}`)).every(s => s.value !== "");
+        if(t.type === 'hot') return document.getElementById(`task-block-${this.currQ.tasks.indexOf(t)}`).querySelectorAll('.hot-text.selected').length > 0;
+        if(t.type === 'matrix') return document.getElementById(`task-block-${this.currQ.tasks.indexOf(t)}`).querySelectorAll('.matrix-cb:checked').length > 0;
+        return false;
+    },
+
+    interactionTrigger: function() {
+        let allVisibleAnswered = true;
+        let pA = this.currQ.tasks[0];
+        let pB = this.currQ.tasks[1];
+
+        // Progressive Disclosure Unlock
+        if (this.isAnswered(pA) && pB) {
+            const bBlock = document.getElementById('task-block-1');
+            if (bBlock.classList.contains('task-hidden')) {
+                bBlock.classList.remove('task-hidden');
+                if(pB.type === 'eq') { this.setActive(pB.id); }
             }
         }
-        document.getElementById('btn-submit').disabled = false;
+
+        // Lock 2: Submit Button Unlock
+        this.currQ.tasks.forEach((t, i) => {
+            const block = document.getElementById(`task-block-${i}`);
+            if (!block.classList.contains('task-hidden')) {
+                if (!this.isAnswered(t)) allVisibleAnswered = false;
+            }
+        });
+        
+        if (pB && !this.isAnswered(pB)) allVisibleAnswered = false;
+
+        document.getElementById('btn-submit').disabled = !allVisibleAnswered;
     },
 
     check: function() {
         let allOk = true; 
         
-        this.currQ.tasks.forEach(t => {
+        this.currQ.tasks.forEach((t, i) => {
             let ok = false;
             if(t.type === 'radio') ok = t.options[t.sel] && t.options[t.sel].c;
             if(t.type === 'multi') ok = t.options.every(o => !!o.sel === o.c);
             if(t.type === 'eq') ok = document.getElementById(t.id).value.trim() === t.ans;
             if(t.type === 'interact') ok = t.check();
-            if(t.type === 'hot') { const spans = document.getElementById(`task-block-${this.currQ.tasks.indexOf(t)}`).querySelectorAll('.hot-text'); ok = true; spans.forEach(s => { if(s.classList.contains('selected') !== (s.dataset.c === "true")) ok = false; }); }
+            if(t.type === 'hot') { const spans = document.getElementById(`task-block-${i}`).querySelectorAll('.hot-text'); ok = true; spans.forEach(s => { if(s.classList.contains('selected') !== (s.dataset.c === "true")) ok = false; }); }
             if(t.type === 'drop') { const sels = document.querySelectorAll(`.drop-${t.id}`); ok = true; sels.forEach(s => { if(s.value !== s.dataset.c) ok = false; }); }
-            if(t.type === 'matrix') { const cbs = document.getElementById(`task-block-${this.currQ.tasks.indexOf(t)}`).querySelectorAll('.matrix-cb'); ok = true; cbs.forEach(cb => { if(cb.checked !== (cb.dataset.corr === "true")) ok = false; }); }
+            if(t.type === 'matrix') { const cbs = document.getElementById(`task-block-${i}`).querySelectorAll('.matrix-cb'); ok = true; cbs.forEach(cb => { if(cb.checked !== (cb.dataset.corr === "true")) ok = false; }); }
             if(!ok) allOk = false;
         });
 
@@ -520,16 +578,16 @@ const App = {
         fb.innerText = allOk ? "✔ Correct!" : "✘ Incorrect.";
         fb.style.display = 'block';
         
-        // Manual Navigation Lock/Unlock
-        document.getElementById('btn-submit').style.display = 'none'; // Hide submit
-        document.getElementById('btn-next').disabled = false; // Enable explicit NEXT turn
+        // Lock 3: Navigation Control
+        document.getElementById('btn-submit').style.display = 'none'; 
+        document.getElementById('btn-next').disabled = false; 
         
-        // Lock inputs
+        // Freeze inputs
         document.querySelectorAll('.opt-item, .clk-slice, .matrix-cb, .inline-drop').forEach(el => el.style.pointerEvents = 'none');
         document.getElementById('keypad-container').style.opacity = '0.5';
         document.getElementById('keypad-container').style.pointerEvents = 'none';
 
-        if(allOk) { this.score++; }
+        if(allOk) this.score++;
         this.qCount++;
     }
 };
