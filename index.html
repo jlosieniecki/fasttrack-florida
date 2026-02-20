@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florida FAST Math | Enterprise Simulator</title>
+    <title>Florida FAST Math | Ultimate Level 5 Simulator</title>
     <style>
         /* ==========================================
-           PHASE 1: CSS & CAMBIUM DESIGN SYSTEM
+           1. CSS & UI STYLING (Authentic Cambium)
            ========================================== */
-        
-        /* 1. Root Variables & Reset */
         :root {
             --cam-blue: #003366; 
             --cam-light-blue: #e6f0fa; 
@@ -21,109 +19,67 @@
             --incorrect: #dc3545;
         }
         
-        * { 
-            box-sizing: border-box; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            /* We will handle user-select via JS later to allow physical typing */
-        }
-        
-        body { 
-            margin: 0; 
-            padding: 0; 
-            background: var(--cam-gray); 
-            color: var(--text); 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
+        body { margin: 0; padding: 0; background: var(--cam-gray); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        /* 2. Dashboard UI */
+        /* DASHBOARD */
         #dashboard { display: flex; height: 100vh; }
-        
-        .sidebar { 
-            width: 340px; 
-            background: white; 
-            border-right: 1px solid var(--border); 
-            display: flex; 
-            flex-direction: column; 
-            z-index: 10; 
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05); 
-        }
-        
+        .sidebar { width: 340px; background: white; border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
         .logo-area { padding: 25px; background: var(--cam-blue); color: white; }
         .logo-area h1 { margin: 0; font-size: 1.4rem; letter-spacing: 0.5px; }
-        
         .menu-scroll { flex: 1; overflow-y: auto; padding: 15px 10px; }
-        .cat-title { font-size: 0.85rem; text-transform: uppercase; color: #546e7a; font-weight: 800; margin: 15px 0 5px 5px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
-        
-        .std-btn { display: block; width: 100%; text-align: left; padding: 12px 10px; margin-bottom: 4px; background: transparent; border: 1px solid transparent; border-radius: 4px; cursor: pointer; font-size: 0.9rem; color: #333; transition: 0.1s; }
+        .cat-title { font-size: 0.85rem; text-transform: uppercase; color: #546e7a; font-weight: 800; margin: 15px 0 5px 5px; border-bottom: 2px solid #eee; padding-bottom: 5px;}
+        .std-btn { display: block; width: 100%; text-align: left; padding: 10px; margin-bottom: 4px; background: transparent; border: 1px solid transparent; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; transition: 0.1s; }
         .std-btn:hover { background: var(--cam-light-blue); border-color: #b2dfdb; }
         .std-btn.active { background: var(--cam-light-blue); border-color: var(--cam-blue); font-weight: bold; }
-        .std-btn small { display: block; font-size: 0.75rem; margin-top: 4px; color: #666; font-weight: normal; }
+        .std-btn small { display: block; font-size: 0.75rem; margin-top: 3px; color: #666; font-weight: normal; }
 
         .main-dash { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; background: white; }
-        
         .mock-btn { padding: 20px 50px; font-size: 1.3rem; font-weight: bold; background: #0056b3; color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,86,179,0.3); transition: 0.2s; }
-        .mock-btn:hover { background: #004494; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,86,179,0.4); }
+        .mock-btn:hover { background: #004494; transform: translateY(-2px); }
 
-        /* 3. Authentic Test Interface */
+        /* TEST INTERFACE NAVIGATION */
         #test-interface, #review-screen { display: none; height: 100vh; flex-direction: column; background: white; }
-        
-        .top-nav { background: var(--cam-blue); color: white; height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 100; }
+        .top-nav { background: var(--cam-blue); color: white; height: 55px; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 100;}
         .nav-left { display: flex; gap: 20px; align-items: center; }
         .nav-right { display: flex; gap: 15px; align-items: center; }
-        
         .nav-btn { background: transparent; border: 1px solid white; color: white; padding: 8px 20px; cursor: pointer; font-size: 0.95rem; border-radius: 4px; font-weight: bold; transition: 0.2s; }
         .nav-btn:hover:not(:disabled) { background: rgba(255,255,255,0.2); }
         .nav-btn.primary { background: white; color: var(--cam-blue); }
         .nav-btn.primary:hover:not(:disabled) { background: #e0e0e0; }
         .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
-        /* 4. Split-Screen Layout */
+        /* SPLIT SCREEN */
         .test-body { flex: 1; display: flex; overflow: hidden; }
         .pane { flex: 1; overflow-y: auto; padding: 40px; position: relative; }
-        
         .stimulus-pane { border-right: 3px solid var(--border); background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; max-width: 45%; }
-        .response-pane { background: white; display: flex; flex-direction: column; position: relative; padding-bottom: 140px; }
-        
-        .q-text { font-size: 1.4rem; line-height: 1.6; margin-bottom: 25px; color: #212529; }
+        .response-pane { background: white; display: flex; flex-direction: column; position: relative; padding-bottom: 120px; }
+        .q-text { font-size: 1.35rem; line-height: 1.6; margin-bottom: 20px; color: #212529; }
 
-        /* 5. Progressive Disclosure (Task Blocks) */
+        /* PROGRESSIVE DISCLOSURE */
         .task-block { background: #fff; border: 1px solid var(--border); border-left: 5px solid var(--cam-blue); border-radius: 4px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: opacity 0.4s ease, transform 0.4s ease; }
         .task-hidden { display: none; opacity: 0; pointer-events: none; height: 0; margin: 0; padding: 0; border: none; transform: translateY(-10px); }
-        .task-label { font-weight: bold; font-size: 1.15rem; color: var(--cam-blue); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .task-label { font-weight: bold; font-size: 1.15rem; color: var(--cam-blue); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
 
-        /* 6. Dynamic Keypad & Inputs */
-        .eq-input { width: 100%; max-width: 250px; padding: 12px; font-size: 1.4rem; border: 2px solid #666; border-radius: 6px; outline: none; text-align: center; margin: 5px; background: white; font-weight: bold; }
-        .eq-input.active-focus { border-color: var(--focus); box-shadow: 0 0 8px rgba(255,153,0,0.6); background: #fffde7; }
-        
-        #keypad-container { margin-top: 20px; }
-        .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-width: 380px; background: #e9ecef; padding: 15px; border-radius: 8px; border: 1px solid #ced4da; }
-        .key-btn { padding: 12px; font-size: 1.3rem; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 2px rgba(0,0,0,0.05); }
-        .key-btn:active { transform: scale(0.95); }
-        .key-btn.op { background: #cfd8dc; color: #003366; }
-        .key-btn.wide { grid-column: span 2; }
-
-        /* 7. General TEI Styles (Drag/Drop, Options, Matrix) */
+        /* TEIs (Technology Enhanced Items) */
         .visual-stage svg { max-width: 100%; height: auto; overflow: visible; margin-bottom: 15px; }
-        .drag-bank { display: flex; gap: 10px; padding: 15px; background: #e9ecef; border-radius: 6px; min-height: 70px; margin-bottom: 15px; flex-wrap: wrap; border: 1px solid #ccc; }
-        .draggable { padding: 12px 25px; background: white; border: 2px solid var(--cam-blue); border-radius: 4px; cursor: grab; font-weight: bold; font-size: 1.3rem; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .drag-bank { display: flex; gap: 10px; padding: 15px; background: #e9ecef; border-radius: 6px; min-height: 70px; margin-bottom: 15px; flex-wrap: wrap; border: 1px solid #ccc;}
+        .draggable { padding: 12px 25px; background: white; border: 2px solid var(--cam-blue); border-radius: 4px; cursor: grab; font-weight: bold; font-size: 1.3rem; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
         .draggable:active { cursor: grabbing; transform: scale(0.95); }
-        .dropzone { display: inline-block; min-width: 70px; min-height: 50px; border: 2px dashed #999; border-radius: 4px; background: #fff; vertical-align: middle; text-align: center; line-height: 46px; font-weight: bold; font-size: 1.3rem; color: var(--cam-blue); }
+        .dropzone { display: inline-block; min-width: 70px; min-height: 50px; border: 2px dashed #999; border-radius: 4px; background: #fff; vertical-align: middle; text-align: center; line-height: 46px; font-weight: bold; font-size: 1.3rem; color: var(--cam-blue);}
         .dropzone.hover { background: #e6f0fa; border-color: var(--focus); }
         
         .opt-list { display: flex; flex-direction: column; gap: 10px; }
         .opt-list.grid { display: grid; grid-template-columns: 1fr 1fr; }
-        .opt-item { display: flex; align-items: center; padding: 15px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 1.15rem; background: white; transition: 0.1s; }
+        .opt-item { display: flex; align-items: center; padding: 15px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 1.15rem; background: white; transition: 0.1s;}
         .opt-item:hover { background: var(--cam-light-blue); border-color: #90caf9; }
         .opt-item.selected { border-color: var(--cam-blue); background: var(--cam-light-blue); box-shadow: inset 0 0 0 1px var(--cam-blue); }
-        .opt-icon { width: 22px; height: 22px; border: 2px solid #666; margin-right: 15px; display: flex; justify-content: center; align-items: center; border-radius: 50%; flex-shrink: 0; }
+        .opt-icon { width: 22px; height: 22px; border: 2px solid #666; margin-right: 15px; display: flex; justify-content: center; align-items: center; border-radius: 50%; flex-shrink: 0;}
         .multi .opt-icon { border-radius: 4px; }
         .selected .opt-icon { background: var(--cam-blue); border-color: var(--cam-blue); }
         .selected .opt-icon::after { content:''; width:10px; height:10px; background:white; border-radius:50%; }
         .multi.selected .opt-icon::after { content:'✔'; background:none; color:white; font-size:16px; font-weight:bold; }
-        
+
         .hot-text { cursor: pointer; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; margin: 0 3px; background: white; display: inline-block; font-weight: bold; color: #0056b3; text-decoration: underline; }
         .hot-text:hover { border-color: #0056b3; background: #e6f0fa; }
         .hot-text.selected { background: #0056b3; color: white; border-color: #0056b3; text-decoration: none; }
@@ -133,128 +89,117 @@
         .matrix-table th, .matrix-table td { border: 1px solid var(--border); padding: 12px; text-align: center; }
         .matrix-table th { background: var(--cam-light-blue); color: var(--cam-blue); }
         .matrix-cb { width: 24px; height: 24px; cursor: pointer; }
+        
+        /* DYNAMIC KEYPAD */
+        .eq-input { width: 100%; max-width: 250px; padding: 12px; font-size: 1.4rem; border: 2px solid #666; border-radius: 6px; outline: none; text-align: center; margin: 5px; background: white; font-weight: bold; user-select: text;}
+        .eq-input.active-focus { border-color: var(--focus); box-shadow: 0 0 8px rgba(255,153,0,0.6); background: #fffde7; }
+        .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-width: 380px; background: #e9ecef; padding: 15px; border-radius: 8px; border: 1px solid #ced4da; margin-top: 20px; }
+        .key-btn { padding: 12px; font-size: 1.3rem; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 2px rgba(0,0,0,0.05);}
+        .key-btn:active { transform: scale(0.95); }
+        .key-btn.op { background: #cfd8dc; color: #003366; }
+        .key-btn.wide { grid-column: span 2; }
 
-        /* 8. Action Bar & Feedback Container */
-        .action-bar { position: absolute; bottom: 30px; right: 40px; display: flex; gap: 15px; align-items: center; }
-        .submit-btn { padding: 15px 30px; font-size: 1.1rem; font-weight: bold; background: var(--cam-blue); color: white; border: none; border-radius: 4px; cursor: pointer; transition: 0.2s; }
-        .submit-btn:disabled { background: #ccc; cursor: not-allowed; color: #666; }
-        #feedback-msg { font-weight: bold; font-size: 1.2rem; display: none; padding: 10px 20px; border-radius: 4px; }
-        .fb-corr { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .fb-wrg { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        /* ACTION BAR & FEEDBACK */
+        .action-bar { position: absolute; bottom: 30px; right: 40px; display: flex; gap: 15px; align-items: center;}
+        .submit-btn { padding: 15px 30px; font-size: 1.1rem; font-weight: bold; background: var(--cam-blue); color: white; border: none; border-radius: 4px; cursor: pointer; transition: 0.2s;}
+        .submit-btn:disabled { background: #ccc; cursor: not-allowed; color: #666;}
+        #feedback-msg { font-weight: bold; font-size: 1.2rem; display: none; padding: 10px 20px; border-radius: 4px;}
+        .fb-corr { background: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
+        .fb-wrg { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;}
 
-        /* 9. End-of-Test Review Screen */
-        .review-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 15px; padding: 40px; max-width: 1000px; margin: 0 auto; }
-        .rev-btn { padding: 20px; font-size: 1.2rem; font-weight: bold; border: 2px solid #ccc; background: white; border-radius: 6px; cursor: pointer; position: relative; transition: 0.2s; }
+        /* REVIEW SCREEN */
+        .review-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 15px; padding: 40px; max-width: 1000px; margin: 0 auto;}
+        .rev-btn { padding: 20px; font-size: 1.2rem; font-weight: bold; border: 2px solid #ccc; background: white; border-radius: 6px; cursor: pointer; position: relative; transition: 0.2s;}
         .rev-btn:hover { background: #eee; }
         .rev-btn.answered { border-color: var(--cam-blue); background: var(--cam-light-blue); }
-        .rev-btn.flagged::after { content: '⚑'; position: absolute; top: -12px; right: -8px; color: var(--incorrect); font-size: 1.8rem; }
-        .rev-header { text-align: center; margin-top: 40px; font-size: 2rem; color: var(--cam-blue); }
+        .rev-btn.flagged::after { content: '⚑'; position: absolute; top: -12px; right: -8px; color: red; font-size: 1.8rem; }
+        .rev-header { text-align: center; margin-top: 40px; font-size: 2rem; color: var(--cam-blue);}
     </style>
 </head>
 <body>
 
-    <div id="dashboard">
-        <div class="sidebar">
-            <div class="logo-area">
-                <h1>FAST Mathematics</h1>
-                <p>Enterprise Engine v1.0</p>
-            </div>
-            <div class="menu-scroll" id="menu"></div>
+<div id="dashboard">
+    <div class="sidebar">
+        <div class="logo-area">
+            <h1>FAST Mathematics</h1>
+            <p>Enterprise Engine v6.0</p>
         </div>
-        <div class="main-dash">
-            <h2 style="font-size:2.5rem; color:var(--cam-blue); margin-bottom:15px;">Florida B.E.S.T. Assessment</h2>
-            <p style="max-width: 650px; font-size: 1.25rem; line-height: 1.6; margin-bottom: 40px; color:#555;">
-                Enterprise Shell Loaded. Awaiting Engine, SVG Models, and Standard Bank injections.
-            </p>
-            <button class="mock-btn" id="launch-btn">Begin Adaptive Mock Test</button>
+        <div class="menu-scroll" id="menu"></div>
+    </div>
+    <div class="main-dash">
+        <h2 style="font-size:2.5rem; color:var(--cam-blue); margin-bottom:15px;">Florida B.E.S.T. Assessment</h2>
+        <p style="max-width: 650px; font-size: 1.25rem; line-height: 1.6; margin-bottom: 40px; color:#555;">
+            Enterprise Features Activated: Computer Adaptive Testing (CAT), HTML5 Drag-and-Drop (GRID), SVG Number Lines, Progressive Disclosure, and Authentic End-of-Test Review.
+        </p>
+        <button class="mock-btn" id="launch-btn">Begin Adaptive Mock Test</button>
+    </div>
+</div>
+
+<div id="test-interface">
+    <div class="top-nav">
+        <div class="nav-left">
+            <strong id="test-title" style="font-size:1.2rem; letter-spacing: 1px;">Test Mode</strong>
+            <span id="q-counter" style="opacity: 0.9; font-size: 1.1rem; border-left:2px solid #888; padding-left:15px;">Q 1 of 40</span>
+        </div>
+        <div class="nav-right">
+            <button class="nav-btn" id="btn-flag">⚑ Flag</button>
+            <button class="nav-btn" id="btn-pause">Pause / Save</button>
+            <button class="nav-btn primary" id="btn-next" disabled>Next &rarr;</button>
         </div>
     </div>
-
-    <div id="test-interface">
-        <div class="top-nav">
-            <div class="nav-left">
-                <strong id="test-title" style="font-size:1.2rem; letter-spacing: 1px;">Test Mode</strong>
-                <span id="q-counter" style="opacity: 0.9; font-size: 1.1rem; border-left:2px solid #888; padding-left:15px;">Q 1 of 40</span>
-            </div>
-            <div class="nav-right">
-                <button class="nav-btn" id="btn-flag">⚑ Flag</button>
-                <button class="nav-btn" id="btn-pause">Pause / Save</button>
-                <button class="nav-btn primary" id="btn-next" disabled>Next &rarr;</button>
-            </div>
-        </div>
-        <div class="test-body">
-            <div class="pane stimulus-pane" id="stimulus-pane"></div>
+    <div class="test-body">
+        <div class="pane stimulus-pane" id="stimulus-pane"></div>
+        <div class="pane response-pane">
+            <div class="q-text" id="q-text"></div>
+            <div id="q-response-area"></div>
             
-            <div class="pane response-pane">
-                <div class="q-text" id="q-text"></div>
-                <div id="q-response-area"></div>
-                
-                <div id="keypad-container" style="display:none;">
-                    <p style="color:#666; font-size:0.85rem; margin-bottom:5px;"><b>On-Screen Keypad:</b></p>
-                    <div class="keypad" id="dynamic-pad"></div>
-                </div>
+            <div id="keypad-container" style="display:none;">
+                <p style="color:#666; font-size:0.85rem; margin-bottom:5px;"><b>On-Screen Keypad:</b></p>
+                <div class="keypad" id="dynamic-pad"></div>
+            </div>
 
-                <div class="action-bar">
-                    <div id="feedback-msg"></div>
-                    <button class="submit-btn" id="btn-submit" disabled>Submit Answer</button>
-                </div>
+            <div class="action-bar">
+                <div id="feedback-msg"></div>
+                <button class="submit-btn" id="btn-submit" disabled>Submit Answer</button>
             </div>
         </div>
     </div>
+</div>
 
-    <div id="review-screen">
-        <div class="top-nav">
-            <div class="nav-left"><strong style="font-size: 1.2rem;">End of Test Review</strong></div>
-            <div class="nav-right"><button class="nav-btn primary" id="btn-finish">Submit Final Score</button></div>
-        </div>
-        <div class="rev-header">Click any question to review your answer.</div>
-        <div class="review-grid" id="review-grid"></div>
+<div id="review-screen">
+    <div class="top-nav">
+        <div class="nav-left"><strong style="font-size: 1.2rem;">End of Test Review</strong></div>
+        <div class="nav-right"><button class="nav-btn primary" id="btn-finish">Submit Final Score</button></div>
     </div>
+    <div class="rev-header">Click any question to review your answer.</div>
+    <div class="review-grid" id="review-grid"></div>
+</div>
 
-    <script>
 <script>
 // ==========================================
-// PHASE 2: SECURITY & GLOBAL EVENT DELEGATION
+// SECURITY & GLOBAL DELEGATION
 // ==========================================
-
-// 1. Secure Browser Mimicry
-document.addEventListener('contextmenu', e => e.preventDefault()); // Disable right-click
-document.addEventListener('keydown', e => { 
-    if(e.key === 'Enter') e.preventDefault(); // Prevent accidental physical Enter key submissions
-});
-
-// 2. Global Event Delegator (Fixes the "Grey Submit Button" Bug)
-// Because we rebuild the DOM for every question, we must attach listeners to the document, 
-// not the individual elements. This ensures they never disconnect.
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => { if(e.key === 'Enter') e.preventDefault(); });
 document.addEventListener('input', function(e) {
-    if(e.target && e.target.classList.contains('eq-input')) {
-        App.interactionTrigger(); // Instantly validate physical typing
-    }
+    if(e.target && e.target.classList.contains('eq-input')) { App.interactionTrigger(); }
 });
-
 document.addEventListener('focusin', function(e) {
-    if(e.target && e.target.tagName === 'INPUT' && e.target.type === 'text') {
-        App.setActive(e.target); // Track which box is active for the keypad
-    }
+    if(e.target && e.target.tagName === 'INPUT' && e.target.type === 'text') { App.setActive(e.target); }
 });
 
 // ==========================================
-// PHASE 3: THE TEI & SVG VISUAL GENERATORS
+// CORE ENGINE & TEI GENERATORS
 // ==========================================
-
 const Utils = {
     rInt: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
     pick: (arr) => arr[Math.floor(Math.random() * arr.length)],
     shuffle: (arr) => arr.sort(() => Math.random() - 0.5),
-    
-    // Procedural Stems (Prevents Rigor Bleed)
     genCtx: () => Utils.pick([
         { n: Utils.pick(["Leo","Mia","Sam"]), act1: "earned", unit: "$", per: "an hour", act2: "spent", isSub: true },
         { n: Utils.pick(["Zoe","David","Chloe"]), act1: "ran", unit: "miles", per: "a day", act2: "walked back", isSub: true },
         { n: Utils.pick(["Carlos","Emma","Jamal"]), act1: "collected boxes of", unit: "stickers", per: "per box", act2: "was given more", isSub: false }
     ]),
-    
-    // Smart Word Distractors
     numWords: (n) => {
         const o=['','one','two','three','four','five','six','seven','eight','nine'];
         const ty=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
@@ -266,27 +211,22 @@ const Utils = {
         else if(n>=10){s+=te[n-10];} else if(n>0){s+=o[n];}
         return s.trim();
     },
-
     genWordOpts: (num) => {
-        const s = new Set([Utils.numWords(num)]);
-        const strNum = num.toString();
-        if (num > 1000) s.add(Utils.numWords(Math.floor(num/10))); // Missing placeholder error
+        const s = new Set([Utils.numWords(num)]); const strNum = num.toString();
+        if (num > 1000) s.add(Utils.numWords(Math.floor(num/10)));
         if (strNum.includes('0')) { let fake = strNum.replace('0', '5'); s.add(Utils.numWords(parseInt(fake))); }
-        s.add(Utils.numWords(num + 100)); // Magnitude error
+        s.add(Utils.numWords(num + 100));
         while(s.size < 4) s.add(Utils.numWords(Utils.rInt(1000, 9999)));
         return Array.from(s).sort(() => Math.random() - 0.5).map(x => ({t:x, c:x===Utils.numWords(num)}));
     }
 };
 
 const TEI = {
-    // 1. Drag and Drop GRID
     dragDrop: (bank, drops) => {
         let b = `<div class="drag-bank">` + bank.map((i, idx) => `<div class="draggable" draggable="true" ondragstart="App.dragStart(event)" id="drag-${idx}">${i}</div>`).join('') + `</div>`;
         let d = drops.map(i => `<div style="display:inline-block; margin:10px; font-size:1.2rem;">${i.text} <div class="dropzone" id="${i.id}" ondragover="App.dragOver(event)" ondragleave="App.dragLeave(event)" ondrop="App.drop(event)"></div></div>`).join('');
         return `<div><p style="color:#666; font-size:0.9rem; font-weight:bold;">(Drag numbers from the bank into the empty boxes)</p>${b}${d}</div>`;
     },
-
-    // 2. Interactive SVG Number Line
     numberLine: (min, max, step, width) => {
         let s = `<svg width="${width}" height="100" style="background:#fff; border:1px solid #ccc; border-radius:6px; margin: 10px 0;"><line x1="30" y1="40" x2="${width-30}" y2="40" stroke="black" stroke-width="3"/>`;
         const count = (max-min)/step; const pxStep = (width-60)/count;
@@ -294,13 +234,10 @@ const TEI = {
             const val = min + (i*step); const cx = 30 + (i*pxStep);
             s += `<line x1="${cx}" y1="25" x2="${cx}" y2="55" stroke="black" stroke-width="2"/>`;
             s += `<text x="${cx}" y="80" text-anchor="middle" font-size="16" font-weight="bold">${val}</text>`;
-            // Hitboxes for clicking
             s += `<circle cx="${cx}" cy="40" r="20" fill="transparent" class="nl-hotspot" data-val="${val}" onclick="App.plotPoint(this)" style="cursor:pointer;"/>`;
         }
         return s + `<circle id="nl-plot" cx="-100" cy="40" r="8" fill="#003366" pointer-events="none"/></svg>`;
     },
-
-    // 3. Interactive Bar Graph
     barGraph: (a, b) => {
         const step = 150/8; let s = `<line x1="40" y1="180" x2="180" y2="180" stroke="#333" stroke-width="2"/><line x1="40" y1="10" x2="40" y2="180" stroke="#333" stroke-width="2"/>`;
         s += `<rect id="barA" x="60" y="180" width="40" height="0" fill="#003366" /><text x="80" y="195" text-anchor="middle" font-weight="bold">Group A</text>`;
@@ -310,8 +247,6 @@ const TEI = {
         for(let i=0; i<=8; i+=2) s += `<text x="30" y="${180-i*step + 5}" font-size="12" text-anchor="end">${i}</text>`;
         return `<svg width="250" height="220" viewBox="0 0 200 200">${s}</svg><br><span style="font-size:0.9rem; color:#666; font-weight:bold;">(Click the grid lines to build the bars)</span>`;
     },
-
-    // 4. Interactive Fraction Circles
     fracCirc: (n, d) => {
         let p = '';
         for(let i=0; i<d; i++) {
@@ -322,8 +257,6 @@ const TEI = {
         }
         return `<svg width="220" height="220" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#fff"/>${p}</svg>`;
     },
-
-    // 5. Static Models (Geometry, Clocks, Rulers)
     geoSym: (type) => {
         const s = 'fill="#e6f0fa" stroke="#003366" stroke-width="3"'; const line = `<line x1="50" y1="5" x2="50" y2="95" stroke="red" stroke-width="4" stroke-dasharray="6"/>`;
         if(type === 'half') return `<svg width="100" height="100"><rect x="10" y="30" width="40" height="40" ${s}/>${line}</svg>`;
@@ -335,323 +268,16 @@ const TEI = {
     lShape: (w1,h1,w2,h2) => `<svg width="${(w1+w2)*25+40}" height="${(h1+h2)*25+40}"><path d="M20 20 H${20+w1*25} V${20+h1*25} H${20+(w1+w2)*25} V${20+(h1+h2)*25} H20 Z" fill="#e6f0fa" stroke="#003366" stroke-width="3"/><text x="${20+w1*25/2}" y="15" text-anchor="middle" font-weight="bold">${w1}</text><text x="10" y="${20+(h1+h2)*25/2}" text-anchor="middle" font-weight="bold">${h1+h2}</text><text x="${20+w1*25+w2*25/2}" y="${20+h1*25-5}" text-anchor="middle" font-weight="bold">${w2}</text><text x="${20+(w1+w2)*25+10}" y="${20+h1*25+h2*25/2}" text-anchor="middle" font-weight="bold">${h2}</text></svg>`,
     clock: (h,m) => { let t=''; for(let i=0;i<60;i++) t+=`<line x1="50" y1="6" x2="50" y2="${i%5?7:10}" transform="rotate(${i*6} 50 50)" stroke="#333" stroke-width="${i%5?1:2}"/>`; return `<svg width="180" height="180" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="#333" fill="#fff" stroke-width="2"/>${t}<line x1="50" y1="50" x2="50" y2="28" stroke="black" stroke-width="5" stroke-linecap="round" transform="rotate(${(h%12)*30+m*0.5} 50 50)"/><line x1="50" y1="50" x2="50" y2="15" stroke="#cc0000" stroke-width="3" stroke-linecap="round" transform="rotate(${m*6} 50 50)"/><circle cx="50" cy="50" r="4"/></svg>`; },
     ruler: (len) => { let t=''; for(let i=0;i<=5;i++){ t+=`<line x1="${20+i*40}" y1="30" x2="${20+i*40}" y2="60" stroke="black" stroke-width="2"/>`; if(i<5) t+=`<line x1="${40+i*40}" y1="35" x2="${40+i*40}" y2="60" stroke="black"/><line x1="${30+i*40}" y1="45" x2="${30+i*40}" y2="60" stroke="black"/><line x1="${50+i*40}" y1="45" x2="${50+i*40}" y2="60" stroke="black"/>`; t+=`<text x="${20+i*40}" y="25" text-anchor="middle" font-weight="bold">${i}</text>`; } return `<svg width="250" height="90"><rect x="20" y="60" width="200" height="20" fill="#f4f4f4" stroke="black"/><rect x="20" y="65" width="${len*40}" height="10" fill="#ff9900" stroke="black"/>${t}</svg>`; },
-    
-    // 6. Inline UI Formats (Matrix, Dropdown, Hot Text)
     dropdown: (id, parts) => parts.map(p => p.opts ? `<select class="inline-drop drop-${id}" data-c="${p.c}" onchange="App.interactionTrigger()"><option value="">[ ? ]</option>` + p.opts.map(o => `<option value="${o}">${o}</option>`).join('') + `</select>` : `<span>${p.t}</span>`).join(''),
     hotText: (parts) => parts.map((p) => p.hot ? `<span class="hot-text" data-c="${p.c}" onclick="this.classList.toggle('selected'); App.interactionTrigger();">${p.t}</span>` : `<span>${p.t}</span>`).join(''),
     matrix: (rows, cols, answers) => { let h = `<table class="matrix-table"><tr><th></th>`; cols.forEach(c => h += `<th>${c}</th>`); h += `</tr>`; rows.forEach((r, rIdx) => { h += `<tr><td><strong>${r}</strong></td>`; cols.forEach((c, cIdx) => h += `<td><input type="checkbox" class="matrix-cb" data-corr="${answers[rIdx].includes(cIdx)}" onchange="App.interactionTrigger()"></td>`); h += `</tr>`; }); return h + `</table>`; }
 };
 
 // ==========================================
-// PHASE 2 CONT.: THE CENTRAL STATE MANAGER
+// 34-STANDARD BANK
 // ==========================================
-
-const App = {
-    // The "Memory Brain"
-    state: { mode: 'practice', currStd: null, qNum: 1, streak: 0, catDiff: 3, testData: [] },
-    currQ: null, data: {}, activeInput: null, draggedItem: null,
-
-    init: function() {
-        // Wiring up the standard buttons to launch practice mode
-        const m = document.getElementById('menu'); const order = ["MA.3.NSO", "MA.3.AR", "MA.3.FR", "MA.3.GR", "MA.3.M", "MA.3.DP"];
-        order.forEach(prefix => {
-            const h = document.createElement('div'); h.className = 'cat-title'; h.innerText = prefix; m.appendChild(h);
-            Object.keys(window.Bank).filter(k => k.startsWith(prefix)).forEach(id => {
-                const b = document.createElement('div'); b.className = 'std-btn'; b.innerHTML = `<strong>${id}</strong><br><small>${window.Bank[id].desc}</small>`;
-                b.onclick = () => { document.querySelectorAll('.std-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); App.startPractice(id); };
-                m.appendChild(b);
-            });
-        });
-
-        // Wire up Top UI Buttons
-        document.getElementById('launch-btn').onclick = () => this.startTest();
-        document.getElementById('btn-flag').onclick = () => this.toggleFlag();
-        document.getElementById('btn-pause').onclick = () => location.reload();
-        document.getElementById('btn-next').onclick = () => this.nextQuestion();
-        document.getElementById('btn-submit').onclick = () => this.check();
-        document.getElementById('btn-finish').onclick = () => this.endTest();
-    },
-
-    startPractice: function(id) {
-        this.state = { mode: 'practice', currStd: id, qNum: 1, streak: 0, catDiff: 5, testData: [] };
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('test-interface').style.display = 'flex';
-        this.load(id);
-    },
-
-    startTest: function() {
-        this.state = { mode: 'test', currStd: null, qNum: 1, streak: 0, catDiff: 3, testData: Array(40).fill(null).map(() => ({ans: null, flag: false})) };
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('test-interface').style.display = 'flex';
-        document.querySelectorAll('.std-btn').forEach(x=>x.classList.remove('active'));
-        this.nextQuestion();
-    },
-
-    nextQuestion: function() {
-        if(this.state.mode === 'test' && this.state.qNum > 40) { this.showReview(); return; }
-        
-        let targetStd = this.state.currStd;
-        // Blueprint Distribution
-        if(this.state.mode === 'test') {
-            const r = Math.random(); 
-            if(r < 0.28) targetStd = Utils.pick(Object.keys(window.Bank).filter(k => k.startsWith("MA.3.NSO")));
-            else if(r < 0.56) targetStd = Utils.pick(Object.keys(window.Bank).filter(k => k.startsWith("MA.3.AR")));
-            else if(r < 0.76) targetStd = Utils.pick(Object.keys(window.Bank).filter(k => k.startsWith("MA.3.FR")));
-            else targetStd = Utils.pick(Object.keys(window.Bank).filter(k => k.startsWith("MA.3.GR") || k.startsWith("MA.3.M") || k.startsWith("MA.3.DP")));
-        }
-        this.load(targetStd);
-    },
-
-    load: function(id) {
-        this.state.currStd = id; this.data = {}; this.activeInput = null;
-        document.getElementById('test-title').innerText = this.state.mode === 'test' ? `Test Mode` : `Practice: ${id}`;
-        document.getElementById('q-counter').innerText = `Q ${this.state.qNum}` + (this.state.mode === 'test' ? ' of 40' : '');
-        
-        // Pull adaptive question
-        let scenarios = window.Bank[id].scenarios.filter(s => s.diff <= this.state.catDiff);
-        if(scenarios.length === 0) scenarios = window.Bank[id].scenarios;
-        const q = Utils.pick(scenarios).gen(); 
-        this.currQ = q;
-
-        // Reset UI Boards
-        document.getElementById('stimulus-pane').innerHTML = q.left || ''; 
-        document.getElementById('stimulus-pane').style.display = q.left ? 'flex' : 'none';
-        document.getElementById('q-text').innerHTML = q.text || '';
-        const resp = document.getElementById('q-response-area'); resp.innerHTML = ''; 
-        document.getElementById('keypad-container').style.display = 'none';
-        document.getElementById('btn-submit').style.display = 'inline-block'; 
-        document.getElementById('btn-submit').disabled = true;
-        document.getElementById('btn-next').disabled = true; 
-        document.getElementById('feedback-msg').style.display = 'none';
-        
-        // Review Flag Tracking
-        const btnFlag = document.getElementById('btn-flag');
-        if(this.state.mode === 'test' && this.state.testData[this.state.qNum-1].flag) { 
-            btnFlag.innerText = "⚑ Flagged"; btnFlag.style.color = "var(--incorrect)"; 
-        } else { 
-            btnFlag.innerText = "⚑ Flag"; btnFlag.style.color = "white"; 
-        }
-
-        // Render DOM dynamically
-        q.tasks.forEach((t, idx) => {
-            const block = document.createElement('div'); 
-            block.className = t.isFollowUp ? 'task-block task-hidden' : 'task-block'; 
-            block.id = `task-block-${idx}`;
-            block.innerHTML = `<div class="task-label">${t.label}</div><div style="margin-bottom:15px; font-size: 1.2rem;">${t.text || ''}</div>`;
-            
-            if(t.type === 'radio' || t.type === 'multi') {
-                const list = document.createElement('div'); list.className = t.options[0].t.includes('<svg') ? 'opt-list grid' : 'opt-list';
-                t.options.forEach((o,i) => {
-                    const el = document.createElement('div'); el.className = `opt-item`; 
-                    el.innerHTML = `<div class="opt-icon"></div> <div>${o.t}</div>`;
-                    el.onclick = () => { 
-                        if(t.type === 'radio'){ list.querySelectorAll('.opt-item').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); t.sel=i; } 
-                        else { el.classList.toggle('selected'); o.sel = !o.sel; } 
-                        App.interactionTrigger(); 
-                    };
-                    list.appendChild(el);
-                }); 
-                block.appendChild(list);
-            } 
-            else if (t.type === 'eq') { 
-                // Removed readonly! Students can type on physical keyboard now.
-                block.innerHTML += `<input type="text" id="${t.id}" class="eq-input" data-pad="${t.data_pad||'num'}" placeholder="Type or tap...">`; 
-            }
-            else if (t.type === 'interact' || t.type === 'drop' || t.type === 'drag' || t.type === 'matrix') { 
-                block.innerHTML += t.html || ''; 
-            }
-            resp.appendChild(block);
-        });
-
-        // Set focus
-        const firstEq = document.querySelector('.eq-input');
-        if(firstEq && !firstEq.closest('.task-hidden')) { this.setActive(firstEq); }
-    },
-
-    // --- Keypad Management ---
-    setActive: function(el) {
-        document.querySelectorAll('.eq-input').forEach(i => i.classList.remove('active-focus'));
-        el.classList.add('active-focus'); this.activeInput = el;
-        
-        let kp = `<button class="key-btn" onclick="App.typeKey('1')">1</button><button class="key-btn" onclick="App.typeKey('2')">2</button><button class="key-btn" onclick="App.typeKey('3')">3</button>`;
-        const type = el.getAttribute('data-pad');
-        if(type==='time') kp+=`<button class="key-btn op" onclick="App.typeKey(':')">:</button>`;
-        else if(type==='frac') kp+=`<button class="key-btn op" onclick="App.typeKey('/')">/</button>`;
-        else kp+=`<button class="key-btn op" onclick="App.typeKey('+')">+</button>`;
-        
-        kp += `<button class="key-btn" onclick="App.typeKey('4')">4</button><button class="key-btn" onclick="App.typeKey('5')">5</button><button class="key-btn" onclick="App.typeKey('6')">6</button><button class="key-btn op" onclick="App.typeKey('-')">-</button>
-               <button class="key-btn" onclick="App.typeKey('7')">7</button><button class="key-btn" onclick="App.typeKey('8')">8</button><button class="key-btn" onclick="App.typeKey('9')">9</button>`;
-        
-        if(type==='money') kp+=`<button class="key-btn op" onclick="App.typeKey('$')">$</button>`;
-        else kp+=`<button class="key-btn op" onclick="App.typeKey('.')">.</button>`;
-        
-        kp += `<button class="key-btn wide" onclick="App.typeKey('0')">0</button><button class="key-btn op wide" onclick="App.typeKey('BACK')">&larr; Delete</button>`;
-        document.getElementById('dynamic-pad').innerHTML = kp;
-        document.getElementById('keypad-container').style.display = 'block';
-    },
-
-    typeKey: function(k) {
-        if(!this.activeInput) return;
-        if(k === 'BACK') this.activeInput.value = this.activeInput.value.slice(0,-1); 
-        else this.activeInput.value += k;
-        this.interactionTrigger(); // Trigger validation manually after soft key press
-    },
-
-    // --- Drag and Drop API ---
-    dragStart: function(e) { this.draggedItem = e.target.innerText; e.target.style.opacity = '0.5'; setTimeout(() => e.target.style.opacity = '1', 100); },
-    dragOver: function(e) { e.preventDefault(); if(e.target.classList.contains('dropzone')) e.target.classList.add('hover'); },
-    dragLeave: function(e) { if(e.target.classList.contains('dropzone')) e.target.classList.remove('hover'); },
-    drop: function(e) { 
-        e.preventDefault(); 
-        if(e.target.classList.contains('dropzone')) {
-            e.target.classList.remove('hover'); 
-            e.target.innerText = this.draggedItem; 
-            this.interactionTrigger(); // Validate drop
-        }
-    },
-
-    // --- Number Line Logic ---
-    plotPoint: function(el) {
-        const cx = el.getAttribute('cx'); const val = parseFloat(el.getAttribute('data-val'));
-        const dot = document.getElementById('nl-plot'); 
-        dot.setAttribute('cx', cx); App.data.nl = val;
-        this.interactionTrigger(); // Validate plot
-    },
-
-    // --- Core Architecture: The Validator ---
-    toggleFlag: function() {
-        if(this.state.mode !== 'test') return;
-        const btn = document.getElementById('btn-flag');
-        const isFlagged = !this.state.testData[this.state.qNum-1].flag;
-        this.state.testData[this.state.qNum-1].flag = isFlagged;
-        btn.innerText = isFlagged ? "⚑ Flagged" : "⚑ Flag"; 
-        btn.style.color = isFlagged ? "var(--incorrect)" : "white";
-    },
-
-    // Fixed resilient logic checking directly against the live DOM
-    isAnswered: function(t) {
-        if(t.type==='radio') return t.sel !== undefined;
-        if(t.type==='multi') return t.options.some(o => o.sel);
-        if(t.type==='eq') { 
-            const input = document.getElementById(t.id);
-            return input && input.value.trim() !== ''; 
-        }
-        if(t.type==='drag') return document.getElementById('d1') && document.getElementById('d1').innerText.trim() !== '';
-        if(t.type==='interact' && t.html && t.html.includes('fracCirc')) return document.querySelectorAll('path[fill="#ff9900"]').length > 0;
-        if(t.type==='interact' && t.html && t.html.includes('numberLine')) return App.data.nl !== undefined;
-        if(t.type==='interact' && t.html && t.html.includes('barGraph')) return App.data.a !== undefined && App.data.b !== undefined;
-        if(t.type==='drop') return Array.from(document.querySelectorAll(`.drop-${t.id}`)).every(s => s.value !== "");
-        if(t.type==='matrix') return document.getElementById(`task-block-${this.currQ.tasks.indexOf(t)}`).querySelectorAll('.matrix-cb:checked').length > 0;
-        return false;
-    },
-
-    interactionTrigger: function() {
-        // Runs every single time a student touches the screen
-        let pA = this.currQ.tasks[0]; let pB = this.currQ.tasks[1];
-        
-        // 1. Progressive Disclosure Unlock Check
-        if (this.isAnswered(pA) && pB) {
-            const bBlock = document.getElementById('task-block-1');
-            if (bBlock && bBlock.classList.contains('task-hidden')) { 
-                bBlock.classList.remove('task-hidden'); 
-                const nEq = bBlock.querySelector('.eq-input'); 
-                if(nEq) this.setActive(nEq); 
-            }
-        }
-
-        // 2. Submit Button Unlock Check
-        let allVisibleAnswered = true;
-        this.currQ.tasks.forEach((t, i) => { 
-            const block = document.getElementById(`task-block-${i}`);
-            // Only check tasks that are currently visible on the screen
-            if (block && !block.classList.contains('task-hidden')) {
-                if (!this.isAnswered(t)) allVisibleAnswered = false; 
-            }
-        });
-        
-        // Extra check: If Part B exists, it MUST be answered to unlock Submit
-        if (pB && !this.isAnswered(pB)) allVisibleAnswered = false;
-        
-        document.getElementById('btn-submit').disabled = !allVisibleAnswered;
-    },
-
-    check: function() {
-        let allCorrect = true; 
-        this.currQ.tasks.forEach((t) => {
-            let ok = false;
-            if(t.type==='radio') ok = t.options[t.sel] && t.options[t.sel].c;
-            if(t.type==='multi') ok = t.options.every(o => !!o.sel === o.c);
-            if(t.type==='eq') ok = document.getElementById(t.id).value.trim() === t.ans;
-            if(t.type==='interact' || t.type==='drag') ok = t.check();
-            if(t.type==='drop') { const sels = document.querySelectorAll(`.drop-${t.id}`); ok=true; sels.forEach(s => { if(s.value !== s.dataset.c) ok=false; }); }
-            if(t.type==='matrix') { const cbs = document.getElementById(`task-block-${this.currQ.tasks.indexOf(t)}`).querySelectorAll('.matrix-cb'); ok = true; cbs.forEach(cb => { if(cb.checked !== (cb.dataset.corr === "true")) ok = false; }); }
-            if(!ok) allCorrect = false;
-        });
-
-        // Computer Adaptive Logic
-        if(this.state.mode === 'test') {
-            this.state.testData[this.state.qNum-1].ans = allCorrect;
-            if(allCorrect) { 
-                this.state.streak++; 
-                if(this.state.streak > 1) this.state.catDiff = Math.min(5, this.state.catDiff + 1); 
-            } else { 
-                this.state.streak = 0; 
-                this.state.catDiff = Math.max(3, this.state.catDiff - 1); 
-            }
-        }
-
-        // Show Visual Feedback
-        const fb = document.getElementById('feedback-msg'); 
-        fb.className = allCorrect ? 'fb-corr' : 'fb-wrg';
-        fb.innerText = allCorrect ? "✔ Correct!" : "✘ Incorrect."; 
-        fb.style.display = 'block';
-        
-        // Toggle State Locks
-        document.getElementById('btn-submit').style.display = 'none'; 
-        document.getElementById('btn-next').disabled = false; 
-        document.getElementById('keypad-container').style.opacity = '0.5';
-        document.getElementById('keypad-container').style.pointerEvents = 'none';
-        
-        if(this.state.mode === 'test') {
-            document.getElementById('btn-next').innerText = this.state.qNum === 40 ? "Finish Test \u2192" : "Next \u2192";
-        }
-        
-        this.state.qNum++;
-    },
-
-    showReview: function() {
-        document.getElementById('test-interface').style.display = 'none';
-        document.getElementById('review-screen').style.display = 'flex';
-        const grid = document.getElementById('review-grid'); grid.innerHTML = '';
-        this.state.testData.forEach((d, i) => {
-            const btn = document.createElement('button'); btn.className = 'rev-btn';
-            if(d.ans !== null) btn.classList.add('answered');
-            if(d.flag) btn.classList.add('flagged');
-            btn.innerText = i + 1;
-            btn.onclick = () => { 
-                this.state.qNum = i+1; 
-                document.getElementById('review-screen').style.display = 'none'; 
-                document.getElementById('test-interface').style.display = 'flex'; 
-                this.load(this.state.testData[i].std || Utils.pick(Object.keys(window.Bank))); 
-            };
-            grid.appendChild(btn);
-        });
-    },
-
-    endTest: function() {
-        const correct = this.state.testData.filter(d => d.ans === true).length;
-        const scaleScore = 240 + Math.floor((correct/40)*100);
-        document.getElementById('review-screen').innerHTML = `<div style="text-align:center; padding:100px;"><h2>Test Complete</h2><p style="font-size:1.5rem">Raw Score: ${correct} / 40</p><h1 style="color:var(--cam-blue); font-size:3.5rem;">FAST Scale Score: ${scaleScore}</h1><br><button class="mock-btn" onclick="App.exitToMenu()">Return to Dashboard</button></div>`;
-    }
-};
-// ==========================================
-// PHASE 4: THE COMPLETE 34-STANDARD BANK
-// ==========================================
-
 window.Bank = {
-    // ----------------------------------------------------
-    // DOMAIN 1: NUMBER SENSE & ADDITIVE REASONING (NSO)
-    // ----------------------------------------------------
+    // --- NSO ---
     "MA.3.NSO.1.1": { desc: "Read/Write Numbers", scenarios: [
         { diff: 3, gen: () => { const n=Utils.rInt(4000,9999); return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Select the exact word form for ${n}.`, options: Utils.genWordOpts(n) }]}; }},
         { diff: 5, gen: () => { const n=Utils.rInt(2000,9000), h=Math.floor((n%1000)/100); return { text: "Level 5: Error Analysis", tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Select the word form for ${n}.`, options: Utils.genWordOpts(n) }, { id: "t2", type: "drop", label: "Part B (Error Analysis)", text: "Fix the error in this student's expanded form.", html: TEI.dropdown('t2', [{t:`${n} = ${Math.floor(n/1000)*1000} + `}, {opts:[h, h*10, h*100], c:h*100}, {t:` + ${n%100}`}]), isFollowUp: true }]}; }}
@@ -672,23 +298,12 @@ window.Bank = {
         { diff: 3, gen: () => { const a=Utils.rInt(2000,5000), b=Utils.rInt(1000,1999); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Find the exact difference: ${a} - ${b} = ?`, ans:(a-b).toString() }]}; }},
         { diff: 5, gen: () => { const a=Utils.rInt(1000,4000), b=Utils.rInt(1000,4000); return { text: "Level 5: Error Analysis", tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Solve correctly: ${a} + ${b} = ?`, ans:(a+b).toString() }, { id: "t2", type: "drop", label: "Part B", text: `A student solved it and got ${(a+b)-100}. What mistake did they make?`, html: TEI.dropdown('t2', [{t:"They forgot to regroup the "}, {opts:["ones", "tens", "hundreds", "thousands"], c:"hundreds"}, {t:" place."}]), isFollowUp: true }]}; }}
     ]},
-    "MA.3.NSO.2.2": { desc: "Mult/Div Facts", scenarios: [
-        { diff: 3, gen: () => { const a=Utils.rInt(7,12), b=Utils.rInt(7,12); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Solve: ${a} x ${b} = ?`, ans:(a*b).toString() }]}; }},
-        { diff: 4, gen: () => { const a=Utils.rInt(6,9), p=a*Utils.rInt(6,9); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Solve: ${p} ÷ ${a} = ?`, ans:(p/a).toString() }]}; }}
-    ]},
-    "MA.3.NSO.2.3": { desc: "Multiply by 10s", scenarios: [
-        { diff: 3, gen: () => { const a=Utils.rInt(4,9), b=Utils.pick([20,30,40,50]); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Solve: ${a} x ${b} = ?`, ans:(a*b).toString() }]}; }}
-    ]},
-    "MA.3.NSO.2.4": { desc: "Mult 1-digit by 2-digit", scenarios: [
-        { diff: 4, gen: () => { const a=Utils.rInt(3,8), b=Utils.rInt(13,25); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`A theater has ${b} rows. Each row has ${a} seats. Total seats?`, ans:(a*b).toString() }]}; }}
-    ]},
+    "MA.3.NSO.2.2": { desc: "Mult/Div Facts", scenarios: [{ diff: 3, gen: () => { const a=Utils.rInt(7,12), b=Utils.rInt(7,12); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Solve: ${a} x ${b} = ?`, ans:(a*b).toString() }]}; }}]},
+    "MA.3.NSO.2.3": { desc: "Multiply by 10s", scenarios: [{ diff: 3, gen: () => { const a=Utils.rInt(4,9), b=Utils.pick([20,30,40,50]); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Solve: ${a} x ${b} = ?`, ans:(a*b).toString() }]}; }}]},
+    "MA.3.NSO.2.4": { desc: "Mult 1-digit by 2-digit", scenarios: [{ diff: 4, gen: () => { const a=Utils.rInt(3,8), b=Utils.rInt(13,25); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`A theater has ${b} rows. Each row has ${a} seats. Total seats?`, ans:(a*b).toString() }]}; }}]},
 
-    // ----------------------------------------------------
-    // DOMAIN 2: ALGEBRAIC REASONING (AR)
-    // ----------------------------------------------------
-    "MA.3.AR.1.1": { desc: "Distributive Property", scenarios: [
-        { diff: 4, gen: () => { const a=Utils.rInt(4,9), b=Utils.rInt(12,18); return { left: `<div style="padding:20px;">`+TEI.areaModel(a,10,b-10)+`</div>`, tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Which expression equals the Area Model?`, options: Utils.shuffle([{t:`(${a} x 10) + (${a} x ${b-10})`,c:true},{t:`${a} + 10 + ${b-10}`,c:false},{t:`(${a} x 10) x (${a} x ${b-10})`,c:false},{t:`${a} x 100`,c:false}]) }]}; }}
-    ]},
+    // --- AR ---
+    "MA.3.AR.1.1": { desc: "Distributive Property", scenarios: [{ diff: 4, gen: () => { const a=Utils.rInt(4,9), b=Utils.rInt(12,18); return { left: `<div style="padding:20px;">`+TEI.areaModel(a,10,b-10)+`</div>`, tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Which expression equals the Area Model?`, options: Utils.shuffle([{t:`(${a} x 10) + (${a} x ${b-10})`,c:true},{t:`${a} + 10 + ${b-10}`,c:false},{t:`(${a} x 10) x (${a} x ${b-10})`,c:false},{t:`${a} x 100`,c:false}]) }]}; }}]},
     "MA.3.AR.1.2": { desc: "Multi-Step Word Problems", scenarios: [
         { diff: 3, gen: () => { const a=Utils.rInt(3,6), b=Utils.rInt(4,8), c=Utils.rInt(2,10); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Jon buys ${a} packs of ${b} cards. He gives ${c} away. How many left?`, ans:((a*b)-c).toString() }]}; }},
         { diff: 5, gen: () => { 
@@ -701,41 +316,21 @@ window.Bank = {
             }; 
         }}
     ]},
-    "MA.3.AR.2.1": { desc: "Inverse Operations", scenarios: [
-        { diff: 4, gen: () => { const a=Utils.rInt(6,9), p=a*Utils.rInt(6,9); return { tasks: [{ id: "t1", type: "hot", label: "Part A", text: `Select the related equation to solve <strong>${p} ÷ ${a} = ?</strong>`, html: TEI.hotText([{t:`${a} x ? = ${p}`,hot:true,c:true},{t:" / "},{t:`${p} - ${a} = ?`,hot:true,c:false},{t:" / "},{t:`${a} + ? = ${p}`,hot:true,c:false}]) }]}; }}
-    ]},
-    "MA.3.AR.2.2": { desc: "Equality", scenarios: [
-        { diff: 4, gen: () => { const a=Utils.rInt(4,8), b=Utils.rInt(4,8); return { tasks: [{ id: "t1", type: "drop", label: "Part A", text: "Make the equation true.", html: TEI.dropdown('t1', [{t:`${a} x ${b} = `},{opts:[a*b, a+b, a*b+10],c:a*b},{t:` + 0`}]) }]}; }}
-    ]},
-    "MA.3.AR.2.3": { desc: "Missing Factor", scenarios: [
-        { diff: 3, gen: () => { const a=Utils.rInt(6,9), p=a*Utils.rInt(4,9); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Find the missing factor: ${a} x [ ? ] = ${p}`, ans:(p/a).toString() }]}; }}
-    ]},
-    "MA.3.AR.3.1": { desc: "Even/Odd", scenarios: [
-        { diff: 3, gen: () => { const n=Utils.rInt(10,99); return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Is ${n} Even or Odd?`, options:[{t:"Even",c:n%2===0},{t:"Odd",c:n%2!==0}] }]}; }}
-    ]},
-    "MA.3.AR.3.2": { desc: "Multiples", scenarios: [
-        { diff: 3, gen: () => { const base = Utils.pick([3,4,6]); return { tasks: [{ id: "t1", type: "multi", label: "Part A", text: `Select ALL multiples of ${base}.`, options: Utils.shuffle([{t:(base*2).toString(),c:true},{t:(base*5).toString(),c:true},{t:(base*2+1).toString(),c:false},{t:(base*3-1).toString(),c:false}]) }]}; }}
-    ]},
-    "MA.3.AR.3.3": { desc: "Patterns", scenarios: [
-        { diff: 4, gen: () => { const r=Utils.pick([4,5]); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Rule: Multiply by ${r}. If input is 6, what is the output?`, ans:(r*6).toString() }]}; }}
-    ]},
+    "MA.3.AR.2.1": { desc: "Inverse Operations", scenarios: [{ diff: 4, gen: () => { const a=Utils.rInt(6,9), p=a*Utils.rInt(6,9); return { tasks: [{ id: "t1", type: "hot", label: "Part A", text: `Select the related equation to solve <strong>${p} ÷ ${a} = ?</strong>`, html: TEI.hotText([{t:`${a} x ? = ${p}`,hot:true,c:true},{t:" / "},{t:`${p} - ${a} = ?`,hot:true,c:false},{t:" / "},{t:`${a} + ? = ${p}`,hot:true,c:false}]) }]}; }}]},
+    "MA.3.AR.2.2": { desc: "Equality", scenarios: [{ diff: 4, gen: () => { const a=Utils.rInt(4,8), b=Utils.rInt(4,8); return { tasks: [{ id: "t1", type: "drop", label: "Part A", text: "Make the equation true.", html: TEI.dropdown('t1', [{t:`${a} x ${b} = `},{opts:[a*b, a+b, a*b+10],c:a*b},{t:` + 0`}]) }]}; }}]},
+    "MA.3.AR.2.3": { desc: "Missing Factor", scenarios: [{ diff: 3, gen: () => { const a=Utils.rInt(6,9), p=a*Utils.rInt(4,9); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Find the missing factor: ${a} x [ ? ] = ${p}`, ans:(p/a).toString() }]}; }}]},
+    "MA.3.AR.3.1": { desc: "Even/Odd", scenarios: [{ diff: 3, gen: () => { const n=Utils.rInt(10,99); return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Is ${n} Even or Odd?`, options:[{t:"Even",c:n%2===0},{t:"Odd",c:n%2!==0}] }]}; }}]},
+    "MA.3.AR.3.2": { desc: "Multiples", scenarios: [{ diff: 3, gen: () => { const base = Utils.pick([3,4,6]); return { tasks: [{ id: "t1", type: "multi", label: "Part A", text: `Select ALL multiples of ${base}.`, options: Utils.shuffle([{t:(base*2).toString(),c:true},{t:(base*5).toString(),c:true},{t:(base*2+1).toString(),c:false},{t:(base*3-1).toString(),c:false}]) }]}; }}]},
+    "MA.3.AR.3.3": { desc: "Patterns", scenarios: [{ diff: 4, gen: () => { const r=Utils.pick([4,5]); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Rule: Multiply by ${r}. If input is 6, what is the output?`, ans:(r*6).toString() }]}; }}]},
 
-    // ----------------------------------------------------
-    // DOMAIN 3: FRACTIONAL REASONING (FR)
-    // ----------------------------------------------------
+    // --- FR ---
     "MA.3.FR.1.1": { desc: "Visual Fractions", scenarios: [
         { diff: 4, gen: () => { const d=Utils.pick([4,6,8]), n=Utils.rInt(1,d-1); return { left: TEI.fracCirc(n,d), tasks: [{ id:"t1", type:"interact", label:"Part A", text:`Click and shade the visual model to represent <strong>${n}/${d}</strong>.`, check: ()=>document.querySelectorAll('path[fill="#ff9900"]').length===n }]}; }},
         { diff: 5, gen: () => { return { text: "Level 5 Number Line", tasks: [{ id:"t1", type:"interact", label:"Part A", text:`Click on the number line to plot 3/4. (Between 0 and 1)`, html: TEI.numberLine(0, 1, 0.25, 400), check:()=>App.data.nl===0.75 }]}; }}
     ]},
-    "MA.3.FR.1.2": { desc: "Unit/Whole", scenarios: [
-        { diff: 3, gen: () => { return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:"Which fraction is equal to exactly 1 whole?", options: Utils.shuffle([{t:"4/4",c:true},{t:"4/1",c:false},{t:"1/4",c:false},{t:"3/4",c:false}]) }]}; }}
-    ]},
-    "MA.3.FR.1.3": { desc: "Word Form", scenarios: [
-        { diff: 3, gen: () => { return { tasks: [{ id:"t1", type:"hot", label:"Part A", text:"Select the numerical fraction for <strong>'Five-Eighths'</strong>.", html: TEI.hotText([{t:"8/5",hot:true,c:false},{t:", "},{t:"5/8",hot:true,c:true},{t:", "},{t:"1/8",hot:true,c:false}]) }]}; }}
-    ]},
-    "MA.3.FR.2.1": { desc: "Compare", scenarios: [
-        { diff: 4, gen: () => { const d1=Utils.pick([3,4]), d2=Utils.pick([6,8]); return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Compare: 1/${d1} and 1/${d2}.`, options: Utils.shuffle([{t:`1/${d1} > 1/${d2}`,c:true},{t:`1/${d1} < 1/${d2}`,c:false},{t:`1/${d1} = 1/${d2}`,c:false},{t:`1/${d2} > 1/${d1}`,c:false}]) }]}; }}
-    ]},
+    "MA.3.FR.1.2": { desc: "Unit/Whole", scenarios: [{ diff: 3, gen: () => { return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:"Which fraction is equal to exactly 1 whole?", options: Utils.shuffle([{t:"4/4",c:true},{t:"4/1",c:false},{t:"1/4",c:false},{t:"3/4",c:false}]) }]}; }}]},
+    "MA.3.FR.1.3": { desc: "Word Form", scenarios: [{ diff: 3, gen: () => { return { tasks: [{ id:"t1", type:"hot", label:"Part A", text:"Select the numerical fraction for <strong>'Five-Eighths'</strong>.", html: TEI.hotText([{t:"8/5",hot:true,c:false},{t:", "},{t:"5/8",hot:true,c:true},{t:", "},{t:"1/8",hot:true,c:false}]) }]}; }}]},
+    "MA.3.FR.2.1": { desc: "Compare", scenarios: [{ diff: 4, gen: () => { const d1=Utils.pick([3,4]), d2=Utils.pick([6,8]); return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Compare: 1/${d1} and 1/${d2}.`, options: Utils.shuffle([{t:`1/${d1} > 1/${d2}`,c:true},{t:`1/${d1} < 1/${d2}`,c:false},{t:`1/${d1} = 1/${d2}`,c:false},{t:`1/${d2} > 1/${d1}`,c:false}]) }]}; }}]},
     "MA.3.FR.2.2": { desc: "Equivalence Justification", scenarios: [
         { diff: 5, gen: () => { return { left: `<div style="font-size:3.5rem; font-weight:bold; color:#003366; text-align:center; padding:60px;">2 / 4</div>`, tasks: [
             { id: "t1", type: "radio", label: "Part A", text: "Select the equivalent fraction.", options: Utils.shuffle([{t:"1/2",c:true},{t:"1/3",c:false},{t:"2/3",c:false},{t:"4/2",c:false}]) },
@@ -743,69 +338,258 @@ window.Bank = {
         ]}; }}
     ]},
 
-    // ----------------------------------------------------
-    // DOMAIN 4: GEOMETRIC REASONING (GR)
-    // ----------------------------------------------------
-    "MA.3.GR.1.1": { desc: "Points/Lines", scenarios: [
-        { diff: 3, gen: () => { return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:"Which image shows <strong>Perpendicular Lines</strong>?", options: Utils.shuffle([{t:`<svg width="100" height="100"><line x1="50" y1="10" x2="50" y2="90" stroke="black" stroke-width="3"/><line x1="10" y1="50" x2="90" y2="50" stroke="black" stroke-width="3"/><rect x="50" y="50" width="10" height="10" fill="none" stroke="black"/></svg>`,c:true},{t:`<svg width="100" height="100"><line x1="30" y1="20" x2="30" y2="80" stroke="black" stroke-width="3"/><line x1="70" y1="20" x2="70" y2="80" stroke="black" stroke-width="3"/></svg>`,c:false}]) }]}; }}
-    ]},
-    "MA.3.GR.1.2": { desc: "Attributes Matrix", scenarios: [
-        { diff: 4, gen: () => { return { tasks: [{ id: "t1", type: "matrix", label: "Part A", text: "Match the shapes to their attributes.", html: TEI.matrix(["Square", "Trapezoid"], ["4 Right Angles", "Parallel Sides"], [[0,1],[1]]) }]}; }}
-    ]},
-    "MA.3.GR.1.3": { desc: "Symmetry Completion", scenarios: [
-        { diff: 5, gen: () => { return { left: TEI.geoSym('half'), text: `Complete the figure along the line of symmetry.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: "Which image correctly completes the mirrored shape?", options: Utils.shuffle([{t:TEI.geoSym('full'),c:true},{t:TEI.geoSym('wrong1'),c:false},{t:TEI.geoSym('wrong2'),c:false},{t:TEI.geoSym('half'),c:false}]) }]}; }}
-    ]},
-    "MA.3.GR.2.1": { desc: "Area", scenarios: [
-        { diff: 3, gen: () => { const w=Utils.rInt(4,7), h=Utils.rInt(3,5); return { left: `<div style="padding:20px;">`+TEI.areaModel(h,w,0)+`</div>`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: "Find the Area.", ans:(w*h).toString() }]}; }}
-    ]},
-    "MA.3.GR.2.2": { desc: "Distributive Area", scenarios: [
-        { diff: 4, gen: () => { const a=4, b=12; return { tasks: [{ id: "t1", type: "radio", label: "Part A", text: `Which shows the area of a ${a}x${b} rectangle broken apart?`, options: Utils.shuffle([{t:`(${a} x 10) + (${a} x ${b-10})`,c:true},{t:`${a} + 10 + ${b-10}`,c:false},{t:`(${a} x 10) x (${a} x ${b-10})`,c:false},{t:`${a} x 10`,c:false}]) }]}; }}
-    ]},
-    "MA.3.GR.2.3": { desc: "Perimeter Reverse", scenarios: [
-        { diff: 5, gen: () => { const w=Utils.rInt(3,7), l=Utils.rInt(5,9), p=2*w+2*l; return { text: `<b>Level 5 Reverse Engineering</b>`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `The Perimeter of a rectangle is ${p}. The Width is ${w}. What is the length?`, ans:l.toString() }]}; }}
-    ]},
-    "MA.3.GR.2.4": { desc: "Composite Area", scenarios: [
-        { diff: 5, gen: () => { const w1=3, h1=4, w2=2, h2=3; const total = (w1*(h1+h2))+(w2*h2); return { left: `<div style="padding:20px;">`+TEI.lShape(w1,h1,w2,h2)+`</div>`, text: `Total area is <b>${total}</b> square units.`, tasks: [ { id: "t1", type: "eq", label: "Part A", text: "Area of the large left rectangle?", ans: (w1*(h1+h2)).toString() }, { id: "t2", type: "eq", label: "Part B", text: "Area of the smaller right rectangle?", ans: (w2*h2).toString(), isFollowUp: true } ] }; }}
-    ]},
+    // --- GR ---
+    "MA.3.GR.1.1": { desc: "Points/Lines", scenarios: [{ diff: 3, gen: () => { return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:"Which image shows <strong>Perpendicular Lines</strong>?", options: Utils.shuffle([{t:`<svg width="100" height="100"><line x1="50" y1="10" x2="50" y2="90" stroke="black" stroke-width="3"/><line x1="10" y1="50" x2="90" y2="50" stroke="black" stroke-width="3"/><rect x="50" y="50" width="10" height="10" fill="none" stroke="black"/></svg>`,c:true},{t:`<svg width="100" height="100"><line x1="30" y1="20" x2="30" y2="80" stroke="black" stroke-width="3"/><line x1="70" y1="20" x2="70" y2="80" stroke="black" stroke-width="3"/></svg>`,c:false}]) }]}; }}]},
+    "MA.3.GR.1.2": { desc: "Attributes Matrix", scenarios: [{ diff: 4, gen: () => { return { tasks: [{ id: "t1", type: "matrix", label: "Part A", text: "Match the shapes to their attributes.", html: TEI.matrix(["Square", "Trapezoid"], ["4 Right Angles", "Parallel Sides"], [[0,1],[1]]) }]}; }}]},
+    "MA.3.GR.1.3": { desc: "Symmetry Completion", scenarios: [{ diff: 5, gen: () => { return { left: TEI.geoSym('half'), text: `Complete the figure along the line of symmetry.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: "Which image correctly completes the mirrored shape?", options: Utils.shuffle([{t:TEI.geoSym('full'),c:true},{t:TEI.geoSym('wrong1'),c:false},{t:TEI.geoSym('wrong2'),c:false},{t:TEI.geoSym('half'),c:false}]) }]}; }}]},
+    "MA.3.GR.2.1": { desc: "Area", scenarios: [{ diff: 3, gen: () => { const w=Utils.rInt(4,7), h=Utils.rInt(3,5); return { left: `<div style="padding:20px;">`+TEI.areaModel(h,w,0)+`</div>`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: "Find the Area.", ans:(w*h).toString() }]}; }}]},
+    "MA.3.GR.2.2": { desc: "Distributive Area", scenarios: [{ diff: 4, gen: () => { const a=4, b=12; return { tasks: [{ id: "t1", type: "radio", label: "Part A", text: `Which shows the area of a ${a}x${b} rectangle broken apart?`, options: Utils.shuffle([{t:`(${a} x 10) + (${a} x ${b-10})`,c:true},{t:`${a} + 10 + ${b-10}`,c:false},{t:`(${a} x 10) x (${a} x ${b-10})`,c:false},{t:`${a} x 10`,c:false}]) }]}; }}]},
+    "MA.3.GR.2.3": { desc: "Perimeter Reverse", scenarios: [{ diff: 5, gen: () => { const w=Utils.rInt(3,7), l=Utils.rInt(5,9), p=2*w+2*l; return { text: `<b>Level 5 Reverse Engineering</b>`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `The Perimeter of a rectangle is ${p}. The Width is ${w}. What is the length?`, ans:l.toString() }]}; }}]},
+    "MA.3.GR.2.4": { desc: "Composite Area", scenarios: [{ diff: 5, gen: () => { const w1=3, h1=4, w2=2, h2=3; const total = (w1*(h1+h2))+(w2*h2); return { left: `<div style="padding:20px;">`+TEI.lShape(w1,h1,w2,h2)+`</div>`, text: `Total area is <b>${total}</b> square units.`, tasks: [ { id: "t1", type: "eq", label: "Part A", text: "Area of the large left rectangle?", ans: (w1*(h1+h2)).toString() }, { id: "t2", type: "eq", label: "Part B", text: "Area of the smaller right rectangle?", ans: (w2*h2).toString(), isFollowUp: true } ] }; }}]},
 
-    // ----------------------------------------------------
-    // DOMAIN 5: MEASUREMENT (M)
-    // ----------------------------------------------------
-    "MA.3.M.1.1": { desc: "Tools & Measure", scenarios: [
-        { diff: 3, gen: () => { const l=Utils.pick([2.25, 3.5, 4.75]); return { left: TEI.ruler(l), tasks: [{ id: "t1", type: "radio", label: "Part A", text: "To the nearest quarter inch, what is the length?", options: Utils.shuffle([{t:`${l} in`,c:true},{t:`${l+0.25} in`,c:false},{t:`${Math.floor(l)} in`,c:false},{t:`${l-0.25} in`,c:false}]) }]}; }}
-    ]},
-    "MA.3.M.1.2": { desc: "Mass/Vol", scenarios: [
-        { diff: 3, gen: () => { const w=Utils.rInt(6,12), c=Utils.rInt(3,7); return { tasks: [{ id: "t1", type: "eq", label: "Part A", text: `One jug holds ${w} Liters. How many Liters in ${c} jugs?`, ans:(w*c).toString() }]}; }}
-    ]},
-    "MA.3.M.2.1": { desc: "Time", scenarios: [
-        { diff: 4, gen: () => { const h=Utils.rInt(1,11), m=Utils.pick(["15","30","45"]); return { left: TEI.clock(h,parseInt(m)), tasks: [{ id: "t1", type: "eq", label: "Part A", text: "What time is shown on the clock? (Use the : button)", ans:`${h}:${m}`, data_pad: "time" }]}; }}
-    ]},
-    "MA.3.M.2.2": { desc: "Elapsed Time", scenarios: [
-        { diff: 5, gen: () => { const s=Utils.rInt(1,5), e=Utils.pick(["15","25","35","45"]); return { tasks: [{ id: "t1", type: "eq", label: "Part A (Reverse Time)", text: `A movie ended at ${s}:${e}. It was exactly ${e} minutes long. What time did it start? (Format H:MM)`, ans:`${s}:00`, data_pad: "time" }]}; }}
-    ]},
+    // --- M ---
+    "MA.3.M.1.1": { desc: "Tools & Measure", scenarios: [{ diff: 3, gen: () => { const l=Utils.pick([2.25, 3.5, 4.75]); return { left: TEI.ruler(l), tasks: [{ id: "t1", type: "radio", label: "Part A", text: "To the nearest quarter inch, what is the length?", options: Utils.shuffle([{t:`${l} in`,c:true},{t:`${l+0.25} in`,c:false},{t:`${Math.floor(l)} in`,c:false},{t:`${l-0.25} in`,c:false}]) }]}; }}]},
+    "MA.3.M.1.2": { desc: "Mass/Vol", scenarios: [{ diff: 3, gen: () => { const w=Utils.rInt(6,12), c=Utils.rInt(3,7); return { tasks: [{ id: "t1", type: "eq", label: "Part A", text: `One jug holds ${w} Liters. How many Liters in ${c} jugs?`, ans:(w*c).toString() }]}; }}]},
+    "MA.3.M.2.1": { desc: "Time", scenarios: [{ diff: 4, gen: () => { const h=Utils.rInt(1,11), m=Utils.pick(["15","30","45"]); return { left: TEI.clock(h,parseInt(m)), tasks: [{ id: "t1", type: "eq", label: "Part A", text: "What time is shown on the clock? (Use the : button)", ans:`${h}:${m}`, data_pad: "time" }]}; }}]},
+    "MA.3.M.2.2": { desc: "Elapsed Time", scenarios: [{ diff: 5, gen: () => { const s=Utils.rInt(1,5), e=Utils.pick(["15","25","35","45"]); return { tasks: [{ id: "t1", type: "eq", label: "Part A (Reverse Time)", text: `A movie ended at ${s}:${e}. It was exactly ${e} minutes long. What time did it start? (Format H:MM)`, ans:`${s}:00`, data_pad: "time" }]}; }}]},
 
-    // ----------------------------------------------------
-    // DOMAIN 6: DATA AND PROBABILITY (DP)
-    // ----------------------------------------------------
+    // --- DP ---
     "MA.3.DP.1.1": { desc: "Graphing", scenarios: [
         { diff: 5, gen: () => { const a=Utils.rInt(3,6), b=Utils.rInt(2,5); let raw = []; for(let i=0;i<a;i++) raw.push("Group A"); for(let i=0;i<b;i++) raw.push("Group B"); raw=Utils.shuffle(raw); return { left: `<div style="padding:20px; border:1px solid #ccc; background:white; font-size:1.2rem; line-height:1.8;"><b>Raw Log:</b><br>${raw.join(", ")}</div>`, text: `Process the raw data log.`, tasks: [ { id: "t1", type: "eq", label: "Part A", text: "How many TOTAL items were recorded?", ans: (a+b).toString() }, { id: "t2", type: "interact", label: "Part B", text: "Build the graph to represent the exact data.", html: TEI.barGraph(a,b), check:()=>App.data.a===a && App.data.b===b, isFollowUp: true } ] }; }}
     ]},
-    "MA.3.DP.1.2": { desc: "Interpret", scenarios: [
-        { diff: 3, gen: () => { const k=Utils.pick([2,5,10]), count=Utils.rInt(3,8); return { tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Key: 1 Circle = ${k} students. If a class has ${count} circles on a pictograph, how many students are there?`, ans:(k*count).toString() }]}; }}
-    ]}
+    "MA.3.DP.1.2": { desc: "Interpret", scenarios: [{ diff: 3, gen: () => { const k=Utils.pick([2,5,10]), count=Utils.rInt(3,8); return { tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Key: 1 Circle = ${k} students. If a class has ${count} circles on a pictograph, how many students are there?`, ans:(k*count).toString() }]}; }}]}
 };
 
 // ==========================================
-// 7. INITIALIZE THE APPLICATION
+// ENGINE CONTROLLER
 // ==========================================
-// This officially boots up the complete engine you built in Phases 1-3.
+const App = {
+    state: { mode: 'practice', currStd: null, qNum: 1, streak: 0, catDiff: 3, testData: [] },
+    currQ: null, data: {}, activeInput: null, draggedItem: null,
+
+    initListeners: function() {
+        document.getElementById('launch-btn').onclick = () => this.startTest();
+        document.getElementById('btn-flag').onclick = () => this.toggleFlag();
+        document.getElementById('btn-pause').onclick = () => location.reload();
+        document.getElementById('btn-next').onclick = () => this.nextQuestion();
+        document.getElementById('btn-submit').onclick = () => this.check();
+        document.getElementById('btn-finish').onclick = () => this.endTest();
+    },
+
+    init: function() {
+        const m = document.getElementById('menu'); const order = ["MA.3.NSO", "MA.3.AR", "MA.3.FR", "MA.3.GR", "MA.3.M", "MA.3.DP"];
+        order.forEach(prefix => {
+            const h = document.createElement('div'); h.className = 'cat-title'; h.innerText = prefix; m.appendChild(h);
+            Object.keys(window.Bank).filter(k => k.startsWith(prefix)).forEach(id => {
+                const b = document.createElement('div'); b.className = 'std-btn'; b.innerHTML = `<strong>${id}</strong><br><small>${window.Bank[id].desc}</small>`;
+                b.onclick = () => { document.querySelectorAll('.std-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); App.startPractice(id); };
+                m.appendChild(b);
+            });
+        });
+    },
+
+    startPractice: function(id) {
+        this.state = { mode: 'practice', currStd: id, qNum: 1, streak: 0, catDiff: 5, testData: [] };
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('test-interface').style.display = 'flex';
+        this.load(id);
+    },
+
+    startTest: function() {
+        this.state = { mode: 'test', currStd: null, qNum: 1, streak: 0, catDiff: 3, testData: Array(40).fill(null).map(() => ({ans: null, flag: false})) };
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('test-interface').style.display = 'flex';
+        document.querySelectorAll('.std-btn').forEach(x=>x.classList.remove('active'));
+        this.nextQuestion();
+    },
+
+    nextQuestion: function() {
+        if(this.state.mode === 'test' && this.state.qNum > 40) { this.showReview(); return; }
+        let targetStd = this.state.currStd;
+        if(this.state.mode === 'test') {
+            const r = Math.random(); 
+            if(r < 0.28) targetStd = Utils.pick(Object.keys(window.Bank).filter(k => k.startsWith("MA.3.NSO")));
+            else if(r < 0.56) targetStd = Utils.pick(Object.keys(window.Bank).filter(k => k.startsWith("MA.3.AR")));
+            else if(r < 0.76) targetStd = Utils.pick(Object.keys(window.Bank).filter(k => k.startsWith("MA.3.FR")));
+            else targetStd = Utils.pick(Object.keys(window.Bank).filter(k => k.startsWith("MA.3.GR") || k.startsWith("MA.3.M") || k.startsWith("MA.3.DP")));
+        }
+        this.load(targetStd);
+    },
+
+    load: function(id) {
+        this.state.currStd = id; this.data = {}; this.activeInput = null;
+        document.getElementById('test-title').innerText = this.state.mode === 'test' ? `Test Mode` : `Practice: ${id}`;
+        document.getElementById('q-counter').innerText = `Q ${this.state.qNum}` + (this.state.mode === 'test' ? ' of 40' : '');
+        
+        let scenarios = window.Bank[id].scenarios.filter(s => s.diff <= this.state.catDiff);
+        if(scenarios.length === 0) scenarios = window.Bank[id].scenarios;
+        const q = Utils.pick(scenarios).gen(); 
+        this.currQ = q;
+
+        document.getElementById('stimulus-pane').innerHTML = q.left || ''; 
+        document.getElementById('stimulus-pane').style.display = q.left ? 'flex' : 'none';
+        document.getElementById('q-text').innerHTML = q.text || '';
+        const resp = document.getElementById('q-response-area'); resp.innerHTML = ''; 
+        document.getElementById('keypad-container').style.display = 'none';
+        document.getElementById('btn-submit').style.display = 'inline-block'; 
+        document.getElementById('btn-submit').disabled = true;
+        document.getElementById('btn-next').disabled = true; 
+        document.getElementById('feedback-msg').style.display = 'none';
+        
+        const btnFlag = document.getElementById('btn-flag');
+        if(this.state.mode === 'test' && this.state.testData[this.state.qNum-1].flag) { btnFlag.innerText = "⚑ Flagged"; btnFlag.style.color = "var(--incorrect)"; } 
+        else { btnFlag.innerText = "⚑ Flag"; btnFlag.style.color = "white"; }
+
+        q.tasks.forEach((t, idx) => {
+            const block = document.createElement('div'); 
+            block.className = t.isFollowUp ? 'task-block task-hidden' : 'task-block'; 
+            block.id = `task-block-${idx}`;
+            block.innerHTML = `<div class="task-label">${t.label}</div><div style="margin-bottom:15px; font-size: 1.2rem;">${t.text || ''}</div>`;
+            
+            if(t.type === 'radio' || t.type === 'multi') {
+                const list = document.createElement('div'); list.className = t.options[0].t.includes('<svg') ? 'opt-list grid' : 'opt-list';
+                t.options.forEach((o,i) => {
+                    const el = document.createElement('div'); el.className = `opt-item`; el.innerHTML = `<div class="opt-icon"></div> <div>${o.t}</div>`;
+                    el.onclick = () => { if(t.type === 'radio'){ list.querySelectorAll('.opt-item').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); t.sel=i; } else { el.classList.toggle('selected'); o.sel = !o.sel; } App.interactionTrigger(); };
+                    list.appendChild(el);
+                }); block.appendChild(list);
+            } 
+            else if (t.type === 'eq') { block.innerHTML += `<input type="text" id="${t.id}" class="eq-input" data-pad="${t.data_pad||'num'}" placeholder="Type or tap...">`; }
+            else if (t.type === 'interact' || t.type === 'drop' || t.type === 'drag' || t.type === 'matrix') { block.innerHTML += t.html || ''; }
+            resp.appendChild(block);
+        });
+
+        const firstEq = document.querySelector('.eq-input');
+        if(firstEq && !firstEq.closest('.task-hidden')) { this.setActive(firstEq); }
+    },
+
+    setActive: function(el) {
+        document.querySelectorAll('.eq-input').forEach(i => i.classList.remove('active-focus'));
+        el.classList.add('active-focus'); this.activeInput = el;
+        let kp = `<button class="key-btn" onclick="App.typeKey('1')">1</button><button class="key-btn" onclick="App.typeKey('2')">2</button><button class="key-btn" onclick="App.typeKey('3')">3</button>`;
+        const type = el.getAttribute('data-pad');
+        if(type==='time') kp+=`<button class="key-btn op" onclick="App.typeKey(':')">:</button>`; else if(type==='frac') kp+=`<button class="key-btn op" onclick="App.typeKey('/')">/</button>`; else kp+=`<button class="key-btn op" onclick="App.typeKey('+')">+</button>`;
+        kp += `<button class="key-btn" onclick="App.typeKey('4')">4</button><button class="key-btn" onclick="App.typeKey('5')">5</button><button class="key-btn" onclick="App.typeKey('6')">6</button><button class="key-btn op" onclick="App.typeKey('-')">-</button><button class="key-btn" onclick="App.typeKey('7')">7</button><button class="key-btn" onclick="App.typeKey('8')">8</button><button class="key-btn" onclick="App.typeKey('9')">9</button>`;
+        if(type==='money') kp+=`<button class="key-btn op" onclick="App.typeKey('$')">$</button>`; else kp+=`<button class="key-btn op" onclick="App.typeKey('.')">.</button>`;
+        kp += `<button class="key-btn wide" onclick="App.typeKey('0')">0</button><button class="key-btn op wide" onclick="App.typeKey('BACK')">&larr; Delete</button>`;
+        document.getElementById('dynamic-pad').innerHTML = kp;
+        document.getElementById('keypad-container').style.display = 'block';
+    },
+
+    typeKey: function(k) {
+        if(!this.activeInput) return;
+        if(k === 'BACK') this.activeInput.value = this.activeInput.value.slice(0,-1); else this.activeInput.value += k;
+        this.interactionTrigger();
+    },
+
+    dragStart: function(e) { this.draggedItem = e.target.innerText; e.target.style.opacity = '0.5'; setTimeout(() => e.target.style.opacity = '1', 100); },
+    dragOver: function(e) { e.preventDefault(); if(e.target.classList.contains('dropzone')) e.target.classList.add('hover'); },
+    dragLeave: function(e) { if(e.target.classList.contains('dropzone')) e.target.classList.remove('hover'); },
+    drop: function(e) { e.preventDefault(); if(e.target.classList.contains('dropzone')) { e.target.classList.remove('hover'); e.target.innerText = this.draggedItem; this.interactionTrigger(); } },
+
+    plotPoint: function(el) {
+        const cx = el.getAttribute('cx'); const val = parseFloat(el.getAttribute('data-val'));
+        const dot = document.getElementById('nl-plot'); dot.setAttribute('cx', cx); App.data.nl = val;
+        this.interactionTrigger();
+    },
+
+    toggleFlag: function() {
+        if(this.state.mode !== 'test') return;
+        const btn = document.getElementById('btn-flag');
+        const isFlagged = !this.state.testData[this.state.qNum-1].flag;
+        this.state.testData[this.state.qNum-1].flag = isFlagged;
+        btn.innerText = isFlagged ? "⚑ Flagged" : "⚑ Flag"; btn.style.color = isFlagged ? "var(--incorrect)" : "white";
+    },
+
+    isAnswered: function(t) {
+        if(t.type==='radio') return t.sel !== undefined;
+        if(t.type==='multi') return t.options.some(o => o.sel);
+        if(t.type==='eq') { const input = document.getElementById(t.id); return input && input.value.trim() !== ''; }
+        if(t.type==='drag') return document.getElementById('d1') && document.getElementById('d1').innerText.trim() !== '';
+        if(t.type==='interact' && t.html && t.html.includes('fracCirc')) return document.querySelectorAll('path[fill="#ff9900"]').length > 0;
+        if(t.type==='interact' && t.html && t.html.includes('numberLine')) return App.data.nl !== undefined;
+        if(t.type==='interact' && t.html && t.html.includes('barGraph')) return App.data.a !== undefined && App.data.b !== undefined;
+        if(t.type==='drop') return Array.from(document.querySelectorAll(`.drop-${t.id}`)).every(s => s.value !== "");
+        if(t.type==='matrix') return document.getElementById(`task-block-${this.currQ.tasks.indexOf(t)}`).querySelectorAll('.matrix-cb:checked').length > 0;
+        return false;
+    },
+
+    interactionTrigger: function() {
+        let pA = this.currQ.tasks[0]; let pB = this.currQ.tasks[1];
+        if (this.isAnswered(pA) && pB) {
+            const bBlock = document.getElementById('task-block-1');
+            if (bBlock && bBlock.classList.contains('task-hidden')) { 
+                bBlock.classList.remove('task-hidden'); const nEq = bBlock.querySelector('.eq-input'); if(nEq) this.setActive(nEq); 
+            }
+        }
+        let allOk = true;
+        this.currQ.tasks.forEach((t, i) => { 
+            const block = document.getElementById(`task-block-${i}`);
+            if (block && !block.classList.contains('task-hidden')) { if (!this.isAnswered(t)) allOk = false; }
+        });
+        if (pB && !this.isAnswered(pB)) allOk = false;
+        document.getElementById('btn-submit').disabled = !allOk;
+    },
+
+    check: function() {
+        let allCorrect = true; 
+        this.currQ.tasks.forEach((t) => {
+            let ok = false;
+            if(t.type==='radio') ok = t.options[t.sel] && t.options[t.sel].c;
+            if(t.type==='multi') ok = t.options.every(o => !!o.sel === o.c);
+            if(t.type==='eq') ok = document.getElementById(t.id).value.trim() === t.ans;
+            if(t.type==='interact' || t.type==='drag') ok = t.check();
+            if(t.type==='drop') { const sels = document.querySelectorAll(`.drop-${t.id}`); ok=true; sels.forEach(s => { if(s.value !== s.dataset.c) ok=false; }); }
+            if(t.type==='matrix') { const cbs = document.getElementById(`task-block-${this.currQ.tasks.indexOf(t)}`).querySelectorAll('.matrix-cb'); ok = true; cbs.forEach(cb => { if(cb.checked !== (cb.dataset.corr === "true")) ok = false; }); }
+            if(!ok) allCorrect = false;
+        });
+
+        if(this.state.mode === 'test') {
+            this.state.testData[this.state.qNum-1].ans = allCorrect;
+            if(allCorrect) { this.state.streak++; if(this.state.streak > 1) this.state.catDiff = Math.min(5, this.state.catDiff + 1); } 
+            else { this.state.streak = 0; this.state.catDiff = Math.max(3, this.state.catDiff - 1); }
+        }
+
+        const fb = document.getElementById('feedback-msg'); 
+        fb.className = allCorrect ? 'fb-corr' : 'fb-wrg';
+        fb.innerText = allCorrect ? "✔ Correct!" : "✘ Incorrect."; 
+        fb.style.display = 'block';
+        
+        document.getElementById('btn-submit').style.display = 'none'; 
+        document.getElementById('btn-next').disabled = false; 
+        document.getElementById('keypad-container').style.opacity = '0.5';
+        document.getElementById('keypad-container').style.pointerEvents = 'none';
+        
+        if(this.state.mode === 'test') { document.getElementById('btn-next').innerText = this.state.qNum === 40 ? "Finish Test \u2192" : "Next \u2192"; }
+        this.state.qNum++;
+    },
+
+    showReview: function() {
+        document.getElementById('test-interface').style.display = 'none';
+        document.getElementById('review-screen').style.display = 'flex';
+        const grid = document.getElementById('review-grid'); grid.innerHTML = '';
+        this.state.testData.forEach((d, i) => {
+            const btn = document.createElement('button'); btn.className = 'rev-btn';
+            if(d.ans !== null) btn.classList.add('answered');
+            if(d.flag) btn.classList.add('flagged');
+            btn.innerText = i + 1;
+            btn.onclick = () => { this.state.qNum = i+1; document.getElementById('review-screen').style.display = 'none'; document.getElementById('test-interface').style.display = 'flex'; this.load(this.state.testData[i].std || Utils.pick(Object.keys(window.Bank))); };
+            grid.appendChild(btn);
+        });
+    },
+
+    endTest: function() {
+        const correct = this.state.testData.filter(d => d.ans === true).length;
+        const scaleScore = 240 + Math.floor((correct/40)*100);
+        document.getElementById('review-screen').innerHTML = `<div style="text-align:center; padding:100px;"><h2>Test Complete</h2><p style="font-size:1.5rem">Raw Score: ${correct} / 40</p><h1 style="color:var(--cam-blue); font-size:3.5rem;">FAST Scale Score: ${scaleScore}</h1><br><button class="mock-btn" onclick="App.exitToMenu()">Return to Dashboard</button></div>`;
+    }
+};
+
+// ==========================================
+// SYSTEM BOOT
+// ==========================================
 App.initListeners();
 App.init();
-
 </script>
-</body>
-</html>
-    </script>
-
 </body>
 </html>
