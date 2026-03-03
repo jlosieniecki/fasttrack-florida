@@ -1,595 +1,619 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florida FAST Math | Ultimate Level 5 Simulator</title>
-    <style>
-        /* ==========================================
-           1. CSS & UI STYLING (Authentic Cambium)
-           ========================================== */
-        :root {
-            --cam-blue: #003366; 
-            --cam-light-blue: #e6f0fa; 
-            --cam-gray: #f4f4f4;
-            --border: #cccccc; 
-            --text: #333333; 
-            --focus: #ff9900;
-            --correct: #28a745;
-            --incorrect: #dc3545;
-        }
-        
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; }
-        body { margin: 0; padding: 0; background: var(--cam-gray); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
-        /* DASHBOARD */
-        #dashboard { display: flex; height: 100vh; }
-        .sidebar { width: 340px; background: white; border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
-        .logo-area { padding: 25px; background: var(--cam-blue); color: white; }
-        .logo-area h1 { margin: 0; font-size: 1.4rem; letter-spacing: 0.5px; }
-        .menu-scroll { flex: 1; overflow-y: auto; padding: 15px 10px; }
-        .cat-title { font-size: 0.85rem; text-transform: uppercase; color: #546e7a; font-weight: 800; margin: 15px 0 5px 5px; border-bottom: 2px solid #eee; padding-bottom: 5px;}
-        .std-btn { display: block; width: 100%; text-align: left; padding: 10px; margin-bottom: 4px; background: transparent; border: 1px solid transparent; border-radius: 4px; cursor: pointer; font-size: 0.85rem; color: #333; transition: 0.1s; }
-        .std-btn:hover { background: var(--cam-light-blue); border-color: #b2dfdb; }
-        .std-btn.active { background: var(--cam-light-blue); border-color: var(--cam-blue); font-weight: bold; }
-        .std-btn small { display: block; font-size: 0.75rem; margin-top: 3px; color: #666; font-weight: normal; }
-
-        .main-dash { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; background: white; }
-        .mock-btn { padding: 20px 50px; font-size: 1.3rem; font-weight: bold; background: #0056b3; color: white; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,86,179,0.3); transition: 0.2s; }
-        .mock-btn:hover { background: #004494; transform: translateY(-2px); }
-
-        /* TEST INTERFACE NAVIGATION */
-        #test-interface, #review-screen { display: none; height: 100vh; flex-direction: column; background: white; }
-        .top-nav { background: var(--cam-blue); color: white; height: 55px; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 100;}
-        .nav-left { display: flex; gap: 20px; align-items: center; }
-        .nav-right { display: flex; gap: 15px; align-items: center; }
-        .nav-btn { background: transparent; border: 1px solid white; color: white; padding: 8px 20px; cursor: pointer; font-size: 0.95rem; border-radius: 4px; font-weight: bold; transition: 0.2s; }
-        .nav-btn:hover:not(:disabled) { background: rgba(255,255,255,0.2); }
-        .nav-btn.primary { background: white; color: var(--cam-blue); }
-        .nav-btn.primary:hover:not(:disabled) { background: #e0e0e0; }
-        .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        /* SPLIT SCREEN */
-        .test-body { flex: 1; display: flex; overflow: hidden; }
-        .pane { flex: 1; overflow-y: auto; padding: 40px; position: relative; }
-        .stimulus-pane { border-right: 3px solid var(--border); background: #fafafa; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; max-width: 45%; }
-        .response-pane { background: white; display: flex; flex-direction: column; position: relative; padding-bottom: 120px; }
-        .q-text { font-size: 1.35rem; line-height: 1.6; margin-bottom: 20px; color: #212529; }
-
-        /* PROGRESSIVE DISCLOSURE */
-        .task-block { background: #fff; border: 1px solid var(--border); border-left: 5px solid var(--cam-blue); border-radius: 4px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: opacity 0.4s ease, transform 0.4s ease; }
-        .task-hidden { display: none; opacity: 0; pointer-events: none; height: 0; margin: 0; padding: 0; border: none; transform: translateY(-10px); }
-        .task-label { font-weight: bold; font-size: 1.15rem; color: var(--cam-blue); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
-
-        /* TEIs (Technology Enhanced Items) */
-        .visual-stage svg { max-width: 100%; height: auto; overflow: visible; margin-bottom: 15px; }
-        .drag-bank { display: flex; gap: 10px; padding: 15px; background: #e9ecef; border-radius: 6px; min-height: 70px; margin-bottom: 15px; flex-wrap: wrap; border: 1px solid #ccc;}
-        .draggable { padding: 12px 25px; background: white; border: 2px solid var(--cam-blue); border-radius: 4px; cursor: grab; font-weight: bold; font-size: 1.3rem; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);}
-        .draggable:active { cursor: grabbing; transform: scale(0.95); }
-        .dropzone { display: inline-block; min-width: 70px; min-height: 50px; border: 2px dashed #999; border-radius: 4px; background: #fff; vertical-align: middle; text-align: center; line-height: 46px; font-weight: bold; font-size: 1.3rem; color: var(--cam-blue);}
-        .dropzone.hover { background: #e6f0fa; border-color: var(--focus); }
-        
-        .opt-list { display: flex; flex-direction: column; gap: 10px; }
-        .opt-list.grid { display: grid; grid-template-columns: 1fr 1fr; }
-        .opt-item { display: flex; align-items: center; padding: 15px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 1.15rem; background: white; transition: 0.1s;}
-        .opt-item:hover { background: var(--cam-light-blue); border-color: #90caf9; }
-        .opt-item.selected { border-color: var(--cam-blue); background: var(--cam-light-blue); box-shadow: inset 0 0 0 1px var(--cam-blue); }
-        .opt-icon { width: 22px; height: 22px; border: 2px solid #666; margin-right: 15px; display: flex; justify-content: center; align-items: center; border-radius: 50%; flex-shrink: 0;}
-        .multi .opt-icon { border-radius: 4px; }
-        .selected .opt-icon { background: var(--cam-blue); border-color: var(--cam-blue); }
-        .selected .opt-icon::after { content:''; width:10px; height:10px; background:white; border-radius:50%; }
-        .multi.selected .opt-icon::after { content:'✔'; background:none; color:white; font-size:16px; font-weight:bold; }
-
-        .hot-text { cursor: pointer; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; margin: 0 3px; background: white; display: inline-block; font-weight: bold; color: #0056b3; text-decoration: underline; }
-        .hot-text:hover { border-color: #0056b3; background: #e6f0fa; }
-        .hot-text.selected { background: #0056b3; color: white; border-color: #0056b3; text-decoration: none; }
-        .inline-drop { font-size: 1.15rem; padding: 6px 12px; border: 2px solid #546e7a; border-radius: 4px; cursor: pointer; font-weight: bold; margin: 0 4px; background: #f8f9fa; }
-        
-        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; font-size: 1.1rem; }
-        .matrix-table th, .matrix-table td { border: 1px solid var(--border); padding: 12px; text-align: center; }
-        .matrix-table th { background: var(--cam-light-blue); color: var(--cam-blue); }
-        .matrix-cb { width: 24px; height: 24px; cursor: pointer; }
-        
-        /* DYNAMIC KEYPAD */
-        .eq-input { width: 100%; max-width: 250px; padding: 12px; font-size: 1.4rem; border: 2px solid #666; border-radius: 6px; outline: none; text-align: center; margin: 5px; background: white; font-weight: bold; user-select: text;}
-        .eq-input.active-focus { border-color: var(--focus); box-shadow: 0 0 8px rgba(255,153,0,0.6); background: #fffde7; }
-        .keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; max-width: 380px; background: #e9ecef; padding: 15px; border-radius: 8px; border: 1px solid #ced4da; margin-top: 20px; }
-        .key-btn { padding: 12px; font-size: 1.3rem; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 2px rgba(0,0,0,0.05);}
-        .key-btn:active { transform: scale(0.95); }
-        .key-btn.op { background: #cfd8dc; color: #003366; }
-        .key-btn.wide { grid-column: span 2; }
-
-        /* ACTION BAR & FEEDBACK */
-        .action-bar { position: absolute; bottom: 30px; right: 40px; display: flex; gap: 15px; align-items: center;}
-        .submit-btn { padding: 15px 30px; font-size: 1.1rem; font-weight: bold; background: var(--cam-blue); color: white; border: none; border-radius: 4px; cursor: pointer; transition: 0.2s;}
-        .submit-btn:disabled { background: #ccc; cursor: not-allowed; color: #666;}
-        #feedback-msg { font-weight: bold; font-size: 1.2rem; display: none; padding: 10px 20px; border-radius: 4px;}
-        .fb-corr { background: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
-        .fb-wrg { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;}
-
-        /* REVIEW SCREEN */
-        .review-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 15px; padding: 40px; max-width: 1000px; margin: 0 auto;}
-        .rev-btn { padding: 20px; font-size: 1.2rem; font-weight: bold; border: 2px solid #ccc; background: white; border-radius: 6px; cursor: pointer; position: relative; transition: 0.2s;}
-        .rev-btn:hover { background: #eee; }
-        .rev-btn.answered { border-color: var(--cam-blue); background: var(--cam-light-blue); }
-        .rev-btn.flagged::after { content: '⚑'; position: absolute; top: -12px; right: -8px; color: red; font-size: 1.8rem; }
-        .rev-header { text-align: center; margin-top: 40px; font-size: 2rem; color: var(--cam-blue);}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Florida FAST Mathematics | Grades 3–5</title>
+<style>
+:root{--blue:#003366;--lblue:#e6f0fa;--gray:#f4f4f4;--border:#ccc;--text:#333;--focus:#ff9900;--green:#28a745;--red:#dc3545;}
+*{box-sizing:border-box;font-family:'Segoe UI',sans-serif;}
+body{margin:0;background:var(--gray);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+#grade-selector{display:flex;height:100vh;justify-content:center;align-items:center;background:linear-gradient(135deg,#001f3f,#003366,#0056b3);}
+.grade-card-wrap{text-align:center;color:white;}
+.grade-card-wrap h1{font-size:2.5rem;margin-bottom:8px;letter-spacing:1px;}
+.grade-card-wrap>p{font-size:1.05rem;opacity:.85;margin-bottom:46px;}
+.grade-cards{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;}
+.grade-card{background:white;color:var(--blue);border-radius:16px;padding:34px 38px;cursor:pointer;transition:.2s;box-shadow:0 8px 30px rgba(0,0,0,.25);min-width:190px;}
+.grade-card:hover{transform:translateY(-6px);box-shadow:0 14px 40px rgba(0,0,0,.35);}
+.grade-card .gnum{font-size:3.8rem;font-weight:900;line-height:1;}
+.grade-card .glbl{font-size:.95rem;font-weight:700;margin-top:5px;opacity:.75;text-transform:uppercase;letter-spacing:1px;}
+.grade-card .gtopics{font-size:.75rem;color:#555;margin-top:9px;line-height:1.7;}
+#dashboard{display:none;height:100vh;}
+.dashboard-inner{display:flex;height:100vh;}
+.sidebar{width:300px;background:white;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;}
+.logo-area{padding:15px 18px;background:var(--blue);color:white;}
+.logo-area h1{margin:0 0 2px;font-size:1.1rem;}
+.logo-area p{margin:0 0 8px;font-size:.7rem;opacity:.8;}
+.grade-switcher{display:flex;gap:4px;}
+.gs-btn{flex:1;padding:5px 0;font-size:.78rem;font-weight:700;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.15);color:white;border-radius:4px;cursor:pointer;}
+.gs-btn.active{background:white;color:var(--blue);}
+.menu-scroll{flex:1;overflow-y:auto;padding:7px;}
+.cat-title{font-size:.7rem;text-transform:uppercase;color:#546e7a;font-weight:800;margin:11px 0 3px 4px;border-bottom:2px solid #eee;padding-bottom:3px;}
+.std-btn{display:block;width:100%;text-align:left;padding:8px 9px;margin-bottom:2px;background:transparent;border:1px solid transparent;border-radius:4px;cursor:pointer;font-size:.82rem;color:#333;transition:.1s;}
+.std-btn:hover{background:var(--lblue);border-color:#b2dfdb;}
+.std-btn.active{background:var(--lblue);border-color:var(--blue);font-weight:700;}
+.std-btn small{display:block;font-size:.67rem;margin-top:1px;color:#666;font-weight:normal;}
+.main-dash{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px;text-align:center;background:white;}
+.main-dash h2{font-size:1.8rem;color:var(--blue);margin-bottom:8px;}
+.main-dash>p{max-width:500px;font-size:.98rem;line-height:1.65;margin-bottom:24px;color:#555;}
+.badge-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:28px;}
+.badge{background:var(--lblue);border:1px solid #90caf9;border-radius:20px;padding:4px 13px;font-size:.78rem;font-weight:600;color:var(--blue);}
+.mock-btn{padding:14px 40px;font-size:1.08rem;font-weight:700;background:#0056b3;color:white;border:none;border-radius:8px;cursor:pointer;box-shadow:0 4px 15px rgba(0,86,179,.3);transition:.2s;}
+.mock-btn:hover{background:#004494;transform:translateY(-2px);}
+#test-interface,#review-screen,#score-screen{display:none;height:100vh;flex-direction:column;background:white;}
+.top-nav{background:var(--blue);color:white;height:52px;display:flex;justify-content:space-between;align-items:center;padding:0 19px;flex-shrink:0;}
+.nav-left{display:flex;gap:15px;align-items:center;}
+.nav-right{display:flex;gap:8px;align-items:center;}
+.nav-btn{background:transparent;border:1px solid white;color:white;padding:5px 13px;cursor:pointer;font-size:.84rem;border-radius:4px;font-weight:700;}
+.nav-btn:hover:not(:disabled){background:rgba(255,255,255,.2);}
+.nav-btn.primary{background:white;color:var(--blue);}
+.nav-btn:disabled{opacity:.4;cursor:not-allowed;}
+.test-body{flex:1;display:flex;overflow:hidden;}
+.pane{flex:1;overflow-y:auto;padding:26px 32px;position:relative;}
+.stimulus-pane{border-right:3px solid var(--border);background:#fafafa;display:flex;flex-direction:column;align-items:center;max-width:44%;}
+.response-pane{background:white;padding-bottom:110px;}
+.q-text{font-size:1.25rem;line-height:1.65;margin-bottom:16px;font-weight:500;}
+.task-block{background:#fff;border:1px solid var(--border);border-left:5px solid var(--blue);border-radius:4px;padding:17px;margin-bottom:13px;box-shadow:0 2px 5px rgba(0,0,0,.04);}
+.task-hidden{display:none!important;}
+.task-label{font-weight:700;font-size:.93rem;color:var(--blue);margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #eee;padding-bottom:3px;}
+.eq-input{width:100%;max-width:215px;padding:9px;font-size:1.25rem;border:2px solid #666;border-radius:6px;outline:none;text-align:center;margin:3px 0;background:white;font-weight:700;font-family:inherit;}
+.eq-input.active-focus{border-color:var(--focus);box-shadow:0 0 7px rgba(255,153,0,.4);background:#fffde7;}
+#keypad-container{margin-top:11px;}
+.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:300px;background:#e9ecef;padding:9px;border-radius:8px;border:1px solid #ced4da;}
+.key-btn{padding:9px 5px;font-size:1.08rem;border:1px solid #ccc;background:white;border-radius:4px;cursor:pointer;font-weight:700;}
+.key-btn:active{transform:scale(.93);background:#e0e0e0;}
+.key-btn.op{background:#cfd8dc;color:var(--blue);}
+.key-btn.wide{grid-column:span 2;}
+.opt-list{display:flex;flex-direction:column;gap:7px;}
+.opt-item{display:flex;align-items:center;padding:10px 13px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:1.03rem;background:white;transition:.1s;user-select:none;}
+.opt-item:hover{background:var(--lblue);border-color:#90caf9;}
+.opt-item.selected{border-color:var(--blue);background:var(--lblue);box-shadow:inset 0 0 0 1px var(--blue);}
+.opt-icon{width:21px;height:21px;border:2px solid #777;margin-right:11px;display:flex;justify-content:center;align-items:center;border-radius:50%;flex-shrink:0;font-size:.76rem;font-weight:800;color:#555;}
+.opt-item.selected .opt-icon{background:var(--blue);border-color:var(--blue);color:white;}
+.action-bar{position:absolute;bottom:20px;right:28px;display:flex;gap:10px;align-items:center;}
+.submit-btn{padding:11px 22px;font-size:.96rem;font-weight:700;background:var(--blue);color:white;border:none;border-radius:4px;cursor:pointer;}
+.submit-btn:disabled{background:#ccc;cursor:not-allowed;color:#666;}
+#feedback-msg{font-weight:700;font-size:.98rem;display:none;padding:8px 14px;border-radius:4px;}
+.fb-corr{background:#d4edda;color:#155724;border:1px solid #c3e6cb;}
+.fb-wrg{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb;}
+#review-screen{overflow-y:auto;flex-direction:column;}
+.rev-header{text-align:center;padding:24px 18px 6px;font-size:1.4rem;color:var(--blue);}
+.rev-sub{text-align:center;color:#666;margin-bottom:14px;font-size:.9rem;}
+.review-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:9px;padding:14px 32px 32px;max-width:840px;margin:0 auto;}
+.rev-btn{padding:14px 6px;font-size:.95rem;font-weight:700;border:2px solid #ccc;background:white;border-radius:6px;cursor:pointer;position:relative;}
+.rev-btn.answered{border-color:var(--blue);background:var(--lblue);color:var(--blue);}
+.rev-btn.flagged::after{content:'⚑';position:absolute;top:-8px;right:-4px;color:var(--red);font-size:1.15rem;}
+#score-screen{justify-content:center;align-items:center;background:white;}
+.score-card{text-align:center;padding:45px 32px;max-width:620px;}
+.score-card h2{font-size:1.5rem;color:var(--blue);margin-bottom:7px;}
+.scale-score{font-size:4rem;font-weight:900;color:var(--blue);line-height:1;margin:15px 0;}
+.al-badge{display:inline-block;padding:8px 22px;border-radius:30px;font-size:1.05rem;font-weight:800;margin:7px 0 19px;}
+.al-2{background:#fff3cd;color:#856404;border:2px solid #ffc107;}
+.al-3{background:#cce5ff;color:#004085;border:2px solid #b8daff;}
+.al-4{background:#d4edda;color:#155724;border:2px solid #c3e6cb;}
+.al-5{background:#d1ecf1;color:#0c5460;border:2px solid #bee5eb;}
+.score-detail{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin:14px 0 22px;}
+.score-stat{background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:12px 18px;}
+.score-stat .num{font-size:1.85rem;font-weight:800;color:var(--blue);}
+.score-stat .lbl{font-size:.73rem;color:#666;text-transform:uppercase;font-weight:600;}
+.visual-box{background:#fafafa;border:1px solid #ddd;border-radius:8px;padding:14px;margin-bottom:11px;text-align:center;}
+.nl-hint{font-size:.74rem;color:#888;font-style:italic;margin-top:5px;}
+.progress-wrap{height:4px;background:rgba(255,255,255,.2);}
+.progress-fill{height:4px;background:#ff9900;transition:width .4s ease;}
+.timer-display{font-size:.88rem;font-weight:700;background:rgba(255,255,255,.15);padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.3);}
+.timer-display.warning{background:rgba(220,53,69,.4);animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:#f1f1f1;}::-webkit-scrollbar-thumb{background:#bbb;border-radius:3px;}
+</style>
 </head>
 <body>
 
+<div id="grade-selector">
+  <div class="grade-card-wrap">
+    <h1>🏛 Florida FAST Mathematics</h1>
+    <p>Grades 3–5 · B.E.S.T. Standards Practice Platform</p>
+    <div class="grade-cards">
+      <div class="grade-card" onclick="App.selectGrade(3)">
+        <div class="gnum">3</div><div class="glbl">Grade 3</div>
+        <div class="gtopics">Multiplication & Division<br>Fractions · Area & Perimeter<br>Data & Graphs</div>
+      </div>
+      <div class="grade-card" onclick="App.selectGrade(4)">
+        <div class="gnum">4</div><div class="glbl">Grade 4</div>
+        <div class="gtopics">Multi-digit Operations<br>Fractions & Decimals<br>Angles · Mode, Median & Range</div>
+      </div>
+      <div class="grade-card" onclick="App.selectGrade(5)">
+        <div class="gnum">5</div><div class="glbl">Grade 5</div>
+        <div class="gtopics">Division Algorithm<br>Fractions & Decimals<br>Volume · Coordinate Plane</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="dashboard">
+  <div class="dashboard-inner">
     <div class="sidebar">
-        <div class="logo-area">
-            <h1>FAST Mathematics</h1>
-            <p>Enterprise Engine v6.0</p>
+      <div class="logo-area">
+        <h1>🏛 FAST Mathematics</h1>
+        <p id="grade-subtitle">Grade 3 · B.E.S.T. Standards</p>
+        <div class="grade-switcher">
+          <button class="gs-btn active" id="gs3" onclick="App.selectGrade(3)">Gr 3</button>
+          <button class="gs-btn" id="gs4" onclick="App.selectGrade(4)">Gr 4</button>
+          <button class="gs-btn" id="gs5" onclick="App.selectGrade(5)">Gr 5</button>
         </div>
-        <div class="menu-scroll" id="menu"></div>
+      </div>
+      <div class="menu-scroll" id="menu"></div>
     </div>
     <div class="main-dash">
-        <h2 style="font-size:2.5rem; color:var(--cam-blue); margin-bottom:15px;">Florida B.E.S.T. Assessment</h2>
-        <p style="max-width: 650px; font-size: 1.25rem; line-height: 1.6; margin-bottom: 40px; color:#555;">
-            Enterprise Features Activated: Computer Adaptive Testing (CAT), HTML5 Drag-and-Drop (GRID), SVG Number Lines, Progressive Disclosure, and Authentic End-of-Test Review.
-        </p>
-        <button class="mock-btn" id="launch-btn">Begin Adaptive Mock Test</button>
+      <h2 id="dash-title">Grade 3 FAST Mathematics</h2>
+      <p id="dash-desc">Select a benchmark from the left to practice, or launch a full 40-question adaptive mock test.</p>
+      <div class="badge-row">
+        <div class="badge" id="badge-bm">📐 Benchmarks</div>
+        <div class="badge">🎯 Adaptive Engine</div>
+        <div class="badge">⏱ Per-Question Timer</div>
+        <div class="badge">📊 FAST Scale Scores</div>
+        <div class="badge">✏ Cambium TEI Formats</div>
+      </div>
+      <button class="mock-btn" id="launch-btn">▶ Begin 40-Question Mock Test</button>
     </div>
+  </div>
 </div>
 
 <div id="test-interface">
-    <div class="top-nav">
-        <div class="nav-left">
-            <strong id="test-title" style="font-size:1.2rem; letter-spacing: 1px;">Test Mode</strong>
-            <span id="q-counter" style="opacity: 0.9; font-size: 1.1rem; border-left:2px solid #888; padding-left:15px;">Q 1 of 40</span>
-        </div>
-        <div class="nav-right">
-            <button class="nav-btn" id="btn-flag">⚑ Flag</button>
-            <button class="nav-btn" id="btn-pause">Pause / Save</button>
-            <button class="nav-btn primary" id="btn-next" disabled>Next &rarr;</button>
-        </div>
+  <div class="top-nav">
+    <div class="nav-left">
+      <strong id="test-title" style="font-size:.98rem;letter-spacing:.4px;">FAST Math</strong>
+      <span id="q-counter" style="opacity:.85;font-size:.9rem;border-left:2px solid #558;padding-left:12px;">Q 1 of 40</span>
     </div>
-    <div class="test-body">
-        <div class="pane stimulus-pane" id="stimulus-pane"></div>
-        <div class="pane response-pane">
-            <div class="q-text" id="q-text"></div>
-            <div id="q-response-area"></div>
-            
-            <div id="keypad-container" style="display:none;">
-                <p style="color:#666; font-size:0.85rem; margin-bottom:5px;"><b>On-Screen Keypad:</b></p>
-                <div class="keypad" id="dynamic-pad"></div>
-            </div>
-
-            <div class="action-bar">
-                <div id="feedback-msg"></div>
-                <button class="submit-btn" id="btn-submit" disabled>Submit Answer</button>
-            </div>
-        </div>
+    <div class="nav-right">
+      <span class="timer-display" id="timer-display">⏱ 1:30</span>
+      <button class="nav-btn" id="btn-flag">⚑ Flag</button>
+      <button class="nav-btn" id="btn-pause">✕ Exit</button>
+      <button class="nav-btn primary" id="btn-next" disabled>Next →</button>
     </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="test-body">
+    <div class="pane stimulus-pane" id="stimulus-pane"></div>
+    <div class="pane response-pane">
+      <div class="q-text" id="q-text"></div>
+      <div id="q-response-area"></div>
+      <div id="keypad-container" style="display:none;">
+        <p style="color:#666;font-size:.76rem;margin-bottom:3px;font-weight:700;">On-Screen Keypad:</p>
+        <div class="keypad" id="dynamic-pad"></div>
+      </div>
+      <div class="action-bar">
+        <div id="feedback-msg"></div>
+        <button class="submit-btn" id="btn-submit" disabled>Submit Answer</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="review-screen">
-    <div class="top-nav">
-        <div class="nav-left"><strong style="font-size: 1.2rem;">End of Test Review</strong></div>
-        <div class="nav-right"><button class="nav-btn primary" id="btn-finish">Submit Final Score</button></div>
+  <div class="top-nav">
+    <div class="nav-left"><strong style="font-size:.98rem;">End of Test — Review Answers</strong></div>
+    <div class="nav-right"><button class="nav-btn primary" id="btn-finish">Submit Final Score →</button></div>
+  </div>
+  <div class="rev-header">Review Screen</div>
+  <div class="rev-sub">Flagged items show ⚑. Click any number to return to that question.</div>
+  <div class="review-grid" id="review-grid"></div>
+</div>
+
+<div id="score-screen">
+  <div class="score-card">
+    <h2 id="score-title">Test Complete — FAST Grade 3 Mathematics</h2>
+    <div class="scale-score" id="final-scale">312</div>
+    <div id="al-badge-el" class="al-badge al-3">Achievement Level 3</div>
+    <div class="score-detail">
+      <div class="score-stat"><div class="num" id="raw-score">-</div><div class="lbl">Raw Score</div></div>
+      <div class="score-stat"><div class="num" id="pct-score">-</div><div class="lbl">Percent</div></div>
+      <div class="score-stat"><div class="num" id="time-used">-</div><div class="lbl">Time Used</div></div>
     </div>
-    <div class="rev-header">Click any question to review your answer.</div>
-    <div class="review-grid" id="review-grid"></div>
+    <p id="al-desc" style="color:#555;font-size:.93rem;line-height:1.65;max-width:440px;margin:0 auto 22px;"></p>
+    <button class="mock-btn" onclick="location.reload()">↩ Return to Grade Select</button>
+  </div>
 </div>
 
 <script>
-// ==========================================
-// SECURITY & GLOBAL DELEGATION
-// ==========================================
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => { if(e.key === 'Enter') e.preventDefault(); });
-document.addEventListener('input', function(e) {
-    if(e.target && e.target.classList.contains('eq-input')) { App.interactionTrigger(); }
-});
-document.addEventListener('focusin', function(e) {
-    if(e.target && e.target.tagName === 'INPUT' && e.target.type === 'text') { App.setActive(e.target); }
-});
+// ---- UTILITIES ----
+const U={
+  rInt:(a,b)=>Math.floor(Math.random()*(b-a+1))+a,
+  pick:a=>a[Math.floor(Math.random()*a.length)],
+  shuffle:a=>[...a].sort(()=>Math.random()-.5),
+  names:['Leo','Mia','Sam','Zoe','David','Chloe','Carlos','Emma','Jamal','Sofia','Aiden','Maya','Tyler','Grace','Omar'],
+  name(){return this.pick(this.names);},
+  numWords(n){
+    const o=['','one','two','three','four','five','six','seven','eight','nine'];
+    const ty=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+    const te=['ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+    if(n===0)return'zero';let s='';
+    if(n>=1000000){s+=this.numWords(Math.floor(n/1000000))+' million ';n%=1000000;}
+    if(n>=1000){s+=this.numWords(Math.floor(n/1000))+' thousand ';n%=1000;}
+    if(n>=100){s+=o[Math.floor(n/100)]+' hundred ';n%=100;}
+    if(n>=20)s+=ty[Math.floor(n/10)]+(n%10?' ':'')+o[n%10];
+    else if(n>=10)s+=te[n-10];
+    else if(n>0)s+=o[n];
+    return s.trim();
+  },
+  fmtT(h,m,ap=true){const h12=h%12||12;const s=`${h12}:${m<10?'0'+m:m}`;return ap?s+(h<12?'AM':'PM'):s;}
+};
 
-// ==========================================
-// CORE ENGINE & TEI GENERATORS
-// ==========================================
-const Utils = {
-    rInt: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
-    pick: (arr) => arr[Math.floor(Math.random() * arr.length)],
-    shuffle: (arr) => arr.sort(() => Math.random() - 0.5),
-    genCtx: () => Utils.pick([
-        { n: Utils.pick(["Leo","Mia","Sam"]), act1: "earned", unit: "$", per: "an hour", act2: "spent", isSub: true },
-        { n: Utils.pick(["Zoe","David","Chloe"]), act1: "ran", unit: "miles", per: "a day", act2: "walked back", isSub: true },
-        { n: Utils.pick(["Carlos","Emma","Jamal"]), act1: "collected boxes of", unit: "stickers", per: "per box", act2: "was given more", isSub: false }
-    ]),
-    numWords: (n) => {
-        const o=['','one','two','three','four','five','six','seven','eight','nine'];
-        const ty=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
-        const te=['ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
-        if(n===0) return 'zero'; let s='';
-        if(n>=1000){s+=o[Math.floor(n/1000)]+' thousand '; n%=1000;}
-        if(n>=100){s+=o[Math.floor(n/100)]+' hundred '; n%=100;}
-        if(n>=20){s+=ty[Math.floor(n/10)]+(n%10!==0?' ':'')+o[n%10];}
-        else if(n>=10){s+=te[n-10];} else if(n>0){s+=o[n];}
-        return s.trim();
-    },
-    genWordOpts: (num) => {
-        const s = new Set([Utils.numWords(num)]); const strNum = num.toString();
-        if (num > 1000) s.add(Utils.numWords(Math.floor(num/10)));
-        if (strNum.includes('0')) { let fake = strNum.replace('0', '5'); s.add(Utils.numWords(parseInt(fake))); }
-        s.add(Utils.numWords(num + 100));
-        while(s.size < 4) s.add(Utils.numWords(Utils.rInt(1000, 9999)));
-        return Array.from(s).sort(() => Math.random() - 0.5).map(x => ({t:x, c:x===Utils.numWords(num)}));
+// ---- TEI GENERATORS ----
+const TEI={
+  fracCircle(d){let p='';for(let i=0;i<d;i++){const s=i*360/d,e=(i+1)*360/d;const x1=(100+90*Math.sin(Math.PI*s/180)).toFixed(1),y1=(100-90*Math.cos(Math.PI*s/180)).toFixed(1),x2=(100+90*Math.sin(Math.PI*e/180)).toFixed(1),y2=(100-90*Math.cos(Math.PI*e/180)).toFixed(1);p+=`<path d="M100 100 L${x1} ${y1} A90 90 0 0 1 ${x2} ${y2} Z" fill="white" stroke="#333" stroke-width="2" onclick="this.setAttribute('fill',this.getAttribute('fill')==='white'?'#0056b3':'white');App.iTrig();" style="cursor:pointer;"/>`;}return`<div class="visual-box"><svg width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#f0f4ff" stroke="#333" stroke-width="2"/>${p}</svg><div class="nl-hint">Click slices to shade them.</div></div>`;},
+  gridArea(rows,cols,shaded){let c='';for(let r=0;r<rows;r++)for(let x=0;x<cols;x++){const idx=r*cols+x;c+=`<rect x="${x*28+2}" y="${r*28+2}" width="26" height="26" fill="${idx<shaded?'#0056b3':'white'}" stroke="#aaa" stroke-width="1" rx="2"/>`;}return`<div class="visual-box"><svg width="${cols*28+4}" height="${rows*28+4}">${c}</svg></div>`;},
+  clock(h,m){let t='';for(let i=0;i<60;i++)t+=`<line x1="100" y1="${i%5?8:12}" x2="100" y2="4" transform="rotate(${i*6} 100 100)" stroke="#333" stroke-width="${i%5?1:2.5}"/>`;const hA=(h%12)*30+m*.5,mA=m*6;return`<div class="visual-box"><svg width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="96" fill="white" stroke="#333" stroke-width="3"/>${t}<line x1="100" y1="100" x2="${(100+55*Math.sin(Math.PI*hA/180)).toFixed(1)}" y2="${(100-55*Math.cos(Math.PI*hA/180)).toFixed(1)}" stroke="#111" stroke-width="6" stroke-linecap="round"/><line x1="100" y1="100" x2="${(100+80*Math.sin(Math.PI*mA/180)).toFixed(1)}" y2="${(100-80*Math.cos(Math.PI*mA/180)).toFixed(1)}" stroke="#c00" stroke-width="4" stroke-linecap="round"/><circle cx="100" cy="100" r="5" fill="#111"/></svg></div>`;},
+  lShape(w1,h1,w2,h2){const u=30;return`<div class="visual-box"><svg width="${(w1+w2)*u+50}" height="${(h1+h2)*u+50}"><path d="M25 25 H${25+w1*u} V${25+h1*u} H${25+(w1+w2)*u} V${25+(h1+h2)*u} H25 Z" fill="#e6f0fa" stroke="#003366" stroke-width="3"/><text x="${25+w1*u/2}" y="18" text-anchor="middle" font-size="12" font-weight="bold">${w1}</text><text x="${25+w1*u+w2*u/2}" y="${25+h1*u-3}" text-anchor="middle" font-size="12" font-weight="bold">${w2}</text><text x="13" y="${25+(h1+h2)*u/2}" text-anchor="middle" font-size="12" font-weight="bold">${h1+h2}</text><text x="${25+(w1+w2)*u+13}" y="${25+h1*u+h2*u/2}" text-anchor="middle" font-size="12" font-weight="bold">${h2}</text></svg></div>`;},
+  angleSVG(deg){const r=80,x2=(100+r*Math.cos((180-deg)*Math.PI/180)).toFixed(1),y2=(100-r*Math.sin((180-deg)*Math.PI/180)).toFixed(1);return`<div class="visual-box"><svg width="200" height="160" viewBox="0 0 200 200"><line x1="100" y1="100" x2="180" y2="100" stroke="#003366" stroke-width="3"/><line x1="100" y1="100" x2="${x2}" y2="${y2}" stroke="#003366" stroke-width="3"/><path d="M120 100 A20 20 0 0 0 ${(100+20*Math.cos((180-deg)*Math.PI/180)).toFixed(1)} ${(100-20*Math.sin((180-deg)*Math.PI/180)).toFixed(1)}" fill="none" stroke="#c00" stroke-width="2"/><text x="${(100+38*Math.cos((180-deg/2)*Math.PI/180)).toFixed(1)}" y="${(100-38*Math.sin((180-deg/2)*Math.PI/180)).toFixed(1)}" font-size="14" fill="#c00" font-weight="bold">${deg}°</text></svg></div>`;},
+  barGraph(data,scale,title){const maxV=Math.max(...data.map(d=>d.v)),bH=120,bW=30,gap=16,u=bH/maxV,W=data.length*(bW+gap)+50;let bars='';data.forEach((d,i)=>{const bh=d.v*u,x=26+i*(bW+gap),y=bH-bh+14;bars+=`<rect x="${x}" y="${y}" width="${bW}" height="${bh}" fill="#0056b3"/><text x="${x+bW/2}" y="${bH+30}" text-anchor="middle" font-size="10" font-weight="bold">${d.n}</text><text x="${x+bW/2}" y="${y-3}" text-anchor="middle" font-size="10" font-weight="bold" fill="#003366">${d.v}</text>`;});for(let v=0;v<=maxV;v+=scale){const y=bH-v*u+14;bars+=`<line x1="22" y1="${y}" x2="${W-4}" y2="${y}" stroke="#ddd"/><text x="20" y="${y+4}" text-anchor="end" font-size="9">${v}</text>`;}return`<div class="visual-box"><p style="font-weight:700;font-size:.8rem;margin-bottom:3px;">${title}</p><svg width="${W}" height="${bH+42}">${bars}<line x1="22" y1="14" x2="22" y2="${bH+14}" stroke="#333" stroke-width="2"/><line x1="22" y1="${bH+14}" x2="${W-4}" y2="${bH+14}" stroke="#333" stroke-width="2"/></svg></div>`;},
+  coordGrid(pts,w=200,h=200,max=8){const u=(w-40)/max,ox=30,oy=h-30;let g=`<line x1="${ox}" y1="10" x2="${ox}" y2="${oy}" stroke="#333" stroke-width="2"/><line x1="${ox}" y1="${oy}" x2="${w-10}" y2="${oy}" stroke="#333" stroke-width="2"/>`;for(let i=0;i<=max;i++){const x=ox+i*u,y=oy-i*u;g+=`<line x1="${x}" y1="10" x2="${x}" y2="${oy}" stroke="#eee"/><line x1="${ox}" y1="${y}" x2="${w-10}" y2="${y}" stroke="#eee"/><text x="${x}" y="${oy+13}" text-anchor="middle" font-size="10">${i}</text><text x="${ox-7}" y="${y+3}" text-anchor="end" font-size="10">${i}</text>`;}let p='';pts.forEach(pt=>{const px=ox+pt.x*u,py=oy-pt.y*u;p+=`<circle cx="${px}" cy="${py}" r="5" fill="#c00"/><text x="${px+8}" y="${py-3}" font-size="10" font-weight="bold" fill="#003366">${pt.label||`(${pt.x},${pt.y})`}</text>`;});return`<div class="visual-box"><svg width="${w}" height="${h}">${g}${p}</svg></div>`;}
+};
+
+// ---- GRADE 3 BANK ----
+const Bank3={
+"MA.3.NSO.1.1":{desc:"Read & write numbers 0–10,000",cat:"Number Sense & Operations",scenarios:[
+  {diff:3,gen:()=>{const n=U.rInt(1000,9999);const opts=U.shuffle([{t:U.numWords(n),c:true},{t:U.numWords(n+100),c:false},{t:U.numWords(n+10),c:false},{t:U.numWords(n-100>0?n-100:n+200),c:false}]);return{text:`What is the word form of <strong>${n.toLocaleString()}</strong>?`,tasks:[{type:'radio',label:'Select one',sel:undefined,options:opts}]};}},
+  {diff:4,gen:()=>{const n=U.rInt(1000,9999);const parts=[];const th=Math.floor(n/1000),hu=Math.floor((n%1000)/100),te=Math.floor((n%100)/10),on=n%10;if(th)parts.push(`${th}×1,000`);if(hu)parts.push(`${hu}×100`);if(te)parts.push(`${te}×10`);if(on)parts.push(`${on}`);return{text:`Write the expanded form of <strong>${n.toLocaleString()}</strong>.`,tasks:[{type:'eq',label:'Expanded Form',id:'g3n11',ans:parts.join('+'),data_pad:'num'}],left:`<div style="padding:15px;font-size:.86rem;color:#555;line-height:1.9">Example:<br>2,345 = 2×1,000+3×100+4×10+5</div>`};}},
+]},
+"MA.3.NSO.1.4":{desc:"Round whole numbers 0–1,000",cat:"Number Sense & Operations",scenarios:[
+  {diff:3,gen:()=>{const n=U.rInt(11,999),to=U.pick([10,100]);const r=Math.round(n/to)*to;const opts=U.shuffle([{t:`${r}`,c:true},{t:`${r+to}`,c:false},{t:`${r-to>0?r-to:r+to*2}`,c:false},{t:`${r+to*2}`,c:false}]);return{text:`Round <strong>${n}</strong> to the nearest <strong>${to}</strong>.`,tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.3.NSO.2.1":{desc:"Add & subtract within 1,000",cat:"Number Sense & Operations",scenarios:[
+  {diff:3,gen:()=>{const add=Math.random()>.5;let a,b;if(add){a=U.rInt(100,499);b=U.rInt(100,499);}else{a=U.rInt(300,999);b=U.rInt(100,a-1);}const nm=U.name();return{text:add?`${nm} collected <strong>${a}</strong> cans in January and <strong>${b}</strong> more in February. How many total?`:`${nm} had <strong>${a}</strong> points and used <strong>${b}</strong>. How many remain?`,tasks:[{type:'eq',label:'Answer',id:'g3n21',ans:`${add?a+b:a-b}`,data_pad:'num'}]};}},
+]},
+"MA.3.NSO.2.3":{desc:"Multiply whole numbers, products 0–100",cat:"Number Sense & Operations",scenarios:[
+  {diff:3,gen:()=>{const a=U.rInt(2,10),b=U.rInt(2,10);return{text:`What is <strong>${a} × ${b}</strong>?`,tasks:[{type:'eq',label:'Answer',id:'g3n23',ans:`${a*b}`,data_pad:'num'}]};}},
+  {diff:4,gen:()=>{const a=U.rInt(2,9),b=U.rInt(2,9);const nm=U.name();return{text:`${nm} has <strong>${a}</strong> bags with <strong>${b}</strong> apples each. How many apples total?`,tasks:[{type:'eq',label:'Answer',id:'g3n23b',ans:`${a*b}`,data_pad:'num'}]};}},
+]},
+"MA.3.AR.1.2":{desc:"True/false multiplication & division equations",cat:"Algebraic Reasoning",scenarios:[
+  {diff:3,gen:()=>{const a=U.rInt(2,9),b=U.rInt(2,9),p=a*b;const isT=Math.random()>.35;const shown=isT?p:p+U.rInt(1,4);return{text:`True or False?<br><br><strong style="font-size:1.45rem">${a} × ${b} = ${shown}</strong>`,tasks:[{type:'radio',label:'Select',sel:undefined,options:[{t:'True',c:isT},{t:'False',c:!isT}]}]};}},
+]},
+"MA.3.AR.2.1":{desc:"One- and two-step word problems",cat:"Algebraic Reasoning",scenarios:[
+  {diff:3,gen:()=>{const a=U.rInt(2,8),b=U.rInt(2,8),add=U.rInt(5,20);const nm=U.name();return{text:`${nm} set up <strong>${a}</strong> rows of <strong>${b}</strong> chairs each, then added <strong>${add}</strong> more. Total chairs?`,tasks:[{type:'eq',label:'Answer',id:'g3a21',ans:`${a*b+add}`,data_pad:'num'}]};}},
+  {diff:4,gen:()=>{const g=U.rInt(2,6),e=U.rInt(3,9);const nm=U.name();return{text:`${nm} packed ${g*e} snacks equally into <strong>${g}</strong> bags. How many per bag?`,tasks:[{type:'eq',label:'Answer',id:'g3a21b',ans:`${e}`,data_pad:'num'}]};}},
+]},
+"MA.3.AR.2.2":{desc:"Find the unknown in multiplication/division",cat:"Algebraic Reasoning",scenarios:[
+  {diff:3,gen:()=>{const a=U.rInt(2,10),b=U.rInt(2,10),p=a*b;const pos=U.rInt(0,1);return{text:`Find the unknown:<br><br><strong style="font-size:1.4rem">${pos===0?`___ × ${b} = ${p}`:`${a} × ___ = ${p}`}</strong>`,tasks:[{type:'eq',label:'Unknown =',id:'g3a22',ans:pos===0?`${a}`:`${b}`,data_pad:'num'}]};}},
+]},
+"MA.3.AR.3.1":{desc:"Even and odd numbers",cat:"Algebraic Reasoning",scenarios:[
+  {diff:2,gen:()=>{const n=U.rInt(1,999);return{text:`Is <strong>${n}</strong> even or odd?`,tasks:[{type:'radio',label:'Select',sel:undefined,options:[{t:'Even',c:n%2===0},{t:'Odd',c:n%2!==0}]}]};}},
+]},
+"MA.3.AR.3.3":{desc:"Identify & extend numerical patterns",cat:"Algebraic Reasoning",scenarios:[
+  {diff:3,gen:()=>{const st=U.rInt(1,20),r=U.rInt(2,9);const seq=[0,1,2,3,4].map(i=>st+r*i);return{text:`Find the next two terms:<br><br><strong style="font-size:1.35rem">${seq[0]}, ${seq[1]}, ${seq[2]}, ${seq[3]}, ___, ___</strong>`,tasks:[{type:'eq',label:'5th term',id:'g3a33a',ans:`${seq[4]}`,data_pad:'num'},{type:'eq',label:'6th term',id:'g3a33b',ans:`${st+r*5}`,data_pad:'num',isFollowUp:true}]};}},
+]},
+"MA.3.FR.1.1":{desc:"Represent unit fractions with models",cat:"Fractional Reasoning",scenarios:[
+  {diff:3,gen:()=>{const d=U.pick([2,3,4,6,8]),n=U.rInt(1,d-1);return{text:`Click slices to shade <strong>${n}/${d}</strong> of the circle.`,left:TEI.fracCircle(d),tasks:[{type:'interact',label:'Shade the fraction',html:'',check:()=>document.querySelectorAll('path[fill="#0056b3"]').length===n}]};}},
+  {diff:3,gen:()=>{const d=U.pick([2,3,4,6,8,10]),n=U.rInt(1,d);const opts=U.shuffle([{t:`${n}/${d}`,c:true},{t:`${n+1}/${d}`,c:false},{t:`${n}/${d+1}`,c:false},{t:`1/${d}`,c:false}]);return{text:`The rectangle has <strong>${d}</strong> equal parts with <strong>${n}</strong> shaded. Which fraction is shown?`,left:TEI.gridArea(1,d,n),tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.3.FR.2.1":{desc:"Equivalent fractions",cat:"Fractional Reasoning",scenarios:[
+  {diff:3,gen:()=>{const pairs=[['1/2','2/4'],['1/2','3/6'],['1/3','2/6'],['2/3','4/6'],['1/4','2/8']];const[a,b]=U.pick(pairs);const opts=U.shuffle([{t:b,c:true},{t:'1/5',c:false},{t:'3/8',c:false},{t:'2/7',c:false}]);return{text:`Which fraction is equivalent to <strong>${a}</strong>?`,tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.3.FR.2.2":{desc:"Compare fractions same numerator/denominator",cat:"Fractional Reasoning",scenarios:[
+  {diff:3,gen:()=>{const sN=Math.random()>.5;let a,b,sym;if(sN){const n=U.rInt(1,4),d1=U.rInt(2,8),d2=U.rInt(2,8);a=`${n}/${d1}`;b=`${n}/${d2}`;sym=d1>d2?'<':d1<d2?'>':'=';}else{const d=U.pick([4,6,8,10]),n1=U.rInt(1,d-1),n2=U.rInt(1,d-1);a=`${n1}/${d}`;b=`${n2}/${d}`;sym=n1<n2?'<':n1>n2?'>':'=';}return{text:`Compare:<br><br><strong style="font-size:1.4rem">${a} _____ ${b}</strong>`,tasks:[{type:'radio',label:'Select',sel:undefined,options:[{t:'<',c:sym==='<'},{t:'>',c:sym==='>'},{t:'=',c:sym==='='}]}]};}},
+]},
+"MA.3.GR.1.1":{desc:"Lines: parallel, perpendicular, intersecting",cat:"Geometric Reasoning",scenarios:[
+  {diff:2,gen:()=>{const tp=U.pick(['parallel','perpendicular','intersecting']);const svgs={parallel:`<svg width="160" height="80"><line x1="10" y1="28" x2="150" y2="28" stroke="#003366" stroke-width="3"/><line x1="10" y1="56" x2="150" y2="56" stroke="#003366" stroke-width="3"/></svg>`,perpendicular:`<svg width="120" height="120"><line x1="60" y1="10" x2="60" y2="110" stroke="#003366" stroke-width="3"/><line x1="10" y1="60" x2="110" y2="60" stroke="#003366" stroke-width="3"/><rect x="62" y="58" width="9" height="9" fill="none" stroke="#c00" stroke-width="2"/></svg>`,intersecting:`<svg width="120" height="120"><line x1="10" y1="100" x2="110" y2="20" stroke="#003366" stroke-width="3"/><line x1="10" y1="20" x2="110" y2="100" stroke="#003366" stroke-width="3"/></svg>`};const opts=U.shuffle([{t:'Parallel',c:tp==='parallel'},{t:'Perpendicular',c:tp==='perpendicular'},{t:'Intersecting',c:tp==='intersecting'},{t:'Vertical',c:false}]);return{text:`What type of lines are shown?`,left:`<div class="visual-box">${svgs[tp]}</div>`,tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.3.GR.1.2":{desc:"Identify quadrilaterals",cat:"Geometric Reasoning",scenarios:[
+  {diff:3,gen:()=>{const shapes=[{name:'Square',svg:`<svg width="100" height="100"><rect x="20" y="20" width="60" height="60" fill="#b3d9f7" stroke="#003366" stroke-width="3"/></svg>`},{name:'Rectangle',svg:`<svg width="150" height="80"><rect x="10" y="15" width="130" height="50" fill="#b3d9f7" stroke="#003366" stroke-width="3"/></svg>`},{name:'Rhombus',svg:`<svg width="120" height="100"><polygon points="60,10 110,50 60,90 10,50" fill="#ffd699" stroke="#cc6600" stroke-width="3"/></svg>`},{name:'Trapezoid',svg:`<svg width="140" height="80"><polygon points="30,65 110,65 90,15 50,15" fill="#d4edda" stroke="#155724" stroke-width="3"/></svg>`},{name:'Parallelogram',svg:`<svg width="140" height="80"><polygon points="30,65 130,65 110,15 10,15" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="3"/></svg>`}];const ch=U.pick(shapes);const wrong=U.shuffle(shapes.filter(s=>s.name!==ch.name)).slice(0,3).map(s=>({t:s.name,c:false}));return{text:`What is the name of this quadrilateral?`,left:`<div class="visual-box">${ch.svg}</div>`,tasks:[{type:'radio',label:'Select',sel:undefined,options:U.shuffle([{t:ch.name,c:true},...wrong])}]};}},
+]},
+"MA.3.GR.2.1":{desc:"Area — count unit squares",cat:"Geometric Reasoning",scenarios:[
+  {diff:3,gen:()=>{const r=U.rInt(2,5),c=U.rInt(2,6),a=r*c;return{text:`Count the unit squares to find the area.`,left:TEI.gridArea(r,c,a),tasks:[{type:'eq',label:'Area = ___ sq units',id:'g3g21',ans:`${a}`,data_pad:'num'}]};}},
+]},
+"MA.3.GR.2.2":{desc:"Area of rectangles using formula",cat:"Geometric Reasoning",scenarios:[
+  {diff:3,gen:()=>{const l=U.rInt(2,12),w=U.rInt(2,8);return{text:`A rectangle has length <strong>${l} units</strong> and width <strong>${w} units</strong>. Find the area.`,tasks:[{type:'eq',label:'Area = ___ sq units',id:'g3g22',ans:`${l*w}`,data_pad:'num'}]};}},
+  {diff:4,gen:()=>{const l=U.rInt(3,12),w=U.rInt(2,8);return{text:`Rectangle: length = <strong>${l} cm</strong>, width = <strong>${w} cm</strong>. Find area AND perimeter.`,tasks:[{type:'eq',label:'Part A – Area (sq cm)',id:'g3g22a',ans:`${l*w}`,data_pad:'num'},{type:'eq',label:'Part B – Perimeter (cm)',id:'g3g22b',ans:`${2*(l+w)}`,data_pad:'num',isFollowUp:true}]};}},
+]},
+"MA.3.GR.2.3":{desc:"Perimeter of rectangles",cat:"Geometric Reasoning",scenarios:[
+  {diff:3,gen:()=>{const l=U.rInt(3,15),w=U.rInt(2,10);const nm=U.name();return{text:`${nm}'s garden is ${l} ft long and ${w} ft wide. How many feet of fencing to go all the way around?`,tasks:[{type:'eq',label:'Perimeter = ___ ft',id:'g3g23',ans:`${2*(l+w)}`,data_pad:'num'}]};}},
+]},
+"MA.3.GR.2.4":{desc:"Area of composite figures",cat:"Geometric Reasoning",scenarios:[
+  {diff:4,gen:()=>{const w1=U.rInt(2,5),h1=U.rInt(2,4),w2=U.rInt(2,4),h2=U.rInt(1,3);return{text:`Find the total area of the composite figure.`,left:TEI.lShape(w1,h1,w2,h2),tasks:[{type:'eq',label:'Area = ___ sq units',id:'g3g24',ans:`${w1*(h1+h2)+w2*h2}`,data_pad:'num'}]};}},
+]},
+"MA.3.M.2.1":{desc:"Tell time to the nearest minute",cat:"Measurement & Data",scenarios:[
+  {diff:3,gen:()=>{const h=U.rInt(1,12),m=U.rInt(0,59);const fmt=U.fmtT(h,m,false);const opts=U.shuffle([{t:fmt,c:true},{t:U.fmtT(h,m+5>59?m-5:m+5,false),c:false},{t:U.fmtT(h%12+1||12,m,false),c:false},{t:U.fmtT(h,m+10>59?m-10:m+10,false),c:false}]);return{text:`What time is shown?`,left:TEI.clock(h,m),tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.3.M.2.2":{desc:"Elapsed time word problems",cat:"Measurement & Data",scenarios:[
+  {diff:3,gen:()=>{const sH=U.rInt(8,15),sM=U.pick([0,15,30,45]),dur=U.rInt(1,4)*15;const tot=sH*60+sM+dur;const eH=Math.floor(tot/60),eM=tot%60;return{text:`A show starts at <strong>${U.fmtT(sH,sM)}</strong> and lasts <strong>${dur} min</strong>. When does it end?`,tasks:[{type:'eq',label:'End time (e.g. 3:45PM)',id:'g3m22',ans:U.fmtT(eH,eM),data_pad:'time'}]};}},
+]},
+"MA.3.DP.1.2":{desc:"Interpret scaled bar graphs",cat:"Measurement & Data",scenarios:[
+  {diff:3,gen:()=>{const cats=['Cats','Dogs','Birds','Fish'],sc=U.rInt(2,5);const data=cats.map(n=>({n,v:U.rInt(2,8)*sc}));const q=U.pick(data);const qT=Math.random()>.5;const ans=qT?`${q.v}`:`${data.reduce((s,d)=>s+d.v,0)}`;return{text:qT?`How many students chose <strong>${q.n}</strong>?`:`How many total students were surveyed?`,left:TEI.barGraph(data,sc,'Favorite Pets Survey'),tasks:[{type:'eq',label:'Answer',id:'g3dp',ans,data_pad:'num'}]};}},
+]},
+};
+
+// ---- GRADE 4 BANK ----
+const Bank4={
+"MA.4.NSO.1.2":{desc:"Read & write numbers 0–1,000,000",cat:"Number Sense & Operations",scenarios:[
+  {diff:3,gen:()=>{const n=U.rInt(10000,999999);const opts=U.shuffle([{t:U.numWords(n),c:true},{t:U.numWords(n+1000),c:false},{t:U.numWords(n-100>0?n-100:n+500),c:false},{t:U.numWords(Math.floor(n/10)),c:false}]);return{text:`What is the word form of <strong>${n.toLocaleString()}</strong>?`,tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.4.NSO.1.4":{desc:"Round numbers to 10, 100, or 1,000",cat:"Number Sense & Operations",scenarios:[
+  {diff:3,gen:()=>{const n=U.rInt(100,9999),to=U.pick([10,100,1000]);const r=Math.round(n/to)*to;const opts=U.shuffle([{t:`${r}`,c:true},{t:`${r+to}`,c:false},{t:`${r-to>0?r-to:r+to*2}`,c:false},{t:`${r+to*2}`,c:false}]);return{text:`Round <strong>${n.toLocaleString()}</strong> to the nearest <strong>${to.toLocaleString()}</strong>.`,tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.4.NSO.1.5":{desc:"Compare decimals to hundredths",cat:"Number Sense & Operations",scenarios:[
+  {diff:3,gen:()=>{const a=(U.rInt(10,99)/10).toFixed(1),b=(U.rInt(10,99)/10).toFixed(1);const sym=parseFloat(a)<parseFloat(b)?'<':parseFloat(a)>parseFloat(b)?'>':'=';return{text:`Compare:<br><br><strong style="font-size:1.4rem">${a} _____ ${b}</strong>`,tasks:[{type:'radio',label:'Select',sel:undefined,options:[{t:'<',c:sym==='<'},{t:'>',c:sym==='>'},{t:'=',c:sym==='='}]}]};}},
+  {diff:4,gen:()=>{const a=(U.rInt(100,999)/100).toFixed(2),b=(U.rInt(100,999)/100).toFixed(2);const sym=parseFloat(a)<parseFloat(b)?'<':parseFloat(a)>parseFloat(b)?'>':'=';return{text:`Compare:<br><br><strong style="font-size:1.4rem">${a} _____ ${b}</strong>`,tasks:[{type:'radio',label:'Select',sel:undefined,options:[{t:'<',c:sym==='<'},{t:'>',c:sym==='>'},{t:'=',c:sym==='='}]}]};}},
+]},
+"MA.4.NSO.2.1":{desc:"Multiplication facts to 12 with automaticity",cat:"Number Sense & Operations",scenarios:[
+  {diff:3,gen:()=>{const a=U.rInt(6,12),b=U.rInt(6,12);return{text:`What is <strong>${a} × ${b}</strong>?`,tasks:[{type:'eq',label:'Answer',id:'g4n21',ans:`${a*b}`,data_pad:'num'}]};}},
+]},
+"MA.4.NSO.2.2":{desc:"Multiply up to 3-digit by 2-digit",cat:"Number Sense & Operations",scenarios:[
+  {diff:3,gen:()=>{const a=U.rInt(11,99),b=U.rInt(11,99);return{text:`Find the product:<br><br><strong style="font-size:1.45rem">${a} × ${b}</strong>`,tasks:[{type:'eq',label:'Answer',id:'g4n22',ans:`${a*b}`,data_pad:'num'}]};}},
+  {diff:4,gen:()=>{const a=U.rInt(100,999),b=U.rInt(11,30);const nm=U.name();return{text:`A factory makes <strong>${a}</strong> boxes per day. How many in <strong>${b}</strong> days?`,tasks:[{type:'eq',label:'Answer',id:'g4n22b',ans:`${a*b}`,data_pad:'num'}]};}},
+]},
+"MA.4.NSO.2.4":{desc:"Divide 4-digit by 1-digit with remainders",cat:"Number Sense & Operations",scenarios:[
+  {diff:3,gen:()=>{const d=U.rInt(2,9),q=U.rInt(10,999),r=U.rInt(0,d-1),dvd=d*q+r;return{text:`Find the quotient (include remainder if any):<br><br><strong style="font-size:1.45rem">${dvd} ÷ ${d}</strong>`,tasks:[{type:'eq',label:r===0?'Answer':`Answer (e.g. ${q} R ${r})`,id:'g4n24',ans:r===0?`${q}`:`${q} R ${r}`,data_pad:'num'}]};}},
+]},
+"MA.4.NSO.2.6":{desc:"One-tenth / one-hundredth more or less",cat:"Number Sense & Operations",scenarios:[
+  {diff:3,gen:()=>{const base=(U.rInt(10,990)/100).toFixed(2);const tp=U.pick(['tenth more','tenth less','hundredth more','hundredth less']);const b=parseFloat(base);const ans=tp==='tenth more'?(b+.1).toFixed(2):tp==='tenth less'?(b-.1).toFixed(2):tp==='hundredth more'?(b+.01).toFixed(2):(b-.01).toFixed(2);return{text:`What is one <strong>${tp}</strong> than <strong>${base}</strong>?`,tasks:[{type:'eq',label:'Answer',id:'g4n26',ans:String(parseFloat(ans)),data_pad:'num'}]};}},
+]},
+"MA.4.FR.1.2":{desc:"Decimal notation for fractions (10ths & 100ths)",cat:"Fractional Reasoning",scenarios:[
+  {diff:3,gen:()=>{const n=U.rInt(1,9),is10=Math.random()>.5;const dec=is10?(n/10).toFixed(1):(n/10).toFixed(2);const opts=U.shuffle([{t:dec,c:true},{t:(n/10+.1).toFixed(1),c:false},{t:(n/100).toFixed(2),c:false},{t:`${n}.0`,c:false}]);return{text:`Write the decimal for <strong>${n}/${is10?10:100}</strong>.`,tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.4.FR.1.3":{desc:"Equivalent fractions including greater than one",cat:"Fractional Reasoning",scenarios:[
+  {diff:3,gen:()=>{const pairs=[['1/2','2/4'],['2/3','4/6'],['3/4','6/8'],['1/3','4/12'],['2/5','4/10']];const[a,b]=U.pick(pairs);const opts=U.shuffle([{t:b,c:true},{t:'3/7',c:false},{t:'2/9',c:false},{t:'5/8',c:false}]);return{text:`Which fraction is equivalent to <strong>${a}</strong>?`,tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.4.FR.2.2":{desc:"Add & subtract fractions with like denominators",cat:"Fractional Reasoning",scenarios:[
+  {diff:3,gen:()=>{const d=U.pick([4,5,6,8,10,12]);const n1=U.rInt(1,d-1),n2=U.rInt(1,d-n1);const isA=Math.random()>.4;return{text:`Solve:<br><br><strong style="font-size:1.4rem">${n1}/${d} ${isA?'+':'-'} ${isA?n2:Math.min(n1,n2)}/${d}</strong>`,tasks:[{type:'eq',label:`Answer (n/${d})`,id:'g4fr22',ans:isA?`${n1+n2}/${d}`:`${n1-Math.min(n1,n2)}/${d}`,data_pad:'frac'}]};}},
+]},
+"MA.4.FR.2.4":{desc:"Multiply a fraction by a whole number",cat:"Fractional Reasoning",scenarios:[
+  {diff:3,gen:()=>{const d=U.pick([2,3,4,5,6,8]),w=U.rInt(2,8);const prod=w;return{text:`Find the product:<br><br><strong style="font-size:1.4rem">${w} × 1/${d}</strong>`,tasks:[{type:'eq',label:'Answer as fraction',id:'g4fr24',ans:prod%d===0?`${prod/d}`:`${prod}/${d}`,data_pad:'frac'}]};}},
+]},
+"MA.4.AR.1.1":{desc:"Multiply & divide word problems with remainders",cat:"Algebraic Reasoning",scenarios:[
+  {diff:3,gen:()=>{const students=U.rInt(20,200),perVan=U.rInt(6,12);const vans=Math.ceil(students/perVan);const nm=U.name();return{text:`${nm}'s school has <strong>${students}</strong> students for a field trip. Each van holds <strong>${perVan}</strong>. How many vans are needed?`,tasks:[{type:'eq',label:'Answer',id:'g4a11',ans:`${vans}`,data_pad:'num'}]};}},
+]},
+"MA.4.AR.2.1":{desc:"Factor pairs for whole numbers 1–144",cat:"Algebraic Reasoning",scenarios:[
+  {diff:3,gen:()=>{const ns=[12,16,18,24,30,36,48,60];const n=U.pick(ns);const factors=[];for(let i=1;i<=n;i++)if(n%i===0)factors.push(i);const f=U.pick(factors.slice(1,Math.floor(factors.length/2)));const pair=n/f;const opts=U.shuffle([{t:`${pair}`,c:true},{t:`${pair+1}`,c:false},{t:`${pair-1>0?pair-1:pair+2}`,c:false},{t:`${pair+2}`,c:false}]);return{text:`One factor pair of <strong>${n}</strong> is ${f} and ___. What is the missing factor?`,tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.4.AR.3.2":{desc:"Generate & analyze patterns",cat:"Algebraic Reasoning",scenarios:[
+  {diff:3,gen:()=>{const st=U.rInt(1,10),r=U.rInt(2,8),seq=[0,1,2,3,4].map(i=>st+r*i);return{text:`What are the next two terms?<br><br><strong style="font-size:1.35rem">${seq[0]}, ${seq[1]}, ${seq[2]}, ${seq[3]}, ___, ___</strong>`,tasks:[{type:'eq',label:'Next term',id:'g4a32a',ans:`${seq[4]}`,data_pad:'num'},{type:'eq',label:'Term after that',id:'g4a32b',ans:`${st+r*5}`,data_pad:'num',isFollowUp:true}]};}},
+]},
+"MA.4.GR.1.1":{desc:"Draw & classify angles",cat:"Geometric Reasoning",scenarios:[
+  {diff:3,gen:()=>{const angle=U.pick([30,45,60,90,120,135,150]);const type=angle<90?'acute':angle===90?'right':'obtuse';const opts=U.shuffle([{t:'Acute (< 90°)',c:type==='acute'},{t:'Right (= 90°)',c:type==='right'},{t:'Obtuse (> 90°)',c:type==='obtuse'},{t:'Straight (180°)',c:false}]);return{text:`What type of angle is shown?`,left:TEI.angleSVG(angle),tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+  {diff:4,gen:()=>{const a=U.rInt(15,170);const type=a<90?'acute':a===90?'right':'obtuse';return{text:`An angle measures <strong>${a}°</strong>. What type is it?`,tasks:[{type:'radio',label:'Select',sel:undefined,options:U.shuffle([{t:'Acute',c:type==='acute'},{t:'Right',c:type==='right'},{t:'Obtuse',c:type==='obtuse'},{t:'Straight',c:false}])}]};}},
+]},
+"MA.4.GR.1.2":{desc:"Classify triangles by angles",cat:"Geometric Reasoning",scenarios:[
+  {diff:3,gen:()=>{const types=[{name:'Right triangle',svg:`<svg width="130" height="110"><polygon points="15,95 15,15 115,95" fill="#b3d9f7" stroke="#003366" stroke-width="3"/><rect x="15" y="81" width="13" height="13" fill="none" stroke="#c00" stroke-width="2"/></svg>`},{name:'Acute triangle',svg:`<svg width="130" height="110"><polygon points="65,10 115,100 15,100" fill="#d4edda" stroke="#155724" stroke-width="3"/></svg>`},{name:'Obtuse triangle',svg:`<svg width="150" height="90"><polygon points="10,80 140,80 25,20" fill="#ffd699" stroke="#cc6600" stroke-width="3"/></svg>`}];const ch=U.pick(types);const wrong=types.filter(t=>t.name!==ch.name).map(t=>({t:t.name,c:false}));return{text:`Classify this triangle.`,left:`<div class="visual-box">${ch.svg}</div>`,tasks:[{type:'radio',label:'Select',sel:undefined,options:U.shuffle([{t:ch.name,c:true},...wrong])}]};}},
+]},
+"MA.4.GR.2.1":{desc:"Area & perimeter of rectangles",cat:"Geometric Reasoning",scenarios:[
+  {diff:3,gen:()=>{const l=U.rInt(4,20),w=U.rInt(3,12);return{text:`Rectangle: length = <strong>${l} cm</strong>, width = <strong>${w} cm</strong>. Find area and perimeter.`,tasks:[{type:'eq',label:'Part A – Area (sq cm)',id:'g4gr21a',ans:`${l*w}`,data_pad:'num'},{type:'eq',label:'Part B – Perimeter (cm)',id:'g4gr21b',ans:`${2*(l+w)}`,data_pad:'num',isFollowUp:true}]};}},
+]},
+"MA.4.GR.2.2":{desc:"Area of composite figures",cat:"Geometric Reasoning",scenarios:[
+  {diff:4,gen:()=>{const w1=U.rInt(3,6),h1=U.rInt(2,4),w2=U.rInt(2,4),h2=U.rInt(2,4);return{text:`Find the total area of the composite figure.`,left:TEI.lShape(w1,h1,w2,h2),tasks:[{type:'eq',label:'Area = ___ sq units',id:'g4gr22',ans:`${w1*(h1+h2)+w2*h2}`,data_pad:'num'}]};}},
+]},
+"MA.4.M.1.1":{desc:"Classify & measure angles",cat:"Measurement & Data",scenarios:[
+  {diff:3,gen:()=>{const a=U.rInt(10,170);const opts=U.shuffle([{t:`${a}°`,c:true},{t:`${a+10}°`,c:false},{t:`${180-a}°`,c:false},{t:`${a+15>180?a-15:a+15}°`,c:false}]);return{text:`An angle measure is given. Which is correct for this angle labeled <strong>${a<90?'acute':'obtuse'}</strong>?`,tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.4.M.2.1":{desc:"Solve problems with measurement conversions",cat:"Measurement & Data",scenarios:[
+  {diff:3,gen:()=>{const q=U.pick([{q:'How many inches are in <strong>4 feet</strong>?',ans:'48'},{q:'How many ounces are in <strong>3 pounds</strong>?',ans:'48'},{q:'How many cups are in <strong>2 quarts</strong>?',ans:'8'},{q:'A ribbon is <strong>3 yards</strong> long. How many feet?',ans:'9'},{q:'How many minutes are in <strong>3 hours</strong>?',ans:'180'}]);return{text:q.q,tasks:[{type:'eq',label:'Answer',id:'g4m21',ans:q.ans,data_pad:'num'}]};}},
+]},
+"MA.4.DP.1.2":{desc:"Interpret data: mode, median, range",cat:"Measurement & Data",scenarios:[
+  {diff:4,gen:()=>{const set=[U.rInt(1,10),U.rInt(1,10),U.rInt(1,10),U.rInt(1,10),U.rInt(1,10)].sort((a,b)=>a-b);const range=set[4]-set[0];const median=set[2];return{text:`Data set: <strong>${set.join(', ')}</strong><br><br>Find the <strong>median</strong> and <strong>range</strong>.`,tasks:[{type:'eq',label:'Median',id:'g4dp12a',ans:`${median}`,data_pad:'num'},{type:'eq',label:'Range',id:'g4dp12b',ans:`${range}`,data_pad:'num',isFollowUp:true}]};}},
+  {diff:3,gen:()=>{const sc=U.rInt(2,4);const data=[{n:'Mon',v:U.rInt(2,6)*sc},{n:'Tue',v:U.rInt(2,6)*sc},{n:'Wed',v:U.rInt(2,6)*sc},{n:'Thu',v:U.rInt(2,6)*sc}];const qT=U.pick(['high','low','range']);const sorted=[...data].sort((a,b)=>a.v-b.v);const ans=qT==='high'?`${sorted[sorted.length-1].v}`:qT==='low'?`${sorted[0].v}`:`${sorted[sorted.length-1].v-sorted[0].v}`;const txt=qT==='high'?'What was the highest value?':qT==='low'?'What was the lowest value?':'What is the range of the data?';return{text:txt,left:TEI.barGraph(data,sc,'Weekly Data'),tasks:[{type:'eq',label:'Answer',id:'g4dp12c',ans,data_pad:'num'}]};}},
+]},
+};
+
+// ---- GRADE 5 BANK ----
+const Bank5={
+"MA.5.NSO.1.1":{desc:"Place value to billions",cat:"Number Sense — Whole Numbers",scenarios:[
+  {diff:3,gen:()=>{const n=U.rInt(100000,9999999);const opts=U.shuffle([{t:U.numWords(n),c:true},{t:U.numWords(n+1000),c:false},{t:U.numWords(n+10000),c:false},{t:U.numWords(n-1000>0?n-1000:n+2000),c:false}]);return{text:`What is the word form of <strong>${n.toLocaleString()}</strong>?`,tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.5.NSO.1.3":{desc:"Plot, order & compare decimals to thousandths",cat:"Number Sense — Whole Numbers",scenarios:[
+  {diff:3,gen:()=>{const a=(U.rInt(100,999)/1000).toFixed(3),b=(U.rInt(100,999)/1000).toFixed(3);const sym=parseFloat(a)<parseFloat(b)?'<':parseFloat(a)>parseFloat(b)?'>':'=';return{text:`Compare:<br><br><strong style="font-size:1.4rem">${a} _____ ${b}</strong>`,tasks:[{type:'radio',label:'Select',sel:undefined,options:[{t:'<',c:sym==='<'},{t:'>',c:sym==='>'},{t:'=',c:sym==='='}]}]};}},
+]},
+"MA.5.NSO.1.4":{desc:"Round decimals to any place",cat:"Number Sense — Whole Numbers",scenarios:[
+  {diff:3,gen:()=>{const n=(U.rInt(100,9999)/100).toFixed(2);const to=U.pick(['ones','tenths']);const ans=to==='ones'?`${Math.round(parseFloat(n))}`:`${(Math.round(parseFloat(n)*10)/10).toFixed(1)}`;return{text:`Round <strong>${n}</strong> to the nearest <strong>${to}</strong>.`,tasks:[{type:'eq',label:'Answer',id:'g5n14',ans,data_pad:'num'}]};}},
+]},
+"MA.5.NSO.2.1":{desc:"Multiply multi-digit whole numbers",cat:"Number Sense — Whole Numbers",scenarios:[
+  {diff:3,gen:()=>{const a=U.rInt(11,99),b=U.rInt(11,99);return{text:`Find the product:<br><br><strong style="font-size:1.45rem">${a} × ${b}</strong>`,tasks:[{type:'eq',label:'Answer',id:'g5n21',ans:`${a*b}`,data_pad:'num'}]};}},
+  {diff:4,gen:()=>{const a=U.rInt(100,999),b=U.rInt(11,30);const nm=U.name();return{text:`${nm}'s store sells <strong>${a}</strong> items per day. How many in <strong>${b}</strong> days?`,tasks:[{type:'eq',label:'Answer',id:'g5n21b',ans:`${a*b}`,data_pad:'num'}]};}},
+]},
+"MA.5.NSO.2.2":{desc:"Divide multi-digit whole numbers",cat:"Number Sense — Whole Numbers",scenarios:[
+  {diff:3,gen:()=>{const d=U.rInt(11,25),q=U.rInt(10,99),r=U.rInt(0,d-1),dvd=d*q+r;return{text:`Find the quotient:<br><br><strong style="font-size:1.45rem">${dvd} ÷ ${d}</strong>`,tasks:[{type:'eq',label:r===0?'Answer':`Answer (e.g. ${q} R ${r})`,id:'g5n22',ans:r===0?`${q}`:`${q} R ${r}`,data_pad:'num'}]};}},
+]},
+"MA.5.NSO.2.3":{desc:"Add & subtract fractions with unlike denominators",cat:"Number Sense — Fractions & Decimals",scenarios:[
+  {diff:3,gen:()=>{const d1=U.pick([2,3,4,5,6]),d2=U.pick([2,3,4,5,6].filter(x=>x!==d1));const lcd=d1*d2;const n1=U.rInt(1,d1-1),n2=U.rInt(1,d2-1);const isA=Math.random()>.4;const num1=n1*d2,num2=n2*d1;const resNum=isA?num1+num2:Math.abs(num1-num2);let ans=resNum%lcd===0?`${resNum/lcd}`:`${resNum}/${lcd}`;return{text:`Solve:<br><br><strong style="font-size:1.38rem">${n1}/${d1} ${isA?'+':'-'} ${n2}/${d2}</strong>`,tasks:[{type:'eq',label:'Answer',id:'g5n23',ans,data_pad:'frac'}]};}},
+]},
+"MA.5.NSO.2.5":{desc:"Multiply fractions & decimals",cat:"Number Sense — Fractions & Decimals",scenarios:[
+  {diff:3,gen:()=>{const w=U.rInt(2,8),d=U.pick([2,3,4,5]);const prod=w;const ans=prod%d===0?`${prod/d}`:`${prod}/${d}`;return{text:`What is <strong>${w} × 1/${d}</strong>?`,tasks:[{type:'eq',label:'Answer',id:'g5n25',ans,data_pad:'frac'}]};}},
+  {diff:4,gen:()=>{const a=(U.rInt(11,49)/10).toFixed(1),b=(U.rInt(11,49)/10).toFixed(1);const prod=parseFloat((parseFloat(a)*parseFloat(b)).toFixed(2));return{text:`Find the product:<br><br><strong style="font-size:1.4rem">${a} × ${b}</strong>`,tasks:[{type:'eq',label:'Answer',id:'g5n25b',ans:`${prod}`,data_pad:'num'}]};}},
+]},
+"MA.5.AR.1.1":{desc:"Order of operations with parentheses",cat:"Algebraic Reasoning",scenarios:[
+  {diff:3,gen:()=>{const a=U.rInt(2,8),b=U.rInt(2,8),c=U.rInt(2,5);return{text:`Evaluate using order of operations:<br><br><strong style="font-size:1.45rem">(${a} + ${b}) × ${c}</strong>`,tasks:[{type:'eq',label:'Answer',id:'g5a11',ans:`${(a+b)*c}`,data_pad:'num'}]};}},
+  {diff:4,gen:()=>{const a=U.rInt(2,9),b=U.rInt(2,6),c=U.rInt(2,5);return{text:`Evaluate (multiply before adding):<br><br><strong style="font-size:1.45rem">${a} + ${b} × ${c}</strong>`,tasks:[{type:'eq',label:'Answer',id:'g5a11b',ans:`${a+b*c}`,data_pad:'num'}]};}},
+]},
+"MA.5.AR.2.1":{desc:"Multi-step real-world problems",cat:"Algebraic Reasoning",scenarios:[
+  {diff:3,gen:()=>{const a=U.rInt(10,50),b=U.rInt(2,6),c=U.rInt(5,20);const nm=U.name();return{text:`${nm} earns <strong>$${a}</strong>/hour and works <strong>${b}</strong> hours. Then spends <strong>$${c}</strong>. How much money is left?`,tasks:[{type:'eq',label:'Answer ($)',id:'g5a21',ans:`${a*b-c}`,data_pad:'num'}]};}},
+]},
+"MA.5.AR.3.1":{desc:"Ordered pairs in the coordinate plane",cat:"Algebraic Reasoning",scenarios:[
+  {diff:3,gen:()=>{const x=U.rInt(1,7),y=U.rInt(1,7);const opts=U.shuffle([{t:`(${x}, ${y})`,c:true},{t:`(${y}, ${x})`,c:false},{t:`(${x+1}, ${y})`,c:false},{t:`(${x}, ${y+1})`,c:false}]);return{text:`What ordered pair names point <strong>A</strong>?`,left:TEI.coordGrid([{x,y,label:'A'}]),tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.5.AR.3.2":{desc:"Generate & graph numerical patterns",cat:"Algebraic Reasoning",scenarios:[
+  {diff:3,gen:()=>{const r=U.rInt(2,5),seq=[0,1,2,3,4].map(i=>i*r);return{text:`The table shows a pattern. What is the rule?<br><br><table style="margin:10px auto;border-collapse:collapse;"><tr style="background:#e6f0fa;"><th style="padding:7px 14px;border:1px solid #ccc;">x</th><th style="padding:7px 14px;border:1px solid #ccc;">y</th></tr>${seq.map((v,i)=>`<tr><td style="padding:7px 14px;border:1px solid #ccc;text-align:center;">${i}</td><td style="padding:7px 14px;border:1px solid #ccc;text-align:center;">${v}</td></tr>`).join('')}</table>`,tasks:[{type:'eq',label:'Rule: y = x × ___',id:'g5a32',ans:`${r}`,data_pad:'num'}]};}},
+]},
+"MA.5.GR.1.1":{desc:"Classify 2D figures by properties",cat:"Geometric Reasoning",scenarios:[
+  {diff:3,gen:()=>{const q=U.pick([{p:'All sides equal, all angles equal, 3 sides',ans:'Equilateral triangle'},{p:'4 equal sides, opposite angles equal (not necessarily 90°)',ans:'Rhombus'},{p:'Exactly 1 pair of parallel sides',ans:'Trapezoid'}]);const choices=['Equilateral triangle','Rhombus','Trapezoid','Rectangle','Parallelogram','Right triangle'];const opts=U.shuffle(choices.map(t=>({t,c:t===q.ans}))).slice(0,4);if(!opts.find(o=>o.c)){opts[0]={t:q.ans,c:true};}return{text:`Which shape fits this description?<br><br><em>"${q.p}"</em>`,tasks:[{type:'radio',label:'Select',sel:undefined,options:U.shuffle(opts)}]};}},
+]},
+"MA.5.GR.3.1":{desc:"Volume — count unit cubes",cat:"Geometric Reasoning",scenarios:[
+  {diff:3,gen:()=>{const l=U.rInt(2,5),w=U.rInt(2,4),h=U.rInt(2,3);return{text:`A rectangular prism is <strong>${l}</strong> units long, <strong>${w}</strong> units wide, and <strong>${h}</strong> units tall. What is the volume?`,tasks:[{type:'eq',label:'Volume = ___ cubic units',id:'g5gr31',ans:`${l*w*h}`,data_pad:'num'}]};}},
+]},
+"MA.5.GR.3.2":{desc:"Volume formula for rectangular prisms",cat:"Geometric Reasoning",scenarios:[
+  {diff:3,gen:()=>{const l=U.rInt(3,12),w=U.rInt(2,8),h=U.rInt(2,6);const nm=U.name();return{text:`${nm} has a box: length <strong>${l} cm</strong>, width <strong>${w} cm</strong>, height <strong>${h} cm</strong>. What is the volume?`,tasks:[{type:'eq',label:'Volume = ___ cm³',id:'g5gr32',ans:`${l*w*h}`,data_pad:'num'}]};}},
+]},
+"MA.5.GR.4.1":{desc:"Graph points on a coordinate plane",cat:"Geometric Reasoning",scenarios:[
+  {diff:3,gen:()=>{const x=U.rInt(1,7),y=U.rInt(1,7);const opts=U.shuffle([{t:`(${x}, ${y})`,c:true},{t:`(${y}, ${x})`,c:false},{t:`(${x+2}, ${y})`,c:false},{t:`(${x}, ${y+2})`,c:false}]);return{text:`Point <strong>P</strong> is shown. What are its coordinates?`,left:TEI.coordGrid([{x,y,label:'P'}]),tasks:[{type:'radio',label:'Select',sel:undefined,options:opts}]};}},
+]},
+"MA.5.M.1.1":{desc:"Convert measurement units within a system",cat:"Measurement & Data",scenarios:[
+  {diff:3,gen:()=>{const q=U.pick([{q:'Convert <strong>3.5 meters</strong> to centimeters.',ans:'350'},{q:'How many millimeters are in <strong>4.2 cm</strong>?',ans:'42'},{q:'Convert <strong>2,500 grams</strong> to kilograms.',ans:'2.5'},{q:'How many mL are in <strong>1.5 liters</strong>?',ans:'1500'},{q:'Convert <strong>5 km</strong> to meters.',ans:'5000'}]);return{text:q.q,tasks:[{type:'eq',label:'Answer',id:'g5m11',ans:q.ans,data_pad:'num'}]};}},
+]},
+"MA.5.DP.1.1":{desc:"Interpret data in tables and graphs",cat:"Measurement & Data",scenarios:[
+  {diff:3,gen:()=>{const sc=U.rInt(2,4);const data=[{n:'Mon',v:U.rInt(2,6)*sc},{n:'Tue',v:U.rInt(2,6)*sc},{n:'Wed',v:U.rInt(2,6)*sc},{n:'Thu',v:U.rInt(2,6)*sc}];const sorted=[...data].sort((a,b)=>a.v-b.v);const qT=U.pick(['high','low','range']);const ans=qT==='high'?`${sorted[sorted.length-1].v}`:qT==='low'?`${sorted[0].v}`:`${sorted[sorted.length-1].v-sorted[0].v}`;const txt=qT==='high'?'What was the highest daily value?':qT==='low'?'What was the lowest daily value?':'What is the range of the data?';return{text:txt,left:TEI.barGraph(data,sc,'Daily Data'),tasks:[{type:'eq',label:'Answer',id:'g5dp11',ans,data_pad:'num'}]};}},
+]},
+"MA.5.DP.1.2":{desc:"Interpret line plot data with fractions",cat:"Measurement & Data",scenarios:[
+  {diff:4,gen:()=>{const b=U.rInt(2,5);const vals=[b,b,b+1,b+1,b+1,b+2,b+2];const mode=b+1;const sum=vals.reduce((a,v)=>a+v,0);return{text:`A line plot shows lengths: <strong>${vals.join(', ')}</strong> inches.<br>What is the <strong>mode</strong>?`,tasks:[{type:'eq',label:'Mode = ___ inches',id:'g5dp12',ans:`${mode}`,data_pad:'num'}]};}},
+]},
+};
+
+// ---- GRADE CONFIGS ----
+const GC={
+  3:{bank:Bank3,title:'Grade 3 FAST Mathematics',desc:'Select a benchmark from the left to practice, or launch the full 40-question adaptive mock test aligned to the FAST blueprint.',bm:'📐 17 Benchmarks',
+    bp:{nso:['MA.3.NSO.1.1','MA.3.NSO.1.4','MA.3.NSO.2.1','MA.3.NSO.2.3'],ar:['MA.3.AR.1.2','MA.3.AR.2.1','MA.3.AR.2.2','MA.3.AR.3.1','MA.3.AR.3.3'],fr:['MA.3.FR.1.1','MA.3.FR.2.1','MA.3.FR.2.2'],geo:['MA.3.GR.1.1','MA.3.GR.1.2','MA.3.GR.2.1','MA.3.GR.2.2','MA.3.GR.2.3','MA.3.GR.2.4','MA.3.M.2.1','MA.3.M.2.2','MA.3.DP.1.2']}},
+  4:{bank:Bank4,title:'Grade 4 FAST Mathematics',desc:'Focus areas: multi-digit operations, fractions & decimals, angle classification, and data analysis.',bm:'📐 18 Benchmarks',
+    bp:{nso:['MA.4.NSO.1.2','MA.4.NSO.1.4','MA.4.NSO.1.5','MA.4.NSO.2.1','MA.4.NSO.2.2','MA.4.NSO.2.4','MA.4.NSO.2.6'],ar:['MA.4.AR.1.1','MA.4.AR.2.1','MA.4.AR.3.2'],fr:['MA.4.FR.1.2','MA.4.FR.1.3','MA.4.FR.2.2','MA.4.FR.2.4'],geo:['MA.4.GR.1.1','MA.4.GR.1.2','MA.4.GR.2.1','MA.4.GR.2.2','MA.4.M.1.1','MA.4.M.2.1','MA.4.DP.1.2']}},
+  5:{bank:Bank5,title:'Grade 5 FAST Mathematics',desc:'Focus areas: multi-digit division, fractions & decimals, volume, coordinate plane, and expressions.',bm:'📐 17 Benchmarks',
+    bp:{nso:['MA.5.NSO.1.1','MA.5.NSO.1.3','MA.5.NSO.1.4','MA.5.NSO.2.1','MA.5.NSO.2.2'],fr:['MA.5.NSO.2.3','MA.5.NSO.2.5'],ar:['MA.5.AR.1.1','MA.5.AR.2.1','MA.5.AR.3.1','MA.5.AR.3.2'],geo:['MA.5.GR.1.1','MA.5.GR.3.1','MA.5.GR.3.2','MA.5.GR.4.1','MA.5.M.1.1','MA.5.DP.1.1','MA.5.DP.1.2']}}
+};
+
+// ---- TIMER ----
+let timerInt=null,secsLeft=90,testStart=Date.now();
+function startTimer(){secsLeft=90;clearInterval(timerInt);timerInt=setInterval(()=>{secsLeft--;const el=document.getElementById('timer-display');if(el){const m=Math.floor(secsLeft/60),s=secsLeft%60;el.textContent=`⏱ ${m}:${s<10?'0'+s:s}`;el.className=secsLeft<=15?'timer-display warning':'timer-display';}if(secsLeft<=0){clearInterval(timerInt);App.check();}},1000);}
+
+// ---- APP ----
+const App={
+  grade:3,state:{mode:'practice',currStd:null,qNum:1,streak:0,catDiff:3,testData:[]},
+  currQ:null,data:{},activeInput:null,
+
+  selectGrade(g){
+    this.grade=g;
+    document.getElementById('grade-selector').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    ['gs3','gs4','gs5'].forEach(id=>document.getElementById(id).classList.remove('active'));
+    document.getElementById(`gs${g}`).classList.add('active');
+    document.getElementById('grade-subtitle').textContent=`Grade ${g} · B.E.S.T. Standards`;
+    document.getElementById('dash-title').textContent=GC[g].title;
+    document.getElementById('dash-desc').textContent=GC[g].desc;
+    document.getElementById('badge-bm').textContent=GC[g].bm;
+    this.buildMenu();
+  },
+
+  buildMenu(){
+    const m=document.getElementById('menu');m.innerHTML='';
+    const bank=GC[this.grade].bank;
+    const cats={};
+    Object.entries(bank).forEach(([id,b])=>{if(!cats[b.cat])cats[b.cat]=[];cats[b.cat].push(id);});
+    Object.entries(cats).forEach(([cat,ids])=>{
+      const h=document.createElement('div');h.className='cat-title';h.textContent=cat;m.appendChild(h);
+      ids.forEach(id=>{
+        const b=document.createElement('div');b.className='std-btn';
+        b.innerHTML=`<strong>${id}</strong><small>${bank[id].desc}</small>`;
+        b.onclick=()=>{document.querySelectorAll('.std-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');App.startPractice(id);};
+        m.appendChild(b);
+      });
+    });
+  },
+
+  init(){
+    document.getElementById('launch-btn').onclick=()=>this.startTest();
+    document.getElementById('btn-flag').onclick=()=>this.toggleFlag();
+    document.getElementById('btn-pause').onclick=()=>{clearInterval(timerInt);location.reload();};
+    document.getElementById('btn-next').onclick=()=>this.nextQuestion();
+    document.getElementById('btn-submit').onclick=()=>this.check();
+    document.getElementById('btn-finish').onclick=()=>this.endTest();
+    document.addEventListener('input',e=>{if(e.target&&e.target.classList.contains('eq-input'))App.iTrig();});
+    document.addEventListener('focusin',e=>{if(e.target&&e.target.tagName==='INPUT'&&e.target.type==='text')App.setActive(e.target);});
+    document.addEventListener('contextmenu',e=>e.preventDefault());
+  },
+
+  startPractice(id){this.state={mode:'practice',currStd:id,qNum:1,streak:0,catDiff:5,testData:[]};testStart=Date.now();document.getElementById('dashboard').style.display='none';document.getElementById('test-interface').style.display='flex';this.load(id);},
+
+  startTest(){this.state={mode:'test',currStd:null,qNum:1,streak:0,catDiff:3,testData:Array(40).fill(null).map(()=>({ans:null,flag:false,std:null}))};testStart=Date.now();document.getElementById('dashboard').style.display='none';document.getElementById('test-interface').style.display='flex';this.nextQuestion();},
+
+  nextQuestion(){
+    if(this.state.mode==='test'&&this.state.qNum>40){this.showReview();return;}
+    let std=this.state.currStd;
+    if(this.state.mode==='test'){
+      const r=Math.random(),bp=GC[this.grade].bp,allK=Object.keys(GC[this.grade].bank);
+      const pick=arr=>arr&&arr.length?U.pick(arr):U.pick(allK);
+      if(r<.27)std=pick(bp.nso);else if(r<.54)std=pick(bp.ar);else if(r<.77)std=pick(bp.fr);else std=pick(bp.geo);
+      if(!GC[this.grade].bank[std])std=U.pick(allK);
     }
-};
+    if(this.state.mode==='test')this.state.testData[this.state.qNum-1].std=std;
+    this.load(std);
+  },
 
-const TEI = {
-    dragDrop: (bank, drops) => {
-        let b = `<div class="drag-bank">` + bank.map((i, idx) => `<div class="draggable" draggable="true" ondragstart="App.dragStart(event)" id="drag-${idx}">${i}</div>`).join('') + `</div>`;
-        let d = drops.map(i => `<div style="display:inline-block; margin:10px; font-size:1.2rem;">${i.text} <div class="dropzone" id="${i.id}" ondragover="App.dragOver(event)" ondragleave="App.dragLeave(event)" ondrop="App.drop(event)"></div></div>`).join('');
-        return `<div><p style="color:#666; font-size:0.9rem; font-weight:bold;">(Drag numbers from the bank into the empty boxes)</p>${b}${d}</div>`;
-    },
-    numberLine: (min, max, step, width) => {
-        let s = `<svg width="${width}" height="100" style="background:#fff; border:1px solid #ccc; border-radius:6px; margin: 10px 0;"><line x1="30" y1="40" x2="${width-30}" y2="40" stroke="black" stroke-width="3"/>`;
-        const count = (max-min)/step; const pxStep = (width-60)/count;
-        for(let i=0; i<=count; i++){
-            const val = min + (i*step); const cx = 30 + (i*pxStep);
-            s += `<line x1="${cx}" y1="25" x2="${cx}" y2="55" stroke="black" stroke-width="2"/>`;
-            s += `<text x="${cx}" y="80" text-anchor="middle" font-size="16" font-weight="bold">${val}</text>`;
-            s += `<circle cx="${cx}" cy="40" r="20" fill="transparent" class="nl-hotspot" data-val="${val}" onclick="App.plotPoint(this)" style="cursor:pointer;"/>`;
-        }
-        return s + `<circle id="nl-plot" cx="-100" cy="40" r="8" fill="#003366" pointer-events="none"/></svg>`;
-    },
-    barGraph: (a, b) => {
-        const step = 150/8; let s = `<line x1="40" y1="180" x2="180" y2="180" stroke="#333" stroke-width="2"/><line x1="40" y1="10" x2="40" y2="180" stroke="#333" stroke-width="2"/>`;
-        s += `<rect id="barA" x="60" y="180" width="40" height="0" fill="#003366" /><text x="80" y="195" text-anchor="middle" font-weight="bold">Group A</text>`;
-        for(let i=1; i<=8; i++) s += `<g class="bar-zone" onclick="document.getElementById('barA').setAttribute('height', ${i*step}); document.getElementById('barA').setAttribute('y', ${180-i*step}); App.data.a=${i}; App.interactionTrigger();"><rect x="60" y="${180-i*step}" width="40" height="${step}" fill="transparent" stroke="#ccc" stroke-dasharray="2" style="cursor:pointer;"/></g>`;
-        s += `<rect id="barB" x="120" y="180" width="40" height="0" fill="#ff9900" /><text x="140" y="195" text-anchor="middle" font-weight="bold">Group B</text>`;
-        for(let i=1; i<=8; i++) s += `<g class="bar-zone" onclick="document.getElementById('barB').setAttribute('height', ${i*step}); document.getElementById('barB').setAttribute('y', ${180-i*step}); App.data.b=${i}; App.interactionTrigger();"><rect x="120" y="${180-i*step}" width="40" height="${step}" fill="transparent" stroke="#ccc" stroke-dasharray="2" style="cursor:pointer;"/></g>`;
-        for(let i=0; i<=8; i+=2) s += `<text x="30" y="${180-i*step + 5}" font-size="12" text-anchor="end">${i}</text>`;
-        return `<svg width="250" height="220" viewBox="0 0 200 200">${s}</svg><br><span style="font-size:0.9rem; color:#666; font-weight:bold;">(Click the grid lines to build the bars)</span>`;
-    },
-    fracCirc: (n, d) => {
-        let p = '';
-        for(let i=0; i<d; i++) {
-            const s = (i*360)/d, e = ((i+1)*360)/d;
-            const x1 = 100 + 90 * Math.sin(Math.PI*s/180), y1 = 100 - 90 * Math.cos(Math.PI*s/180);
-            const x2 = 100 + 90 * Math.sin(Math.PI*e/180), y2 = 100 - 90 * Math.cos(Math.PI*e/180);
-            p += `<path d="M100 100 L${x1} ${y1} A90 90 0 0 1 ${x2} ${y2} Z" fill="white" stroke="#333" stroke-width="2" class="clk-slice" onclick="this.setAttribute('fill', this.getAttribute('fill')==='white'?'#ff9900':'white'); App.interactionTrigger();" style="cursor:pointer;" />`;
-        }
-        return `<svg width="220" height="220" viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#fff"/>${p}</svg>`;
-    },
-    geoSym: (type) => {
-        const s = 'fill="#e6f0fa" stroke="#003366" stroke-width="3"'; const line = `<line x1="50" y1="5" x2="50" y2="95" stroke="red" stroke-width="4" stroke-dasharray="6"/>`;
-        if(type === 'half') return `<svg width="100" height="100"><rect x="10" y="30" width="40" height="40" ${s}/>${line}</svg>`;
-        if(type === 'full') return `<svg width="100" height="100"><rect x="10" y="30" width="80" height="40" ${s}/>${line}</svg>`;
-        if(type === 'wrong1') return `<svg width="100" height="100"><rect x="10" y="30" width="40" height="40" ${s}/><rect x="50" y="10" width="40" height="40" ${s}/>${line}</svg>`;
-        if(type === 'wrong2') return `<svg width="100" height="100"><path d="M10 70 L50 70 L30 30 Z" ${s}/><path d="M90 70 L50 70 L70 30 Z" ${s}/>${line}</svg>`;
-    },
-    areaModel: (h, w1, w2) => `<svg width="${(w1+w2)*25+50}" height="${h*25+50}"><rect x="25" y="25" width="${w1*25}" height="${h*25}" fill="#b2dfdb" stroke="#003366" stroke-width="2"/><text x="${25+(w1*25)/2}" y="${25+(h*25)/2+5}" text-anchor="middle" font-weight="bold" font-size="16">${h} x ${w1}</text><rect x="${25+w1*25}" y="25" width="${w2*25}" height="${h*25}" fill="#ffe0b2" stroke="#ff9900" stroke-width="2"/><text x="${25+w1*25+(w2*25)/2}" y="${25+(h*25)/2+5}" text-anchor="middle" font-weight="bold" font-size="16">${h} x ${w2}</text></svg>`,
-    lShape: (w1,h1,w2,h2) => `<svg width="${(w1+w2)*25+40}" height="${(h1+h2)*25+40}"><path d="M20 20 H${20+w1*25} V${20+h1*25} H${20+(w1+w2)*25} V${20+(h1+h2)*25} H20 Z" fill="#e6f0fa" stroke="#003366" stroke-width="3"/><text x="${20+w1*25/2}" y="15" text-anchor="middle" font-weight="bold">${w1}</text><text x="10" y="${20+(h1+h2)*25/2}" text-anchor="middle" font-weight="bold">${h1+h2}</text><text x="${20+w1*25+w2*25/2}" y="${20+h1*25-5}" text-anchor="middle" font-weight="bold">${w2}</text><text x="${20+(w1+w2)*25+10}" y="${20+h1*25+h2*25/2}" text-anchor="middle" font-weight="bold">${h2}</text></svg>`,
-    clock: (h,m) => { let t=''; for(let i=0;i<60;i++) t+=`<line x1="50" y1="6" x2="50" y2="${i%5?7:10}" transform="rotate(${i*6} 50 50)" stroke="#333" stroke-width="${i%5?1:2}"/>`; return `<svg width="180" height="180" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" stroke="#333" fill="#fff" stroke-width="2"/>${t}<line x1="50" y1="50" x2="50" y2="28" stroke="black" stroke-width="5" stroke-linecap="round" transform="rotate(${(h%12)*30+m*0.5} 50 50)"/><line x1="50" y1="50" x2="50" y2="15" stroke="#cc0000" stroke-width="3" stroke-linecap="round" transform="rotate(${m*6} 50 50)"/><circle cx="50" cy="50" r="4"/></svg>`; },
-    ruler: (len) => { let t=''; for(let i=0;i<=5;i++){ t+=`<line x1="${20+i*40}" y1="30" x2="${20+i*40}" y2="60" stroke="black" stroke-width="2"/>`; if(i<5) t+=`<line x1="${40+i*40}" y1="35" x2="${40+i*40}" y2="60" stroke="black"/><line x1="${30+i*40}" y1="45" x2="${30+i*40}" y2="60" stroke="black"/><line x1="${50+i*40}" y1="45" x2="${50+i*40}" y2="60" stroke="black"/>`; t+=`<text x="${20+i*40}" y="25" text-anchor="middle" font-weight="bold">${i}</text>`; } return `<svg width="250" height="90"><rect x="20" y="60" width="200" height="20" fill="#f4f4f4" stroke="black"/><rect x="20" y="65" width="${len*40}" height="10" fill="#ff9900" stroke="black"/>${t}</svg>`; },
-    dropdown: (id, parts) => parts.map(p => p.opts ? `<select class="inline-drop drop-${id}" data-c="${p.c}" onchange="App.interactionTrigger()"><option value="">[ ? ]</option>` + p.opts.map(o => `<option value="${o}">${o}</option>`).join('') + `</select>` : `<span>${p.t}</span>`).join(''),
-    hotText: (parts) => parts.map((p) => p.hot ? `<span class="hot-text" data-c="${p.c}" onclick="this.classList.toggle('selected'); App.interactionTrigger();">${p.t}</span>` : `<span>${p.t}</span>`).join(''),
-    matrix: (rows, cols, answers) => { let h = `<table class="matrix-table"><tr><th></th>`; cols.forEach(c => h += `<th>${c}</th>`); h += `</tr>`; rows.forEach((r, rIdx) => { h += `<tr><td><strong>${r}</strong></td>`; cols.forEach((c, cIdx) => h += `<td><input type="checkbox" class="matrix-cb" data-corr="${answers[rIdx].includes(cIdx)}" onchange="App.interactionTrigger()"></td>`); h += `</tr>`; }); return h + `</table>`; }
-};
+  load(id){
+    const bank=GC[this.grade].bank;
+    if(!bank[id])id=U.pick(Object.keys(bank));
+    this.state.currStd=id;this.data={};this.activeInput=null;
+    clearInterval(timerInt);
+    document.getElementById('test-title').textContent=this.state.mode==='test'?`FAST Mathematics — Grade ${this.grade}`:`Practice: ${id}`;
+    document.getElementById('q-counter').textContent=`Question ${this.state.qNum}`+(this.state.mode==='test'?' of 40':'');
+    document.getElementById('progress-fill').style.width=(this.state.mode==='test'?(this.state.qNum-1)/40*100:0)+'%';
+    let sc=bank[id].scenarios.filter(s=>s.diff<=this.state.catDiff);
+    if(!sc.length)sc=bank[id].scenarios;
+    const q=U.pick(sc).gen();this.currQ=q;
+    const sp=document.getElementById('stimulus-pane');sp.innerHTML=q.left||'';sp.style.display=q.left?'flex':'none';
+    document.getElementById('q-text').innerHTML=q.text||'';
+    const resp=document.getElementById('q-response-area');resp.innerHTML='';
+    document.getElementById('keypad-container').style.display='none';
+    document.getElementById('keypad-container').style.opacity='1';
+    document.getElementById('keypad-container').style.pointerEvents='auto';
+    document.getElementById('btn-submit').style.display='inline-block';
+    document.getElementById('btn-submit').disabled=true;
+    document.getElementById('btn-next').disabled=true;
+    document.getElementById('feedback-msg').style.display='none';
+    const btnF=document.getElementById('btn-flag');
+    if(this.state.mode==='test'&&this.state.testData[this.state.qNum-1]&&this.state.testData[this.state.qNum-1].flag){btnF.textContent='⚑ Flagged';btnF.style.background='rgba(220,53,69,.3)';}
+    else{btnF.textContent='⚑ Flag';btnF.style.background='';}
+    q.tasks.forEach((t,idx)=>{
+      const block=document.createElement('div');block.className=t.isFollowUp?'task-block task-hidden':'task-block';block.id=`task-block-${idx}`;
+      block.innerHTML=`<div class="task-label">${t.label}</div>`;
+      if(t.type==='radio'||t.type==='multi'){
+        const list=document.createElement('div');list.className='opt-list';const L=['A','B','C','D','E'];
+        t.options.forEach((o,i)=>{const el=document.createElement('div');el.className='opt-item';el.innerHTML=`<div class="opt-icon">${L[i]}</div><div>${o.t}</div>`;el.onclick=()=>{list.querySelectorAll('.opt-item').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');t.sel=i;App.iTrig();};list.appendChild(el);});
+        block.appendChild(list);
+      }else if(t.type==='eq'){block.innerHTML+=`<input type="text" id="${t.id}" class="eq-input" data-pad="${t.data_pad||'num'}" placeholder="Type answer...">`;}
+      else if(t.type==='interact'){block.innerHTML+=(t.html||'');}
+      resp.appendChild(block);
+    });
+    const fEq=document.querySelector('.eq-input');if(fEq&&!fEq.closest('.task-hidden'))this.setActive(fEq);
+    startTimer();
+  },
 
-// ==========================================
-// 34-STANDARD BANK
-// ==========================================
-window.Bank = {
-    // --- NSO ---
-    "MA.3.NSO.1.1": { desc: "Read/Write Numbers", scenarios: [
-        { diff: 3, gen: () => { const n=Utils.rInt(4000,9999); return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Select the exact word form for ${n}.`, options: Utils.genWordOpts(n) }]}; }},
-        { diff: 5, gen: () => { const n=Utils.rInt(2000,9000), h=Math.floor((n%1000)/100); return { text: "Level 5: Error Analysis", tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Select the word form for ${n}.`, options: Utils.genWordOpts(n) }, { id: "t2", type: "drop", label: "Part B (Error Analysis)", text: "Fix the error in this student's expanded form.", html: TEI.dropdown('t2', [{t:`${n} = ${Math.floor(n/1000)*1000} + `}, {opts:[h, h*10, h*100], c:h*100}, {t:` + ${n%100}`}]), isFollowUp: true }]}; }}
-    ]},
-    "MA.3.NSO.1.2": { desc: "Compose/Decompose", scenarios: [
-        { diff: 3, gen: () => { const h=Utils.rInt(12,25), t=Utils.rInt(15,45); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`What number is formed by ${h} hundreds, ${t} tens, and 5 ones?`, ans:(h*100+t*10+5).toString() }]}; }},
-        { diff: 5, gen: () => { const thou=Utils.rInt(2,8), hun=Utils.rInt(1,9), ten=Utils.rInt(1,9), one=Utils.rInt(1,9); const full = `${thou},${hun}${ten}${one}`; return { text: "Level 5 Rigor: Place Value Drag & Drop", tasks: [{ id:"t1", type:"drag", label:"Part A", text:`Decompose the number ${full} by dragging the correct digits into the boxes.`, html: TEI.dragDrop(Utils.shuffle([thou.toString(),hun.toString(),ten.toString(),one.toString(),"0"]), [{id:"d1",text:"Thousands:"},{id:"d2",text:"Hundreds:"},{id:"d3",text:"Tens:"},{id:"d4",text:"Ones:"}]), check:()=>document.getElementById('d1').innerText===thou.toString()&&document.getElementById('d2').innerText===hun.toString()&&document.getElementById('d3').innerText===ten.toString()&&document.getElementById('d4').innerText===one.toString() }]}; }}
-    ]},
-    "MA.3.NSO.1.3": { desc: "Compare Numbers", scenarios: [
-        { diff: 3, gen: () => { const a=Utils.rInt(1000,4000), b=a+Utils.rInt(10,50); return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Select the TRUE statement.`, options: Utils.shuffle([{t:`${a} < ${b}`,c:true},{t:`${a} > ${b}`,c:false},{t:`${a} = ${b}`,c:false},{t:`${b} < ${a}`,c:false}]) }]}; }},
-        { diff: 4, gen: () => { const a=Utils.rInt(5000,9000), b=a-Utils.rInt(10,50); return { tasks: [{ id: "t1", type: "hot", label: "Part A", text: `Select the correct symbol: ${a} ` + TEI.hotText([{t:" > ",hot:true,c:true},{t:" < ",hot:true,c:false},{t:" = ",hot:true,c:false}]) + ` ${b}` }]}; }}
-    ]},
-    "MA.3.NSO.1.4": { desc: "Rounding", scenarios: [
-        { diff: 3, gen: () => { const t=Utils.rInt(2,8)*100; return { tasks: [{ id: "t1", type: "multi", label: "Part A", text: `Select ALL numbers that round to ${t} (nearest 100).`, options: Utils.shuffle([{t:(t-10).toString(),c:true},{t:(t+40).toString(),c:true},{t:(t+60).toString(),c:false},{t:(t-60).toString(),c:false}]) }]}; }},
-        { diff: 5, gen: () => { const min=200, max=300, step=10, target=260; return { text: "Level 5: Number Line Plotting", tasks: [{ id:"t1", type:"interact", label:"Part A", text:`Click on the number line to plot ${target}.`, html: TEI.numberLine(min, max, step, 500), check:()=>App.data.nl===target }, { id:"t2", type:"radio", label:"Part B", text:`If you round ${target} to the nearest 100, what is the result?`, options: Utils.shuffle([{t:"300",c:true},{t:"200",c:false},{t:"260",c:false},{t:"250",c:false}]), isFollowUp: true }]}; }}
-    ]},
-    "MA.3.NSO.2.1": { desc: "Add/Sub Multi-Digit", scenarios: [
-        { diff: 3, gen: () => { const a=Utils.rInt(2000,5000), b=Utils.rInt(1000,1999); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Find the exact difference: ${a} - ${b} = ?`, ans:(a-b).toString() }]}; }},
-        { diff: 5, gen: () => { const a=Utils.rInt(1000,4000), b=Utils.rInt(1000,4000); return { text: "Level 5: Error Analysis", tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Solve correctly: ${a} + ${b} = ?`, ans:(a+b).toString() }, { id: "t2", type: "drop", label: "Part B", text: `A student solved it and got ${(a+b)-100}. What mistake did they make?`, html: TEI.dropdown('t2', [{t:"They forgot to regroup the "}, {opts:["ones", "tens", "hundreds", "thousands"], c:"hundreds"}, {t:" place."}]), isFollowUp: true }]}; }}
-    ]},
-    "MA.3.NSO.2.2": { desc: "Mult/Div Facts", scenarios: [{ diff: 3, gen: () => { const a=Utils.rInt(7,12), b=Utils.rInt(7,12); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Solve: ${a} x ${b} = ?`, ans:(a*b).toString() }]}; }}]},
-    "MA.3.NSO.2.3": { desc: "Multiply by 10s", scenarios: [{ diff: 3, gen: () => { const a=Utils.rInt(4,9), b=Utils.pick([20,30,40,50]); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Solve: ${a} x ${b} = ?`, ans:(a*b).toString() }]}; }}]},
-    "MA.3.NSO.2.4": { desc: "Mult 1-digit by 2-digit", scenarios: [{ diff: 4, gen: () => { const a=Utils.rInt(3,8), b=Utils.rInt(13,25); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`A theater has ${b} rows. Each row has ${a} seats. Total seats?`, ans:(a*b).toString() }]}; }}]},
+  setActive(el){
+    document.querySelectorAll('.eq-input').forEach(i=>i.classList.remove('active-focus'));el.classList.add('active-focus');this.activeInput=el;
+    const type=el.getAttribute('data-pad');let kp='';
+    ['1','2','3',type==='time'?':':type==='frac'?'/':'+','4','5','6','-','7','8','9','.'].forEach(k=>{kp+=`<button class="key-btn${['+','-',':','/','.'].includes(k)?' op':''}" onclick="App.typeKey('${k}')">${k}</button>`;});
+    kp+=`<button class="key-btn wide" onclick="App.typeKey('0')">0</button><button class="key-btn op wide" onclick="App.typeKey('BACK')">← Del</button>`;
+    document.getElementById('dynamic-pad').innerHTML=kp;document.getElementById('keypad-container').style.display='block';
+  },
 
-    // --- AR ---
-    "MA.3.AR.1.1": { desc: "Distributive Property", scenarios: [{ diff: 4, gen: () => { const a=Utils.rInt(4,9), b=Utils.rInt(12,18); return { left: `<div style="padding:20px;">`+TEI.areaModel(a,10,b-10)+`</div>`, tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Which expression equals the Area Model?`, options: Utils.shuffle([{t:`(${a} x 10) + (${a} x ${b-10})`,c:true},{t:`${a} + 10 + ${b-10}`,c:false},{t:`(${a} x 10) x (${a} x ${b-10})`,c:false},{t:`${a} x 100`,c:false}]) }]}; }}]},
-    "MA.3.AR.1.2": { desc: "Multi-Step Word Problems", scenarios: [
-        { diff: 3, gen: () => { const a=Utils.rInt(3,6), b=Utils.rInt(4,8), c=Utils.rInt(2,10); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Jon buys ${a} packs of ${b} cards. He gives ${c} away. How many left?`, ans:((a*b)-c).toString() }]}; }},
-        { diff: 5, gen: () => { 
-            const ctx = Utils.genCtx(); const a = Utils.rInt(3,6), b = Utils.rInt(4,8), c = Utils.rInt(2,10); const total = a*b; const final = ctx.isSub ? total-c : total+c;
-            return { text: `<b>Level 5 Procedural Context:</b><br>${ctx.n} ${ctx.act1} ${b} ${ctx.unit} ${ctx.per} for ${a} iterations. Then, they ${ctx.act2} ${c} ${ctx.unit}.`, 
-                tasks: [
-                    { id: "t1", type: "eq", label: "Part A", text: `How many ${ctx.unit} did ${ctx.n} have before the second action?`, ans: total.toString() },
-                    { id: "t2", type: "eq", label: "Part B", text: `What is the final amount of ${ctx.unit}?`, ans: final.toString(), isFollowUp: true }
-                ]
-            }; 
-        }}
-    ]},
-    "MA.3.AR.2.1": { desc: "Inverse Operations", scenarios: [{ diff: 4, gen: () => { const a=Utils.rInt(6,9), p=a*Utils.rInt(6,9); return { tasks: [{ id: "t1", type: "hot", label: "Part A", text: `Select the related equation to solve <strong>${p} ÷ ${a} = ?</strong>`, html: TEI.hotText([{t:`${a} x ? = ${p}`,hot:true,c:true},{t:" / "},{t:`${p} - ${a} = ?`,hot:true,c:false},{t:" / "},{t:`${a} + ? = ${p}`,hot:true,c:false}]) }]}; }}]},
-    "MA.3.AR.2.2": { desc: "Equality", scenarios: [{ diff: 4, gen: () => { const a=Utils.rInt(4,8), b=Utils.rInt(4,8); return { tasks: [{ id: "t1", type: "drop", label: "Part A", text: "Make the equation true.", html: TEI.dropdown('t1', [{t:`${a} x ${b} = `},{opts:[a*b, a+b, a*b+10],c:a*b},{t:` + 0`}]) }]}; }}]},
-    "MA.3.AR.2.3": { desc: "Missing Factor", scenarios: [{ diff: 3, gen: () => { const a=Utils.rInt(6,9), p=a*Utils.rInt(4,9); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Find the missing factor: ${a} x [ ? ] = ${p}`, ans:(p/a).toString() }]}; }}]},
-    "MA.3.AR.3.1": { desc: "Even/Odd", scenarios: [{ diff: 3, gen: () => { const n=Utils.rInt(10,99); return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Is ${n} Even or Odd?`, options:[{t:"Even",c:n%2===0},{t:"Odd",c:n%2!==0}] }]}; }}]},
-    "MA.3.AR.3.2": { desc: "Multiples", scenarios: [{ diff: 3, gen: () => { const base = Utils.pick([3,4,6]); return { tasks: [{ id: "t1", type: "multi", label: "Part A", text: `Select ALL multiples of ${base}.`, options: Utils.shuffle([{t:(base*2).toString(),c:true},{t:(base*5).toString(),c:true},{t:(base*2+1).toString(),c:false},{t:(base*3-1).toString(),c:false}]) }]}; }}]},
-    "MA.3.AR.3.3": { desc: "Patterns", scenarios: [{ diff: 4, gen: () => { const r=Utils.pick([4,5]); return { tasks: [{ id:"t1", type:"eq", label:"Part A", text:`Rule: Multiply by ${r}. If input is 6, what is the output?`, ans:(r*6).toString() }]}; }}]},
+  typeKey(k){if(!this.activeInput)return;if(k==='BACK')this.activeInput.value=this.activeInput.value.slice(0,-1);else this.activeInput.value+=k;this.iTrig();},
 
-    // --- FR ---
-    "MA.3.FR.1.1": { desc: "Visual Fractions", scenarios: [
-        { diff: 4, gen: () => { const d=Utils.pick([4,6,8]), n=Utils.rInt(1,d-1); return { left: TEI.fracCirc(n,d), tasks: [{ id:"t1", type:"interact", label:"Part A", text:`Click and shade the visual model to represent <strong>${n}/${d}</strong>.`, check: ()=>document.querySelectorAll('path[fill="#ff9900"]').length===n }]}; }},
-        { diff: 5, gen: () => { return { text: "Level 5 Number Line", tasks: [{ id:"t1", type:"interact", label:"Part A", text:`Click on the number line to plot 3/4. (Between 0 and 1)`, html: TEI.numberLine(0, 1, 0.25, 400), check:()=>App.data.nl===0.75 }]}; }}
-    ]},
-    "MA.3.FR.1.2": { desc: "Unit/Whole", scenarios: [{ diff: 3, gen: () => { return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:"Which fraction is equal to exactly 1 whole?", options: Utils.shuffle([{t:"4/4",c:true},{t:"4/1",c:false},{t:"1/4",c:false},{t:"3/4",c:false}]) }]}; }}]},
-    "MA.3.FR.1.3": { desc: "Word Form", scenarios: [{ diff: 3, gen: () => { return { tasks: [{ id:"t1", type:"hot", label:"Part A", text:"Select the numerical fraction for <strong>'Five-Eighths'</strong>.", html: TEI.hotText([{t:"8/5",hot:true,c:false},{t:", "},{t:"5/8",hot:true,c:true},{t:", "},{t:"1/8",hot:true,c:false}]) }]}; }}]},
-    "MA.3.FR.2.1": { desc: "Compare", scenarios: [{ diff: 4, gen: () => { const d1=Utils.pick([3,4]), d2=Utils.pick([6,8]); return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:`Compare: 1/${d1} and 1/${d2}.`, options: Utils.shuffle([{t:`1/${d1} > 1/${d2}`,c:true},{t:`1/${d1} < 1/${d2}`,c:false},{t:`1/${d1} = 1/${d2}`,c:false},{t:`1/${d2} > 1/${d1}`,c:false}]) }]}; }}]},
-    "MA.3.FR.2.2": { desc: "Equivalence Justification", scenarios: [
-        { diff: 5, gen: () => { return { left: `<div style="font-size:3.5rem; font-weight:bold; color:#003366; text-align:center; padding:60px;">2 / 4</div>`, tasks: [
-            { id: "t1", type: "radio", label: "Part A", text: "Select the equivalent fraction.", options: Utils.shuffle([{t:"1/2",c:true},{t:"1/3",c:false},{t:"2/3",c:false},{t:"4/2",c:false}]) },
-            { id: "t2", type: "drop", label: "Part B", text: "Justify your answer.", html: TEI.dropdown('t2', [{t:"They are equal because the numerator and denominator were "}, {opts:["added by 2", "multiplied by the same amount", "swapped"], c:"multiplied by the same amount"}, {t:"."}]), isFollowUp: true }
-        ]}; }}
-    ]},
+  isAns(t){
+    if(t.type==='radio')return t.sel!==undefined;
+    if(t.type==='eq'){const i=document.getElementById(t.id);return i&&i.value.trim()!=='';}
+    if(t.type==='interact')return document.querySelectorAll('path[fill="#0056b3"]').length>0;
+    return true;
+  },
 
-    // --- GR ---
-    "MA.3.GR.1.1": { desc: "Points/Lines", scenarios: [{ diff: 3, gen: () => { return { tasks: [{ id:"t1", type:"radio", label:"Part A", text:"Which image shows <strong>Perpendicular Lines</strong>?", options: Utils.shuffle([{t:`<svg width="100" height="100"><line x1="50" y1="10" x2="50" y2="90" stroke="black" stroke-width="3"/><line x1="10" y1="50" x2="90" y2="50" stroke="black" stroke-width="3"/><rect x="50" y="50" width="10" height="10" fill="none" stroke="black"/></svg>`,c:true},{t:`<svg width="100" height="100"><line x1="30" y1="20" x2="30" y2="80" stroke="black" stroke-width="3"/><line x1="70" y1="20" x2="70" y2="80" stroke="black" stroke-width="3"/></svg>`,c:false}]) }]}; }}]},
-    "MA.3.GR.1.2": { desc: "Attributes Matrix", scenarios: [{ diff: 4, gen: () => { return { tasks: [{ id: "t1", type: "matrix", label: "Part A", text: "Match the shapes to their attributes.", html: TEI.matrix(["Square", "Trapezoid"], ["4 Right Angles", "Parallel Sides"], [[0,1],[1]]) }]}; }}]},
-    "MA.3.GR.1.3": { desc: "Symmetry Completion", scenarios: [{ diff: 5, gen: () => { return { left: TEI.geoSym('half'), text: `Complete the figure along the line of symmetry.`, tasks: [{ id: "t1", type: "radio", label: "Part A", text: "Which image correctly completes the mirrored shape?", options: Utils.shuffle([{t:TEI.geoSym('full'),c:true},{t:TEI.geoSym('wrong1'),c:false},{t:TEI.geoSym('wrong2'),c:false},{t:TEI.geoSym('half'),c:false}]) }]}; }}]},
-    "MA.3.GR.2.1": { desc: "Area", scenarios: [{ diff: 3, gen: () => { const w=Utils.rInt(4,7), h=Utils.rInt(3,5); return { left: `<div style="padding:20px;">`+TEI.areaModel(h,w,0)+`</div>`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: "Find the Area.", ans:(w*h).toString() }]}; }}]},
-    "MA.3.GR.2.2": { desc: "Distributive Area", scenarios: [{ diff: 4, gen: () => { const a=4, b=12; return { tasks: [{ id: "t1", type: "radio", label: "Part A", text: `Which shows the area of a ${a}x${b} rectangle broken apart?`, options: Utils.shuffle([{t:`(${a} x 10) + (${a} x ${b-10})`,c:true},{t:`${a} + 10 + ${b-10}`,c:false},{t:`(${a} x 10) x (${a} x ${b-10})`,c:false},{t:`${a} x 10`,c:false}]) }]}; }}]},
-    "MA.3.GR.2.3": { desc: "Perimeter Reverse", scenarios: [{ diff: 5, gen: () => { const w=Utils.rInt(3,7), l=Utils.rInt(5,9), p=2*w+2*l; return { text: `<b>Level 5 Reverse Engineering</b>`, tasks: [{ id: "t1", type: "eq", label: "Part A", text: `The Perimeter of a rectangle is ${p}. The Width is ${w}. What is the length?`, ans:l.toString() }]}; }}]},
-    "MA.3.GR.2.4": { desc: "Composite Area", scenarios: [{ diff: 5, gen: () => { const w1=3, h1=4, w2=2, h2=3; const total = (w1*(h1+h2))+(w2*h2); return { left: `<div style="padding:20px;">`+TEI.lShape(w1,h1,w2,h2)+`</div>`, text: `Total area is <b>${total}</b> square units.`, tasks: [ { id: "t1", type: "eq", label: "Part A", text: "Area of the large left rectangle?", ans: (w1*(h1+h2)).toString() }, { id: "t2", type: "eq", label: "Part B", text: "Area of the smaller right rectangle?", ans: (w2*h2).toString(), isFollowUp: true } ] }; }}]},
+  iTrig(){
+    if(!this.currQ)return;
+    const pA=this.currQ.tasks[0],pB=this.currQ.tasks[1];
+    if(pB&&this.isAns(pA)){const bb=document.getElementById('task-block-1');if(bb&&bb.classList.contains('task-hidden')){bb.classList.remove('task-hidden');const nEq=bb.querySelector('.eq-input');if(nEq)this.setActive(nEq);}}
+    let ok=true;this.currQ.tasks.forEach((t,i)=>{const b=document.getElementById(`task-block-${i}`);if(b&&!b.classList.contains('task-hidden')&&!this.isAns(t))ok=false;});
+    document.getElementById('btn-submit').disabled=!ok;
+  },
 
-    // --- M ---
-    "MA.3.M.1.1": { desc: "Tools & Measure", scenarios: [{ diff: 3, gen: () => { const l=Utils.pick([2.25, 3.5, 4.75]); return { left: TEI.ruler(l), tasks: [{ id: "t1", type: "radio", label: "Part A", text: "To the nearest quarter inch, what is the length?", options: Utils.shuffle([{t:`${l} in`,c:true},{t:`${l+0.25} in`,c:false},{t:`${Math.floor(l)} in`,c:false},{t:`${l-0.25} in`,c:false}]) }]}; }}]},
-    "MA.3.M.1.2": { desc: "Mass/Vol", scenarios: [{ diff: 3, gen: () => { const w=Utils.rInt(6,12), c=Utils.rInt(3,7); return { tasks: [{ id: "t1", type: "eq", label: "Part A", text: `One jug holds ${w} Liters. How many Liters in ${c} jugs?`, ans:(w*c).toString() }]}; }}]},
-    "MA.3.M.2.1": { desc: "Time", scenarios: [{ diff: 4, gen: () => { const h=Utils.rInt(1,11), m=Utils.pick(["15","30","45"]); return { left: TEI.clock(h,parseInt(m)), tasks: [{ id: "t1", type: "eq", label: "Part A", text: "What time is shown on the clock? (Use the : button)", ans:`${h}:${m}`, data_pad: "time" }]}; }}]},
-    "MA.3.M.2.2": { desc: "Elapsed Time", scenarios: [{ diff: 5, gen: () => { const s=Utils.rInt(1,5), e=Utils.pick(["15","25","35","45"]); return { tasks: [{ id: "t1", type: "eq", label: "Part A (Reverse Time)", text: `A movie ended at ${s}:${e}. It was exactly ${e} minutes long. What time did it start? (Format H:MM)`, ans:`${s}:00`, data_pad: "time" }]}; }}]},
+  toggleFlag(){if(this.state.mode!=='test')return;const d=this.state.testData[this.state.qNum-1];d.flag=!d.flag;const btn=document.getElementById('btn-flag');btn.textContent=d.flag?'⚑ Flagged':'⚑ Flag';btn.style.background=d.flag?'rgba(220,53,69,.3)':'';},
 
-    // --- DP ---
-    "MA.3.DP.1.1": { desc: "Graphing", scenarios: [
-        { diff: 5, gen: () => { const a=Utils.rInt(3,6), b=Utils.rInt(2,5); let raw = []; for(let i=0;i<a;i++) raw.push("Group A"); for(let i=0;i<b;i++) raw.push("Group B"); raw=Utils.shuffle(raw); return { left: `<div style="padding:20px; border:1px solid #ccc; background:white; font-size:1.2rem; line-height:1.8;"><b>Raw Log:</b><br>${raw.join(", ")}</div>`, text: `Process the raw data log.`, tasks: [ { id: "t1", type: "eq", label: "Part A", text: "How many TOTAL items were recorded?", ans: (a+b).toString() }, { id: "t2", type: "interact", label: "Part B", text: "Build the graph to represent the exact data.", html: TEI.barGraph(a,b), check:()=>App.data.a===a && App.data.b===b, isFollowUp: true } ] }; }}
-    ]},
-    "MA.3.DP.1.2": { desc: "Interpret", scenarios: [{ diff: 3, gen: () => { const k=Utils.pick([2,5,10]), count=Utils.rInt(3,8); return { tasks: [{ id: "t1", type: "eq", label: "Part A", text: `Key: 1 Circle = ${k} students. If a class has ${count} circles on a pictograph, how many students are there?`, ans:(k*count).toString() }]}; }}]}
-};
+  check(){
+    clearInterval(timerInt);let allOk=true;
+    this.currQ.tasks.forEach(t=>{
+      let ok=false;
+      if(t.type==='radio')ok=t.options[t.sel]&&t.options[t.sel].c;
+      if(t.type==='eq'){const inp=document.getElementById(t.id);ok=inp&&inp.value.trim().replace(/\s/g,'')===String(t.ans).replace(/\s/g,'');if(inp){inp.style.borderColor=ok?'var(--green)':'var(--red)';inp.style.background=ok?'#d4edda':'#f8d7da';}}
+      if(t.type==='interact')ok=t.check&&t.check();
+      if(!ok)allOk=false;
+    });
+    if(this.state
+Claude's response could not be fully generated
+Q: Do you have the Grade 4 and 5 B.E.S.T. Standards documents to upload?
+A: No — search the web for them
 
-// ==========================================
-// ENGINE CONTROLLER
-// ==========================================
-const App = {
-    state: { mode: 'practice', currStd: null, qNum: 1, streak: 0, catDiff: 3, testData: [] },
-    currQ: null, data: {}, activeInput: null, draggedItem: null,
+Q: Which should I prioritize building first?
+A: Grade 4 first, then Grade 5
 
-    initListeners: function() {
-        document.getElementById('launch-btn').onclick = () => this.startTest();
-        document.getElementById('btn-flag').onclick = () => this.toggleFlag();
-        document.getElementById('btn-pause').onclick = () => location.reload();
-        document.getElementById('btn-next').onclick = () => this.nextQuestion();
-        document.getElementById('btn-submit').onclick = () => this.check();
-        document.getElementById('btn-finish').onclick = () => this.endTest();
-    },
+9:29 AM
 
-    init: function() {
-        const m = document.getElementById('menu'); const order = ["MA.3.NSO", "MA.3.AR", "MA.3.FR", "MA.3.GR", "MA.3.M", "MA.3.DP"];
-        order.forEach(prefix => {
-            const h = document.createElement('div'); h.className = 'cat-title'; h.innerText = prefix; m.appendChild(h);
-            Object.keys(window.Bank).filter(k => k.startsWith(prefix)).forEach(id => {
-                const b = document.createElement('div'); b.className = 'std-btn'; b.innerHTML = `<strong>${id}</strong><br><small>${window.Bank[id].desc}</small>`;
-                b.onclick = () => { document.querySelectorAll('.std-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); App.startPractice(id); };
-                m.appendChild(b);
-            });
-        });
-    },
 
-    startPractice: function(id) {
-        this.state = { mode: 'practice', currStd: id, qNum: 1, streak: 0, catDiff: 5, testData: [] };
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('test-interface').style.display = 'flex';
-        this.load(id);
-    },
 
-    startTest: function() {
-        this.state = { mode: 'test', currStd: null, qNum: 1, streak: 0, catDiff: 3, testData: Array(40).fill(null).map(() => ({ans: null, flag: false})) };
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('test-interface').style.display = 'flex';
-        document.querySelectorAll('.std-btn').forEach(x=>x.classList.remove('active'));
-        this.nextQuestion();
-    },
-
-    nextQuestion: function() {
-        if(this.state.mode === 'test' && this.state.qNum > 40) { this.showReview(); return; }
-        let targetStd = this.state.currStd;
-        if(this.state.mode === 'test') {
-            const r = Math.random(); 
-            if(r < 0.28) targetStd = Utils.pick(Object.keys(window.Bank).filter(k => k.startsWith("MA.3.NSO")));
-            else if(r < 0.56) targetStd = Utils.pick(Object.keys(window.Bank).filter(k => k.startsWith("MA.3.AR")));
-            else if(r < 0.76) targetStd = Utils.pick(Object.keys(window.Bank).filter(k => k.startsWith("MA.3.FR")));
-            else targetStd = Utils.pick(Object.keys(window.Bank).filter(k => k.startsWith("MA.3.GR") || k.startsWith("MA.3.M") || k.startsWith("MA.3.DP")));
-        }
-        this.load(targetStd);
-    },
-
-    load: function(id) {
-        this.state.currStd = id; this.data = {}; this.activeInput = null;
-        document.getElementById('test-title').innerText = this.state.mode === 'test' ? `Test Mode` : `Practice: ${id}`;
-        document.getElementById('q-counter').innerText = `Q ${this.state.qNum}` + (this.state.mode === 'test' ? ' of 40' : '');
-        
-        let scenarios = window.Bank[id].scenarios.filter(s => s.diff <= this.state.catDiff);
-        if(scenarios.length === 0) scenarios = window.Bank[id].scenarios;
-        const q = Utils.pick(scenarios).gen(); 
-        this.currQ = q;
-
-        document.getElementById('stimulus-pane').innerHTML = q.left || ''; 
-        document.getElementById('stimulus-pane').style.display = q.left ? 'flex' : 'none';
-        document.getElementById('q-text').innerHTML = q.text || '';
-        const resp = document.getElementById('q-response-area'); resp.innerHTML = ''; 
-        document.getElementById('keypad-container').style.display = 'none';
-        document.getElementById('btn-submit').style.display = 'inline-block'; 
-        document.getElementById('btn-submit').disabled = true;
-        document.getElementById('btn-next').disabled = true; 
-        document.getElementById('feedback-msg').style.display = 'none';
-        
-        const btnFlag = document.getElementById('btn-flag');
-        if(this.state.mode === 'test' && this.state.testData[this.state.qNum-1].flag) { btnFlag.innerText = "⚑ Flagged"; btnFlag.style.color = "var(--incorrect)"; } 
-        else { btnFlag.innerText = "⚑ Flag"; btnFlag.style.color = "white"; }
-
-        q.tasks.forEach((t, idx) => {
-            const block = document.createElement('div'); 
-            block.className = t.isFollowUp ? 'task-block task-hidden' : 'task-block'; 
-            block.id = `task-block-${idx}`;
-            block.innerHTML = `<div class="task-label">${t.label}</div><div style="margin-bottom:15px; font-size: 1.2rem;">${t.text || ''}</div>`;
-            
-            if(t.type === 'radio' || t.type === 'multi') {
-                const list = document.createElement('div'); list.className = t.options[0].t.includes('<svg') ? 'opt-list grid' : 'opt-list';
-                t.options.forEach((o,i) => {
-                    const el = document.createElement('div'); el.className = `opt-item`; el.innerHTML = `<div class="opt-icon"></div> <div>${o.t}</div>`;
-                    el.onclick = () => { if(t.type === 'radio'){ list.querySelectorAll('.opt-item').forEach(b=>b.classList.remove('selected')); el.classList.add('selected'); t.sel=i; } else { el.classList.toggle('selected'); o.sel = !o.sel; } App.interactionTrigger(); };
-                    list.appendChild(el);
-                }); block.appendChild(list);
-            } 
-            else if (t.type === 'eq') { block.innerHTML += `<input type="text" id="${t.id}" class="eq-input" data-pad="${t.data_pad||'num'}" placeholder="Type or tap...">`; }
-            else if (t.type === 'interact' || t.type === 'drop' || t.type === 'drag' || t.type === 'matrix') { block.innerHTML += t.html || ''; }
-            resp.appendChild(block);
-        });
-
-        const firstEq = document.querySelector('.eq-input');
-        if(firstEq && !firstEq.closest('.task-hidden')) { this.setActive(firstEq); }
-    },
-
-    setActive: function(el) {
-        document.querySelectorAll('.eq-input').forEach(i => i.classList.remove('active-focus'));
-        el.classList.add('active-focus'); this.activeInput = el;
-        let kp = `<button class="key-btn" onclick="App.typeKey('1')">1</button><button class="key-btn" onclick="App.typeKey('2')">2</button><button class="key-btn" onclick="App.typeKey('3')">3</button>`;
-        const type = el.getAttribute('data-pad');
-        if(type==='time') kp+=`<button class="key-btn op" onclick="App.typeKey(':')">:</button>`; else if(type==='frac') kp+=`<button class="key-btn op" onclick="App.typeKey('/')">/</button>`; else kp+=`<button class="key-btn op" onclick="App.typeKey('+')">+</button>`;
-        kp += `<button class="key-btn" onclick="App.typeKey('4')">4</button><button class="key-btn" onclick="App.typeKey('5')">5</button><button class="key-btn" onclick="App.typeKey('6')">6</button><button class="key-btn op" onclick="App.typeKey('-')">-</button><button class="key-btn" onclick="App.typeKey('7')">7</button><button class="key-btn" onclick="App.typeKey('8')">8</button><button class="key-btn" onclick="App.typeKey('9')">9</button>`;
-        if(type==='money') kp+=`<button class="key-btn op" onclick="App.typeKey('$')">$</button>`; else kp+=`<button class="key-btn op" onclick="App.typeKey('.')">.</button>`;
-        kp += `<button class="key-btn wide" onclick="App.typeKey('0')">0</button><button class="key-btn op wide" onclick="App.typeKey('BACK')">&larr; Delete</button>`;
-        document.getElementById('dynamic-pad').innerHTML = kp;
-        document.getElementById('keypad-container').style.display = 'block';
-    },
-
-    typeKey: function(k) {
-        if(!this.activeInput) return;
-        if(k === 'BACK') this.activeInput.value = this.activeInput.value.slice(0,-1); else this.activeInput.value += k;
-        this.interactionTrigger();
-    },
-
-    dragStart: function(e) { this.draggedItem = e.target.innerText; e.target.style.opacity = '0.5'; setTimeout(() => e.target.style.opacity = '1', 100); },
-    dragOver: function(e) { e.preventDefault(); if(e.target.classList.contains('dropzone')) e.target.classList.add('hover'); },
-    dragLeave: function(e) { if(e.target.classList.contains('dropzone')) e.target.classList.remove('hover'); },
-    drop: function(e) { e.preventDefault(); if(e.target.classList.contains('dropzone')) { e.target.classList.remove('hover'); e.target.innerText = this.draggedItem; this.interactionTrigger(); } },
-
-    plotPoint: function(el) {
-        const cx = el.getAttribute('cx'); const val = parseFloat(el.getAttribute('data-val'));
-        const dot = document.getElementById('nl-plot'); dot.setAttribute('cx', cx); App.data.nl = val;
-        this.interactionTrigger();
-    },
-
-    toggleFlag: function() {
-        if(this.state.mode !== 'test') return;
-        const btn = document.getElementById('btn-flag');
-        const isFlagged = !this.state.testData[this.state.qNum-1].flag;
-        this.state.testData[this.state.qNum-1].flag = isFlagged;
-        btn.innerText = isFlagged ? "⚑ Flagged" : "⚑ Flag"; btn.style.color = isFlagged ? "var(--incorrect)" : "white";
-    },
-
-    isAnswered: function(t) {
-        if(t.type==='radio') return t.sel !== undefined;
-        if(t.type==='multi') return t.options.some(o => o.sel);
-        if(t.type==='eq') { const input = document.getElementById(t.id); return input && input.value.trim() !== ''; }
-        if(t.type==='drag') return document.getElementById('d1') && document.getElementById('d1').innerText.trim() !== '';
-        if(t.type==='interact' && t.html && t.html.includes('fracCirc')) return document.querySelectorAll('path[fill="#ff9900"]').length > 0;
-        if(t.type==='interact' && t.html && t.html.includes('numberLine')) return App.data.nl !== undefined;
-        if(t.type==='interact' && t.html && t.html.includes('barGraph')) return App.data.a !== undefined && App.data.b !== undefined;
-        if(t.type==='drop') return Array.from(document.querySelectorAll(`.drop-${t.id}`)).every(s => s.value !== "");
-        if(t.type==='matrix') return document.getElementById(`task-block-${this.currQ.tasks.indexOf(t)}`).querySelectorAll('.matrix-cb:checked').length > 0;
-        return false;
-    },
-
-    interactionTrigger: function() {
-        let pA = this.currQ.tasks[0]; let pB = this.currQ.tasks[1];
-        if (this.isAnswered(pA) && pB) {
-            const bBlock = document.getElementById('task-block-1');
-            if (bBlock && bBlock.classList.contains('task-hidden')) { 
-                bBlock.classList.remove('task-hidden'); const nEq = bBlock.querySelector('.eq-input'); if(nEq) this.setActive(nEq); 
-            }
-        }
-        let allOk = true;
-        this.currQ.tasks.forEach((t, i) => { 
-            const block = document.getElementById(`task-block-${i}`);
-            if (block && !block.classList.contains('task-hidden')) { if (!this.isAnswered(t)) allOk = false; }
-        });
-        if (pB && !this.isAnswered(pB)) allOk = false;
-        document.getElementById('btn-submit').disabled = !allOk;
-    },
-
-    check: function() {
-        let allCorrect = true; 
-        this.currQ.tasks.forEach((t) => {
-            let ok = false;
-            if(t.type==='radio') ok = t.options[t.sel] && t.options[t.sel].c;
-            if(t.type==='multi') ok = t.options.every(o => !!o.sel === o.c);
-            if(t.type==='eq') ok = document.getElementById(t.id).value.trim() === t.ans;
-            if(t.type==='interact' || t.type==='drag') ok = t.check();
-            if(t.type==='drop') { const sels = document.querySelectorAll(`.drop-${t.id}`); ok=true; sels.forEach(s => { if(s.value !== s.dataset.c) ok=false; }); }
-            if(t.type==='matrix') { const cbs = document.getElementById(`task-block-${this.currQ.tasks.indexOf(t)}`).querySelectorAll('.matrix-cb'); ok = true; cbs.forEach(cb => { if(cb.checked !== (cb.dataset.corr === "true")) ok = false; }); }
-            if(!ok) allCorrect = false;
-        });
-
-        if(this.state.mode === 'test') {
-            this.state.testData[this.state.qNum-1].ans = allCorrect;
-            if(allCorrect) { this.state.streak++; if(this.state.streak > 1) this.state.catDiff = Math.min(5, this.state.catDiff + 1); } 
-            else { this.state.streak = 0; this.state.catDiff = Math.max(3, this.state.catDiff - 1); }
-        }
-
-        const fb = document.getElementById('feedback-msg'); 
-        fb.className = allCorrect ? 'fb-corr' : 'fb-wrg';
-        fb.innerText = allCorrect ? "✔ Correct!" : "✘ Incorrect."; 
-        fb.style.display = 'block';
-        
-        document.getElementById('btn-submit').style.display = 'none'; 
-        document.getElementById('btn-next').disabled = false; 
-        document.getElementById('keypad-container').style.opacity = '0.5';
-        document.getElementById('keypad-container').style.pointerEvents = 'none';
-        
-        if(this.state.mode === 'test') { document.getElementById('btn-next').innerText = this.state.qNum === 40 ? "Finish Test \u2192" : "Next \u2192"; }
-        this.state.qNum++;
-    },
-
-    showReview: function() {
-        document.getElementById('test-interface').style.display = 'none';
-        document.getElementById('review-screen').style.display = 'flex';
-        const grid = document.getElementById('review-grid'); grid.innerHTML = '';
-        this.state.testData.forEach((d, i) => {
-            const btn = document.createElement('button'); btn.className = 'rev-btn';
-            if(d.ans !== null) btn.classList.add('answered');
-            if(d.flag) btn.classList.add('flagged');
-            btn.innerText = i + 1;
-            btn.onclick = () => { this.state.qNum = i+1; document.getElementById('review-screen').style.display = 'none'; document.getElementById('test-interface').style.display = 'flex'; this.load(this.state.testData[i].std || Utils.pick(Object.keys(window.Bank))); };
-            grid.appendChild(btn);
-        });
-    },
-
-    endTest: function() {
-        const correct = this.state.testData.filter(d => d.ans === true).length;
-        const scaleScore = 240 + Math.floor((correct/40)*100);
-        document.getElementById('review-screen').innerHTML = `<div style="text-align:center; padding:100px;"><h2>Test Complete</h2><p style="font-size:1.5rem">Raw Score: ${correct} / 40</p><h1 style="color:var(--cam-blue); font-size:3.5rem;">FAST Scale Score: ${scaleScore}</h1><br><button class="mock-btn" onclick="App.exitToMenu()">Return to Dashboard</button></div>`;
-    }
-};
-
-// ==========================================
-// SYSTEM BOOT
-// ==========================================
-App.initListeners();
-App.init();
-</script>
-</body>
-</html>
